@@ -84,7 +84,7 @@ const programConfig = [
         name: 'Asset Tracker',
         type: 'action-list',
         description:
-            'Enable a customizable, power-optimized application framework that provides cloud-connected, battery-efficient asset tracking and sensor data collection.',
+            'Provision and connect to your own nRF Cloud account. The Asset Tracker Template is a customizable, power-optimized application framework that provides cloud-connected, battery-efficient asset tracking and sensor data collection.',
         documentation: {
             label: 'Asset Tracker Template',
             href: 'https://docs.nordicsemi.com/bundle/asset-tracker-template-latest/page/index.html',
