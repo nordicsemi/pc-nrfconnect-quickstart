@@ -1,11 +1,11 @@
-# {{app_name}}
+# Quick Start app
 
-The {{app_name}} is a cross-platform tool for guided setup and installation procedures of Nordic Semiconductor devices, available as one of the applications in [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html).
+The Quick Start app is a cross-platform tool for guided setup and installation procedures of Nordic Semiconductor devices, available as one of the applications in [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html).
 
 ## Installation
 
-You can run the {{app_name}} when you [download and install nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-Desktop/Download).
-You will be prompted to try out the {{app_name}} when you open the launcher.
+You can run the Quick Start app when you [download and install nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-Desktop/Download).
+You will be prompted to try out the Quick Start app when you open the launcher.
 
 After installing and opening the app from nRF Connect for Desktop, connect your device to your machine using an USB cable and follow the steps in the application.
 
