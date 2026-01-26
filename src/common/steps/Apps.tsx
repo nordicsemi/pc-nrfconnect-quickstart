@@ -18,7 +18,6 @@ import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging
 import { useAppSelector } from '../../app/store';
 import { getSelectedDeviceUnsafely } from '../../features/device/deviceSlice';
 import { Back } from '../Back';
-import { SelectableListItem } from '../listSelect/ListSelectItem';
 import MultipleSelect from '../listSelect/MultipleSelect';
 import Main from '../Main';
 import { Next, Skip } from '../Next';
@@ -26,6 +25,23 @@ import { Next, Skip } from '../Next';
 type App = DownloadableApp & {
     selected: boolean;
     installing: boolean;
+    failed: boolean;
+};
+
+const DisabledSelector = ({
+    installed,
+    failed,
+}: {
+    installed: boolean;
+    failed: boolean;
+}) => {
+    if (!installed && failed) {
+        return <p className="tw-text-sm">FAILED</p>;
+    }
+    if (!installed) {
+        return <Spinner size="sm" />;
+    }
+    return <p className="tw-text-sm">INSTALLED</p>;
 };
 
 const AppsStep = ({ apps }: { apps: string[] }) => {
@@ -35,11 +51,12 @@ const AppsStep = ({ apps }: { apps: string[] }) => {
     const items = recommendedApps.map(app => ({
         id: app.name,
         selected: app.selected,
-        disabled: appsService.isInstalled(app) || app.installing,
-        disabledSelector: appsService.isInstalled(app) ? (
-            <p className="tw-text-sm">INSTALLED</p>
-        ) : (
-            <Spinner size="sm" />
+        disabled: appsService.isInstalled(app) || app.installing || app.failed,
+        disabledSelector: (
+            <DisabledSelector
+                installed={appsService.isInstalled(app)}
+                failed={app.failed}
+            />
         ),
         content: (
             <div className="tw-flex tw-flex-row tw-items-center tw-justify-start">
@@ -52,6 +69,15 @@ const AppsStep = ({ apps }: { apps: string[] }) => {
             </div>
         ),
     }));
+
+    const updateApp = (appName: string, updates: Partial<App>) => {
+        setRecommendedApps(old =>
+            old.map(a => {
+                if (a.name === appName) return { ...a, ...updates } as App;
+                return a;
+            }),
+        );
+    };
 
     useEffect(() => {
         appsService.getDownloadableApps().then(({ apps: downloadableApps }) => {
@@ -66,41 +92,37 @@ const AppsStep = ({ apps }: { apps: string[] }) => {
                         ...app,
                         selected: false,
                         installing: false,
+                        failed: false,
                     })),
             );
         });
     }, [apps, device]);
 
-    const setAppSelected = (app: SelectableListItem, selected: boolean) =>
-        setRecommendedApps(oldRecommendedApps =>
-            oldRecommendedApps.map(a => {
-                if (a.name === app.id) {
-                    a.selected = selected;
-                }
-                return a;
-            }),
-        );
-
     const installApp = (appToBeInstalled: App) => {
+        telemetry.sendEvent('Installing app', {
+            app: appToBeInstalled,
+        });
+        updateApp(appToBeInstalled.name, { installing: true, failed: false });
         appsService
             .installDownloadableApp(appToBeInstalled)
             .then(installedApp =>
-                setRecommendedApps(oldRecommendedApps =>
-                    oldRecommendedApps.map(app =>
-                        app.name === installedApp.name
-                            ? {
-                                  ...installedApp,
-                                  selected: false,
-                                  installing: false,
-                              }
-                            : app,
-                    ),
-                ),
+                updateApp(installedApp.name, {
+                    installing: false,
+                    failed: false,
+                    selected: false,
+                }),
             )
-            .catch(e => logger.error(describeError(e)));
+            .catch(e => {
+                logger.error(describeError(e));
+                updateApp(appToBeInstalled.name, {
+                    installing: false,
+                    failed: true,
+                });
+            });
     };
 
     const anySelected = recommendedApps.some(app => app.selected);
+    const anyFailed = recommendedApps.some(app => app.failed);
     const anyInstalling = recommendedApps.some(app => app.installing);
     const allInstalled = recommendedApps.every(app =>
         appsService.isInstalled(app),
@@ -117,7 +139,7 @@ const AppsStep = ({ apps }: { apps: string[] }) => {
                 <MultipleSelect
                     items={items}
                     onSelect={(item, selected) =>
-                        setAppSelected(item, selected)
+                        updateApp(item.id, { selected })
                     }
                 />
             </Main.Content>
@@ -128,6 +150,20 @@ const AppsStep = ({ apps }: { apps: string[] }) => {
                 ) : (
                     <>
                         <Skip disabled={anyInstalling} />
+                        {anyFailed && (
+                            <Next
+                                label="Retry failed"
+                                variant="secondary"
+                                disabled={anyInstalling}
+                                onClick={() =>
+                                    recommendedApps.forEach(app => {
+                                        if (app.failed) {
+                                            installApp(app);
+                                        }
+                                    })
+                                }
+                            />
+                        )}
                         <Next
                             label="Install"
                             variant="primary"
@@ -138,19 +174,6 @@ const AppsStep = ({ apps }: { apps: string[] }) => {
                                         !appsService.isInstalled(app) &&
                                         app.selected
                                     ) {
-                                        setRecommendedApps(oldRecommendedApps =>
-                                            oldRecommendedApps.map(a =>
-                                                a === app
-                                                    ? {
-                                                          ...app,
-                                                          installing: true,
-                                                      }
-                                                    : a,
-                                            ),
-                                        );
-                                        telemetry.sendEvent('Installing app', {
-                                            app,
-                                        });
                                         installApp(app);
                                     }
                                 })
