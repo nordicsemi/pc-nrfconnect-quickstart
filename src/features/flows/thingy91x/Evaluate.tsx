@@ -16,7 +16,9 @@ import {
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
 import { useAppDispatch, useAppSelector } from '../../../app/store';
+import { AcademyExerciseLink } from '../../../common/AcademyExerciseLink';
 import { Back } from '../../../common/Back';
+import { PROVISIONING_LINK } from '../../../common/constants';
 import Copy from '../../../common/Copy';
 import Main from '../../../common/Main';
 import { Next } from '../../../common/Next';
@@ -32,9 +34,6 @@ import {
     setAttestationToken,
     setFailed,
 } from './thingy91xSlice';
-
-const provisioningLink =
-    'https://docs.nordicsemi.com/bundle/asset-tracker-template-latest/page/common/provisioning.html';
 
 export default () => {
     const dispatch = useAppDispatch();
@@ -118,14 +117,16 @@ export default () => {
                         size="xl"
                         onClick={() => {
                             telemetry.sendEvent('Opened evaluation link', {
-                                link: provisioningLink,
+                                link: PROVISIONING_LINK,
                             });
-                            openUrl(provisioningLink);
+                            openUrl(PROVISIONING_LINK);
                         }}
                         className="tw-w-fit"
                     >
-                        Open instructions
+                        Open instructions about how to claim your device
                     </Button>
+
+                    <AcademyExerciseLink />
 
                     {failed && (
                         <IssueBox
