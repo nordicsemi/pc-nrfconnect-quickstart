@@ -2,15 +2,15 @@
 
 ### Added
 
--   Button linking to Nordic Developer Academy in all Asset Tracker evaluation
-    steps for all supported DKs (nRF9151 DK, nRF9161 DK, nRF9151 SMA DK, and
-    Thingy:91 X). The DevAcademy exercise provides step-by-step guidance for the Quick
-    Start process and nRF Cloud claiming and provisioning.
+- Button linking to Nordic Developer Academy in all Asset Tracker evaluation
+  steps for all supported DKs (nRF9151 DK, nRF9161 DK, nRF9151 SMA DK, and
+  Thingy:91 X). The DevAcademy exercise provides step-by-step guidance for the
+  Quick Start process and nRF Cloud claiming and provisioning.
 
 ### Changed
 
--   Asset Tracker app descriptions across all board configurations to include
-    extra help text.
+- Asset Tracker app descriptions across all board configurations to include
+  extra help text.
 
 ## 1.7.1 - 2025-01-14
 
