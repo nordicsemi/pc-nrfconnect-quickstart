@@ -5,11 +5,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-    describeError,
-    IssueBox,
-    logger,
-} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { IssueBox, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { useAppDispatch, useAppSelector } from '../../../app/store';
 import {
@@ -78,7 +74,7 @@ const VerifyStep = ({
             })
             .catch(e => {
                 logger.error(e);
-                dispatch(setFailed(describeError('Failed to verify device.')));
+                dispatch(setFailed('Failed to verify device.'));
             })
             .finally(() => {
                 setVerifying(false);
