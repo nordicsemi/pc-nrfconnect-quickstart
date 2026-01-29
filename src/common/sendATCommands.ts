@@ -147,9 +147,9 @@ export default async (
 
     try {
         await reducedPromise;
-    } catch {
+    } catch (e) {
         serialPort.unregister();
-        throw new Error('Received ERROR as return value from AT command');
+        throw e;
     }
 
     serialPort.unregister();
