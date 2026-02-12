@@ -76,7 +76,7 @@ export default async (
 ) => {
     let serialPort: {
         sendCommand: (cmd: string) => Promise<string>;
-        unregister: () => void;
+        unregister: () => Promise<void>;
     };
 
     const createdSerialPort = await createSerialPort(
@@ -115,18 +115,16 @@ export default async (
         );
         serialPort = {
             sendCommand: (cmd: string) => sendCommandShellMode(sp, cmd),
-            unregister: () => {
+            unregister: async () => {
                 sp.unregister();
-                createdSerialPort.close();
+                await createdSerialPort.close();
             },
         };
     } else {
         serialPort = {
             sendCommand: (cmd: string) =>
                 sendCommandLineMode(createdSerialPort, cmd),
-            unregister: () => {
-                createdSerialPort.close();
-            },
+            unregister: () => createdSerialPort.close(),
         };
     }
 
@@ -149,9 +147,10 @@ export default async (
         await reducedPromise;
     } catch {
         serialPort.unregister();
+        await serialPort.unregister();
         throw new Error('Received ERROR as return value from AT command');
     }
 
-    serialPort.unregister();
+    await serialPort.unregister();
     return newResponses;
 };
