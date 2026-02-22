@@ -11,6 +11,7 @@
 
 - Asset Tracker app descriptions across all board configurations to include
   extra help text.
+- Updated firmware and description for the nRF54LM20 DK.
 
 ## 1.7.1 - 2025-01-14
 
