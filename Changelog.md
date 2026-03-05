@@ -12,7 +12,7 @@
 - Asset Tracker app descriptions across all board configurations to include
   extra help text.
 
-## 1.7.1 - 2025-01-14
+## 1.7.1 - 2026-01-14
 
 ### Changed
 
