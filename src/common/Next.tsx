@@ -7,7 +7,7 @@
 import React from 'react';
 import {
     Button,
-    ButtonVariants,
+    type ButtonVariants,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { useAppDispatch } from '../app/store';

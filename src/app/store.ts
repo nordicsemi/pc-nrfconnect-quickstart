@@ -4,8 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { AnyAction, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import {
+    type TypedUseSelectorHook,
+    useDispatch,
+    useSelector,
+} from 'react-redux';
+import {
+    type AnyAction,
+    configureStore,
+    type ThunkAction,
+} from '@reduxjs/toolkit';
 
 import steps from '../common/steps/stepReducers';
 import device from '../features/device/deviceSlice';

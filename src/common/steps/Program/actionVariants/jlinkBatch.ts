@@ -5,14 +5,14 @@
  */
 
 import {
-    DeviceCore,
+    type DeviceCore,
     NrfutilDeviceLib,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import path from 'path';
 
-import { AppThunk, RootState } from '../../../../app/store';
+import { type AppThunk, type RootState } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../../features/device/deviceGuides';
-import { Firmware } from '../../../../features/device/deviceSlice';
+import { type Firmware } from '../../../../features/device/deviceSlice';
 import type { ProgrammingConfig } from '../programEffects';
 import { setError, setProgrammingProgress } from '../programSlice';
 

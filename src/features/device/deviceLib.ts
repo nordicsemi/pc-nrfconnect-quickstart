@@ -6,8 +6,8 @@
 
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
-    DeviceTraits,
-    NrfutilDevice,
+    type DeviceTraits,
+    type NrfutilDevice,
     NrfutilDeviceLib,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 

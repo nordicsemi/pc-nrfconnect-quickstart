@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { type RootState } from '../../app/store';
-import { DeviceWithSerialnumber } from './deviceLib';
+import { type DeviceWithSerialnumber } from './deviceLib';
 
 export interface Firmware {
     core?: DeviceCore;

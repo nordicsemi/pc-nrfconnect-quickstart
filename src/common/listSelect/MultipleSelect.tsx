@@ -8,10 +8,10 @@ import React from 'react';
 import { classNames } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
-    DisabledListItem,
+    type DisabledListItem,
     DisabledListItemContainer,
     SelectableItem,
-    SelectableListItem,
+    type SelectableListItem,
 } from './ListSelectItem';
 
 const MultipleSelectListItem = ({

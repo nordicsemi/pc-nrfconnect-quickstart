@@ -9,13 +9,13 @@ import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfu
 import path from 'path';
 
 import { alwaysProgramMwfNoATCheck } from '../../../../app/devOptions';
-import { AppThunk, RootState } from '../../../../app/store';
+import { type AppThunk, type RootState } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../../features/device/deviceGuides';
 import {
-    DeviceWithSerialnumber,
+    type DeviceWithSerialnumber,
     reset,
 } from '../../../../features/device/deviceLib';
-import { ActionListEntry } from '../../../../features/device/deviceSlice';
+import { type ActionListEntry } from '../../../../features/device/deviceSlice';
 import sendATCommands from '../../../sendATCommands';
 import type { ProgrammingConfig } from '../programEffects';
 import { setError, setProgrammingProgress } from '../programSlice';
