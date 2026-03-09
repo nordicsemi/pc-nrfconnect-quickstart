@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type AppThunk, RootState } from '../../../app/store';
+import { type AppThunk, type RootState } from '../../../app/store';
 import {
-    DeviceWithSerialnumber,
+    type DeviceWithSerialnumber,
     reset,
 } from '../../../features/device/deviceLib';
 import {
@@ -19,7 +19,7 @@ import jlinkBatch from './actionVariants/jlinkBatch';
 import {
     prepareProgramming,
     removeError,
-    RetryRef,
+    type RetryRef,
     setError,
     setProgrammingProgress,
 } from './programSlice';

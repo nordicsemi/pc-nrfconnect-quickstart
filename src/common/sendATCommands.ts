@@ -6,8 +6,8 @@
 
 import {
     createSerialPort,
-    SerialPort,
-    ShellParser,
+    type SerialPort,
+    type ShellParser,
     shellParser,
     xTerminalShellParserWrapper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';

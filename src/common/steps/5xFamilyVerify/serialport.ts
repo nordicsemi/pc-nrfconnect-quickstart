@@ -9,9 +9,9 @@ import {
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { AppThunk, RootState } from '../../../app/store';
+import { type AppThunk, type RootState } from '../../../app/store';
 import {
-    DeviceWithSerialnumber,
+    type DeviceWithSerialnumber,
     reset,
 } from '../../../features/device/deviceLib';
 import { selectedDeviceIsConnected } from '../../../features/device/deviceSlice';

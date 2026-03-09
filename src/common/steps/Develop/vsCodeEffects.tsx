@@ -8,7 +8,7 @@ import { app } from '@electron/remote';
 import { existsSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { AppDispatch } from '../../../app/store';
+import { type AppDispatch } from '../../../app/store';
 import { setIsVsCodeInstalled } from './developSlice';
 
 const isVsCodeInstalledOnLinux = () =>

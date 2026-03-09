@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { deviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { NrfutilDevice } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { type NrfutilDevice } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import path from 'path';
 
 export const getFirmwareFolder = () =>

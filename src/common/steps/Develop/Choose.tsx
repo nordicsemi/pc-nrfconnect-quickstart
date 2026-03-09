@@ -11,7 +11,7 @@ import vscodeIcon from '../../../../resources/vscode.svg';
 import vscodeAltIcon from '../../../../resources/vscode-alt.svg';
 import { useAppDispatch } from '../../../app/store';
 import { Back } from '../../Back';
-import { ListItemVariant } from '../../listSelect/ListSelectItem';
+import { type ListItemVariant } from '../../listSelect/ListSelectItem';
 import { RadioSelect } from '../../listSelect/RadioSelect';
 import Main from '../../Main';
 import { Next, Skip } from '../../Next';

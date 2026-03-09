@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import {
     apps as appsService,
     deviceInfo,
-    DownloadableApp,
+    type DownloadableApp,
     logger,
     Spinner,
     telemetry,
@@ -18,7 +18,7 @@ import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging
 import { useAppSelector } from '../../app/store';
 import { getSelectedDeviceUnsafely } from '../../features/device/deviceSlice';
 import { Back } from '../Back';
-import { SelectableListItem } from '../listSelect/ListSelectItem';
+import { type SelectableListItem } from '../listSelect/ListSelectItem';
 import MultipleSelect from '../listSelect/MultipleSelect';
 import Main from '../Main';
 import { Next, Skip } from '../Next';

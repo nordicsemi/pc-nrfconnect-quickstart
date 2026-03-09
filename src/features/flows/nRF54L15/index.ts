@@ -12,7 +12,7 @@ import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
-import { Choice } from '../../device/deviceSlice';
+import { type Choice } from '../../device/deviceSlice';
 
 const infoConfig = {
     title: 'nRF54L Series – nRF54L15 DK',

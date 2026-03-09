@@ -10,7 +10,7 @@ import { useAppSelector } from '../../../app/store';
 import Choose from './Choose';
 import CLI from './CLI';
 import { DevelopState, getDevelopState } from './developSlice';
-import OpenVsCode, { SampleWithRef } from './OpenVsCode';
+import OpenVsCode, { type SampleWithRef } from './OpenVsCode';
 import VsCodeOpened from './VsCodeOpened';
 
 const DevelopStep = ({ samples }: { samples: SampleWithRef[] }) => {

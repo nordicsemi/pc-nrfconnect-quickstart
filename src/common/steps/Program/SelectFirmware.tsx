@@ -13,7 +13,7 @@ import {
 import { selectFirmwareWithoutProgrammingOption } from '../../../app/devOptions';
 import { useAppDispatch, useAppSelector } from '../../../app/store';
 import {
-    Choice,
+    type Choice,
     getChoiceUnsafely,
     getSelectedDeviceUnsafely,
     setChoice,

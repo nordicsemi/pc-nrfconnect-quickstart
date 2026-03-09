@@ -17,7 +17,7 @@ import { RadioSelect } from '../../../common/listSelect/RadioSelect';
 import Main from '../../../common/Main';
 import { Next } from '../../../common/Next';
 import { DeviceIcon, deviceName } from '../../device/deviceGuides';
-import { DeviceWithSerialnumber } from '../../device/deviceLib';
+import { type DeviceWithSerialnumber } from '../../device/deviceLib';
 import {
     getConnectedDevices,
     getSelectedDevice,

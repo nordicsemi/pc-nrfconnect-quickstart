@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import type React from 'react';
 
 import NRF52 from './nRF52';
 import NRF54L15 from './nRF54L15';

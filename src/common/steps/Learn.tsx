@@ -9,7 +9,7 @@ import React from 'react';
 import { Back } from '../Back';
 import Main from '../Main';
 import { Next } from '../Next';
-import { Resource, ResourceProps } from '../Resource';
+import { Resource, type ResourceProps } from '../Resource';
 
 const LearnStep = ({ resources }: { resources: ResourceProps[] }) => (
     <Main>
