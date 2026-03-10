@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-quickstart",
-    "version": "1.7.2",
+    "version": "1.8.0",
     "description": "Get started with a new Nordic Semiconductor device",
     "displayName": "Quick Start",
     "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-quickstart",
@@ -27,7 +27,7 @@
         },
         "nrfutil": {
             "device": [
-                "2.17.3"
+                "2.17.4"
             ]
         }
     },
