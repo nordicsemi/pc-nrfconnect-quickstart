@@ -55,4 +55,4 @@ extra:
   test: This is a test abbreviation snippet
 
 nav:
-  - Home: index.md
+  - Get started: index.md
