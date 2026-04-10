@@ -27,5 +27,5 @@ After installing and opening the app from nRF Connect for Desktop, connect your 
 
 ## Application source code
 
-The code of the application is open source and [available on GitHub](https://github.com/NordicSemiconductor/pc-nrfconnect-quickstart).
+The code of the application is open source and [available on GitHub](https://github.com/nordicsemi/pc-nrfconnect-quickstart).
 Feel free to fork the repository and clone it for secondary development or feature contributions.

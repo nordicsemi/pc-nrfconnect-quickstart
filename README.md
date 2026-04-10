@@ -1,6 +1,5 @@
 # Quick Start app
 
-[![Build Status](https://dev.azure.com/NordicSemiconductor/Wayland/_apis/build/status/pc-nrfconnect-quickstart?branchName=master)](https://dev.azure.com/NordicSemiconductor/Wayland/_build/latest?definitionId=10&branchName=master)
 [![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
 The Quick Start app is a cross-platform tool for guided setup and installation
@@ -25,8 +24,7 @@ own documentation. The onboarding steps will be different for each of the
 
 ## Development
 
-See the
-[app development](https://nordicsemiconductor.github.io/pc-nrfconnect-docs/)
+See the [app development](https://nordicsemi.github.io/pc-nrfconnect-docs/)
 pages for details on how to develop apps for the nRF Connect for Desktop
 framework.
 
@@ -37,7 +35,7 @@ Please report issues on the [DevZone](https://devzone.nordicsemi.com) portal.
 ## Contributing
 
 See the
-[information on contributing](https://nordicsemiconductor.github.io/pc-nrfconnect-docs/contributing)
+[information on contributing](https://nordicsemi.github.io/pc-nrfconnect-docs/contributing)
 for details.
 
 ## License
