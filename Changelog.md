@@ -1,3 +1,9 @@
+## 1.9.0 - 2026-04-23
+
+### Added
+
+- Support for the nRF54LS05 DK.
+
 ## 1.8.0 - 2026-03-10
 
 ### Added
