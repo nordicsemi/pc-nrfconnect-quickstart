@@ -266,7 +266,7 @@ const developConfig = [
     },
     {
         ref: 'Peripheral Power Profiling',
-        sampleSource: 'nrf/samples/bluetooth/peripheral_uart',
+        sampleSource: 'nrf/samples/bluetooth/peripheral_power_profiling',
     },
     {
         ref: 'Peripheral UART',
