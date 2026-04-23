@@ -115,7 +115,7 @@ const verifyConfig = [
         ref: 'Hello World',
         config: {
             vComIndex: 0,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello world from nrf54ls05dk.*\r\n)/,
+            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf54ls05dk.*\r\n)/,
         },
     },
     {
