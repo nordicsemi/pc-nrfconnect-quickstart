@@ -18,7 +18,7 @@ import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging
 import { useAppDispatch, useAppSelector } from '../../../app/store';
 import { AcademyExerciseLink } from '../../../common/AcademyExerciseLink';
 import { Back } from '../../../common/Back';
-import { PROVISIONING_LINK } from '../../../common/constants';
+import { CONNECTING_LINK } from '../../../common/constants';
 import Copy from '../../../common/Copy';
 import Main from '../../../common/Main';
 import { Next } from '../../../common/Next';
@@ -117,9 +117,9 @@ export default () => {
                         size="xl"
                         onClick={() => {
                             telemetry.sendEvent('Opened evaluation link', {
-                                link: PROVISIONING_LINK,
+                                link: CONNECTING_LINK,
                             });
-                            openUrl(PROVISIONING_LINK);
+                            openUrl(CONNECTING_LINK);
                         }}
                         className="tw-w-fit"
                     >
