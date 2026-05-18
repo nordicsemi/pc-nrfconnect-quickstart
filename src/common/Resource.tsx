@@ -99,7 +99,7 @@ export const AppResourceButton = ({
     onInstallFinish?: () => void;
 }) => {
     const device = useAppSelector(getSelectedDeviceUnsafely);
-    const [displayName, setDisplayName] = useState(app);
+    const [displayName, setDisplayName] = useState('');
     const [isInstalling, setIsInstalling] = useState(false);
     const path =
         vComIndex !== undefined
