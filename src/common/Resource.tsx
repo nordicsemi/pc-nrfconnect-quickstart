@@ -116,7 +116,7 @@ export const AppResourceButton = ({
     return (
         <div className="tw-flex tw-flex-row tw-items-center tw-justify-between tw-gap-10">
             <div className="tw-w-80">
-                <div>
+                <div className="tw-min-h-5">
                     <b>{title || displayName}</b>
                 </div>
                 {description}
