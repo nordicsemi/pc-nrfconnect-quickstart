@@ -88,7 +88,7 @@ export default ({ samples }: { samples: SampleWithRef[] }) => {
                     label="Open VS Code with extension"
                     onClick={() => {
                         openUrl(
-                            `vscode://nordic-semiconductor.nrf-connect-extension-pack/quickstart?${queryParamsString(
+                            `vscode://nordic-semiconductor.nrf-connect/quickstart?${queryParamsString(
                                 {
                                     deviceSerial: device.serialNumber,
                                     deviceType: device.devkit?.boardVersion,
