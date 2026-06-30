@@ -9,10 +9,7 @@ import { openUrl, telemetry } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import logo from '../../../../resources/nrf_connect_for_vs_code.svg';
 import { useAppDispatch, useAppSelector } from '../../../app/store';
-import {
-    getChoiceUnsafely,
-    getSelectedDeviceUnsafely,
-} from '../../../features/device/deviceSlice';
+import { getChoiceUnsafely } from '../../../features/device/deviceSlice';
 import { Back } from '../../Back';
 import Main from '../../Main';
 import { Next, Skip } from '../../Next';
@@ -46,7 +43,6 @@ export default ({ samples }: { samples: SampleWithRef[] }) => {
     const isVsCodeInstalled = useAppSelector(getIsVsCodeInstalled);
     const choice = useAppSelector(getChoiceUnsafely);
 
-    const device = useAppSelector(getSelectedDeviceUnsafely);
     const sample = samples.find(s => s.ref === choice.name)?.sampleSource;
 
     useEffect(
@@ -87,15 +83,22 @@ export default ({ samples }: { samples: SampleWithRef[] }) => {
                 <Next
                     label="Open VS Code with extension"
                     onClick={() => {
-                        openUrl(
-                            `vscode://nordic-semiconductor.nrf-connect/quickstart?${queryParamsString(
-                                {
-                                    deviceSerial: device.serialNumber,
-                                    deviceType: device.devkit?.boardVersion,
-                                    sample,
-                                },
-                            )}`,
-                        );
+                        const deepLink =
+                            'vscode://nordic-semiconductor.nrf-connect/';
+
+                        if (choice.ncsAddon) {
+                            openUrl(`${deepLink}${choice.ncsAddon}`);
+                        } else {
+                            openUrl(
+                                `${deepLink}openSampleFromSDK?${queryParamsString(
+                                    {
+                                        sample,
+                                        sdkVersion: choice.sdk?.version,
+                                        sdkType: choice.sdk?.type,
+                                    },
+                                )}`,
+                            );
+                        }
 
                         dispatch(setDevelopState(DevelopState.VS_CODE_OPENED));
                         telemetry.sendEvent('Opened VS Code');

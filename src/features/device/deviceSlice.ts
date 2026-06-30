@@ -22,11 +22,21 @@ interface FirmwareNote {
     content: string;
 }
 
+enum SDKType {
+    nRFConnectSDK = 'nRF Connect SDK', // Must match the description on nrfutil SDK types.
+    nRFConnectSDKBareMetal = 'nRF Connect SDK Bare Metal', // Must match the description on nrfutil SDK types.
+}
+
 interface ChoiceInfo {
     name: string;
     description: string;
     documentation: { label: string; href: string };
     firmwareNote: FirmwareNote | undefined;
+    ncsAddon?: string;
+    sdk?: {
+        type: SDKType;
+        version: string;
+    };
 }
 
 interface BatchChoice extends ChoiceInfo {
