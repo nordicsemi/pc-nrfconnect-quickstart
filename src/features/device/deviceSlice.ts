@@ -22,7 +22,7 @@ interface FirmwareNote {
     content: string;
 }
 
-enum SDKType {
+export enum SDKType {
     nRFConnectSDK = 'nRF Connect SDK', // Must match the description on nrfutil SDK types.
     nRFConnectSDKBareMetal = 'nRF Connect SDK Bare Metal', // Must match the description on nrfutil SDK types.
 }

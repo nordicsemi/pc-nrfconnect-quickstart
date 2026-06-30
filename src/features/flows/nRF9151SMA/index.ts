@@ -36,6 +36,8 @@ const programConfig = [
             content:
                 'Modem Trace is enabled; the current consumption will be higher than usual.',
         },
+        ncsAddon:
+            'app=asset-tracker-template&branch=v1.5.3&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
         programmingOptions: {
             actions: [
                 {

@@ -12,7 +12,7 @@ import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
-import { type Choice } from '../../device/deviceSlice';
+import { type Choice, SDKType } from '../../device/deviceSlice';
 import SIM from './SIM';
 
 const infoConfig = {
@@ -84,6 +84,10 @@ const programConfig = [
             title: 'Increased power consumption',
             content:
                 'Modem Trace is enabled; the current consumption will be higher than usual.',
+        },
+        sdk: {
+            type: SDKType.nRFConnectSDK,
+            version: '2.8.0',
         },
         programmingOptions: {
             actions: [
