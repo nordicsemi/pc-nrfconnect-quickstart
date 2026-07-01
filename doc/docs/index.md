@@ -18,6 +18,7 @@ After installing and opening the app from nRF Connect for Desktop, connect your 
 - nRF9151 DK
 - nRF7002 DK
 - nRF54LV10 DK
+- nRF54LS05 DK
 - nRF54LM20 DK
 - nRF54L15 DK
 - nRF5340 DK
