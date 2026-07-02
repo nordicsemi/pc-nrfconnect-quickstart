@@ -15,6 +15,19 @@ export enum DevelopState {
     CLI,
 }
 
+export function developStateToString(developState: DevelopState) {
+    switch (developState) {
+        case DevelopState.CHOOSE:
+            return 'Choose';
+        case DevelopState.OPEN_VS_CODE:
+            return 'Open VS Code';
+        case DevelopState.VS_CODE_OPENED:
+            return 'VS Code Opened';
+        case DevelopState.CLI:
+            return 'CLI';
+    }
+}
+
 interface State {
     developState: DevelopState;
     isVsCodeInstalled: boolean;
