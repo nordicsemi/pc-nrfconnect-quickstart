@@ -26,8 +26,10 @@ import {
     isConnectVisible,
     setFlow,
 } from './flowSlice';
+import telemetryThunk from './telemetryThunk';
 
 const useLogSteps = () => {
+    const dispatch = useAppDispatch();
     const currentStepIndex = useAppSelector(getCurrentStepIndex);
     const flow = useAppSelector(getFlow);
 
@@ -37,7 +39,9 @@ const useLogSteps = () => {
 
         logger.debug(`Changed step: ${step}`);
         telemetry.sendEvent('Changed step', { step });
-    }, [flow, currentStepIndex]);
+
+        dispatch(telemetryThunk());
+    }, [flow, currentStepIndex, dispatch]);
 };
 
 const Flow = () => {
