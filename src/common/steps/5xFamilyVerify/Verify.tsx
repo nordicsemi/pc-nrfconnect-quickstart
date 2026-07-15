@@ -14,6 +14,7 @@ import {
     getSelectedDeviceUnsafely,
 } from '../../../features/device/deviceSlice';
 import { Back } from '../../Back';
+import { cleanShellOutput } from '../../cleanShellOutput';
 import Main from '../../Main';
 import { Next, Skip } from '../../Next';
 import runVerification from './serialport';
@@ -58,7 +59,8 @@ export default ({ vComIndex, regex }: { vComIndex: number; regex: RegExp }) => {
 
     useEffect(() => {
         if (!validResponse) {
-            const [, match] = (response || '').match(regex) ?? [];
+            const stripped = cleanShellOutput(response || '');
+            const [, match] = stripped.match(regex) ?? [];
             if (match) {
                 setValidResponse(match);
             }
