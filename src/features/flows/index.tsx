@@ -7,7 +7,7 @@
 import type React from 'react';
 
 import NRF52 from './nRF52';
-import NRF54L15 from './nRF54L15';
+import NRF54L15 from './nRF54L15_cloud';
 import NRF54LM20 from './nRF54LM20';
 import NRF54LS05 from './nRF54LS05';
 import NRF54LV10 from './nRF54LV10';

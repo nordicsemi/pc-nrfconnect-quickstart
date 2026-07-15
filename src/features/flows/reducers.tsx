@@ -7,6 +7,9 @@
 import { combineReducers } from '@reduxjs/toolkit';
 
 import type { AppThunk } from '../../app/store';
+import nrf54l15Cloud, {
+    reset as nrf54l15CloudReset,
+} from './nRF54L15_cloud/evaluate/cloudEvaluateSlice';
 import nrf9151, { reset as nrf9151Reset } from './nRF9151/nrf9151Slice';
 import nrf9151SMA, {
     reset as nrf9151SMAReset,
@@ -19,6 +22,7 @@ export const allReset = (): AppThunk => dispatch => {
     dispatch(nrf9151SMAReset());
     dispatch(nrf9161Reset());
     dispatch(thingy91xReset());
+    dispatch(nrf54l15CloudReset());
 };
 
 export default combineReducers({
@@ -26,4 +30,5 @@ export default combineReducers({
     thingy91x,
     nrf9151,
     nrf9161,
+    nrf54l15Cloud,
 });
