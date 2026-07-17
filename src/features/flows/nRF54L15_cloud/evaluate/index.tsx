@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import telemetryThunk from '../../../flow/telemetryThunk';
@@ -27,6 +28,7 @@ export default () => {
     const deviceInfo = useAppSelector(getDeviceInfo);
 
     useEffect(() => {
+        logger.debug(`Changed sub-step: ${cloudSubStepTelemetryName(subStep)}`);
         dispatch(telemetryThunk(cloudSubStepTelemetryName(subStep)));
     }, [dispatch, subStep]);
 

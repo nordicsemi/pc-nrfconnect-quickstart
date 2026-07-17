@@ -80,18 +80,33 @@ const fetchCrashReport = async (
     const crashReportUrl = `${BASE_URL}/quickstart/crash-report?device_serial=${encodeURIComponent(
         deviceSerial,
     )}`;
-    const res = await fetch(crashReportUrl, { signal });
-    if (!res.ok) {
-        logger.error(`Crash report request failed (${res.status})`); // TODO: check if this should be logged.
-        throw new Error(`Crash report request failed (${res.status})`);
+
+    try {
+        const res = await fetch(crashReportUrl, { signal });
+
+        if (!res.ok) {
+            logger.error(
+                `Crash report request failed. Server response code ${res.status}`,
+            );
+            throw new Error(
+                `Failed to fetch crash report from the cloud (${res.status})`,
+            );
+        }
+
+        const serverTime = parseServerDate(res);
+        const data = (await res.json()) as CrashReportResponse;
+
+        return {
+            status: data.status,
+            crash: data.crash ? mapCrash(data.crash) : null,
+            serverTime,
+        };
+    } catch (e) {
+        logger.error(
+            `Failed to fetch crash report from the cloud: ${(e as Error).message}`,
+        );
+        throw new Error(`Failed to fetch crash report from the cloud.`);
     }
-    const serverTime = parseServerDate(res);
-    const data = (await res.json()) as CrashReportResponse;
-    return {
-        status: data.status,
-        crash: data.crash ? mapCrash(data.crash) : null,
-        serverTime,
-    };
 };
 
 export const fetchServerTime = async (

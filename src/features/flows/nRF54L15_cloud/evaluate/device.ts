@@ -63,13 +63,14 @@ export const readDeviceInfo = (
                     if (HW_VERSION_REGEX.test(cleaned)) {
                         const serialNumber = SN_REGEX.exec(cleaned)?.[1];
                         if (!serialNumber) {
-                            finish(() =>
+                            finish(() => {
+                                logger.error(
+                                    'Could not parse device serial number.',
+                                );
                                 reject(
-                                    new Error(
-                                        'Could not parse device serial number',
-                                    ),
-                                ),
-                            );
+                                    new Error('Failed to obtain device info.'),
+                                );
+                            });
                             return;
                         }
                         finish(() =>
@@ -85,9 +86,10 @@ export const readDeviceInfo = (
 
                 timeout = setTimeout(
                     () =>
-                        finish(() =>
-                            reject(new Error('Timed out reading device info')),
-                        ),
+                        finish(() => {
+                            logger.error('Timed out reading device info.');
+                            reject(new Error('Failed to obtain device info.'));
+                        }),
                     timeoutMs,
                 );
 
@@ -97,6 +99,6 @@ export const readDeviceInfo = (
             })
             .catch(e => {
                 logger.error(e);
-                reject(new Error('Failed to communicate with the device'));
+                reject(new Error('Failed to obtain device info.'));
             });
     });

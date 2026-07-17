@@ -102,7 +102,7 @@ export default () => {
                     )}
                     {deviceInfo.status === 'error' && (
                         <IssueBox
-                            mdiIcon="tw-mdi-alert"
+                            mdiIcon="mdi-lightbulb-alert-outline"
                             color="tw-text-red"
                             title={
                                 deviceInfo.message ??
@@ -112,7 +112,7 @@ export default () => {
                     )}
                     {error && (
                         <IssueBox
-                            mdiIcon="tw-mdi-alert"
+                            mdiIcon="mdi-lightbulb-alert-outline"
                             color="tw-text-red"
                             title={error}
                         />
