@@ -8,7 +8,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { type RootState } from '../../../../app/store';
 import { setChoice } from '../../../device/deviceSlice';
-import { type CrashReport } from './api';
+import { type CrashReport, type Organization, type Project } from './api';
 
 export enum CloudSubStep {
     ESTABLISH_CONNECTION,
@@ -50,18 +50,34 @@ interface RegistrationState {
     key?: string;
 }
 
+interface MemfaultState {
+    status: 'idle' | 'loading' | 'success' | 'error';
+    accessToken?: string;
+    organizations: Organization[];
+    projects: Project[];
+    selectedOrgSlug?: string;
+    selectedProjectSlug?: string;
+    message?: string;
+}
+
 interface State {
     subStep: CloudSubStep;
     deviceInfo: DeviceInfoState;
     crashReportBaseLine?: number;
     crashReport?: CrashReport;
     registration: RegistrationState;
+    memfault: MemfaultState;
 }
 
 const initialState: State = {
     subStep: CloudSubStep.ESTABLISH_CONNECTION,
     deviceInfo: { status: 'idle' },
     registration: { status: 'idle' },
+    memfault: {
+        status: 'idle',
+        organizations: [],
+        projects: [],
+    },
 };
 
 const slice = createSlice({
@@ -106,6 +122,56 @@ const slice = createSlice({
         ) => {
             state.registration = payload;
         },
+        setMemfaultLoading: state => {
+            state.memfault = {
+                status: 'loading',
+                organizations: [],
+                projects: [],
+            };
+        },
+        setMemfaultError: (state, { payload }: PayloadAction<string>) => {
+            state.memfault.status = 'error';
+            state.memfault.message = payload;
+        },
+        setMemfaultSuccess: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{
+                accessToken: string;
+                organizations: Organization[];
+                projects: Project[];
+                selectedOrgSlug: string;
+                selectedProjectSlug?: string;
+            }>,
+        ) => {
+            state.memfault = { status: 'success', ...payload };
+        },
+        setProjects: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{
+                projects: Project[];
+                selectedProjectSlug?: string;
+            }>,
+        ) => {
+            state.memfault.projects = payload.projects;
+            state.memfault.selectedProjectSlug = payload.selectedProjectSlug;
+        },
+        setSelectedOrgSlug: (state, { payload }: PayloadAction<string>) => {
+            state.memfault.selectedOrgSlug = payload;
+        },
+        setSelectedProjectSlug: (state, { payload }: PayloadAction<string>) => {
+            state.memfault.selectedProjectSlug = payload;
+        },
+        resetMemfault: state => {
+            state.memfault = {
+                status: 'idle',
+                organizations: [],
+                projects: [],
+            };
+        },
 
         reset: () => initialState,
     },
@@ -125,6 +191,13 @@ export const {
     setCrashReportBaseLine,
     setCrashReport,
     setRegistration,
+    setMemfaultLoading,
+    setMemfaultError,
+    setMemfaultSuccess,
+    setProjects,
+    setSelectedOrgSlug,
+    setSelectedProjectSlug,
+    resetMemfault,
     reset,
 } = slice.actions;
 
@@ -138,5 +211,7 @@ export const getCrashReport = (state: RootState) =>
     state.flows.nrf54l15Cloud.crashReport;
 export const getRegistration = (state: RootState) =>
     state.flows.nrf54l15Cloud.registration;
+export const getMemfault = (state: RootState) =>
+    state.flows.nrf54l15Cloud.memfault;
 
 export default slice.reducer;

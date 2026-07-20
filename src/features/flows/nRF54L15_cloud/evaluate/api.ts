@@ -44,6 +44,24 @@ interface CrashReportFetch {
     serverTime: number;
 }
 
+export interface Organization {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+export interface Project {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+interface TokenExchangeResponse {
+    access_token: string;
+}
+
+const bearer = (token: string) => ({ Authorization: `Bearer ${token}` });
+
 const mapCrash = ({
     captured_date: capturedDate,
     ...rest
@@ -144,4 +162,47 @@ export const pollCrashReport = (
     };
 
     return attempt();
+};
+
+export const exchangeToken = async (
+    entraAccessToken: string,
+): Promise<string> => {
+    const res = await fetch(`${BASE_URL}/access-token/exchange`, {
+        method: 'POST',
+        headers: bearer(entraAccessToken),
+    });
+    if (!res.ok) {
+        throw new Error(`Token exchange failed (${res.status})`);
+    }
+    const { access_token: accessToken } =
+        (await res.json()) as TokenExchangeResponse;
+    return accessToken;
+};
+
+export const fetchOrganizations = async (
+    memfaultToken: string,
+): Promise<Organization[]> => {
+    const res = await fetch(`${BASE_URL}/organizations`, {
+        headers: bearer(memfaultToken),
+    });
+    if (!res.ok) {
+        throw new Error(`Failed to fetch organizations (${res.status})`);
+    }
+    const { data } = (await res.json()) as { data: Organization[] };
+    return data;
+};
+
+export const fetchProjects = async (
+    memfaultToken: string,
+    orgSlug: string,
+): Promise<Project[]> => {
+    const res = await fetch(
+        `${BASE_URL}/organizations/${encodeURIComponent(orgSlug)}/projects`,
+        { headers: bearer(memfaultToken) },
+    );
+    if (!res.ok) {
+        throw new Error(`Failed to fetch projects (${res.status})`);
+    }
+    const { data } = (await res.json()) as { data: Project[] };
+    return data;
 };

@@ -17,50 +17,78 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared/ipc/auth';
 
 import Logomark from '../../../../../resources/Logomark.png';
-import { useAppDispatch } from '../../../../app/store';
+import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
-import { Next } from '../../../../common/Next';
-import { nextSubStep, prevSubStep } from './cloudEvaluateSlice';
+import { Next, Skip } from '../../../../common/Next';
+import { connectMemfault, selectOrganization } from './authEffects';
+import {
+    getMemfault,
+    nextSubStep,
+    prevSubStep,
+    resetMemfault,
+    setSelectedProjectSlug,
+} from './cloudEvaluateSlice';
+
+const emptyItem: DropdownItem<string> = { label: '', value: '' };
 
 export default () => {
     const dispatch = useAppDispatch();
+    const memfault = useAppSelector(getMemfault);
     const [account, setAccount] = useState<AccountInfo | null>(null);
     const [isAuthenticating, setIsAuthenticating] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
 
-    const [selectedOrg, setSelectedOrg] = useState<DropdownItem<string>>({
-        label: '',
-        value: '',
-    });
-    const [selectedProject, setSelectedProject] = useState<
-        DropdownItem<string>
-    >({ label: '', value: '' });
-
-    const refresh = () =>
+    const refreshAccount = () =>
         auth.getAccountInfo().then(res => {
-            if (res.status) setAccount(res.data);
-            else setAccount(null);
+            setAccount(res.status ? res.data : null);
         });
 
     useEffect(() => {
-        refresh();
+        refreshAccount();
     }, []);
 
     const login = () => {
         setIsAuthenticating(true);
+        setAuthError(null);
         auth.startLogin().then(res => {
             setIsAuthenticating(false);
-            if (res.status) refresh();
-            else setAuthError(res.error);
+            if (!res.status) {
+                setAuthError(res.error);
+                return;
+            }
+            refreshAccount();
+            dispatch(resetMemfault());
         });
     };
 
     const logout = () =>
         auth.localLogout().then(() => {
-            // dispatch(reset());
-            refresh();
+            refreshAccount();
+            dispatch(resetMemfault());
         });
+
+    // Logged in, but not connected to Memfault yet.
+    useEffect(() => {
+        console.log('Account:', account, 'Memfault status:', memfault.status);
+        if (account && memfault.status === 'idle') {
+            dispatch(connectMemfault());
+        }
+    }, [account, memfault.status, dispatch]);
+
+    const orgItems: DropdownItem<string>[] = memfault.organizations.map(o => ({
+        label: o.name,
+        value: o.slug,
+    }));
+    const projectItems: DropdownItem<string>[] = memfault.projects.map(p => ({
+        label: p.name,
+        value: p.slug,
+    }));
+    const selectedOrgItem =
+        orgItems.find(i => i.value === memfault.selectedOrgSlug) ?? emptyItem;
+    const selectedProjectItem =
+        projectItems.find(i => i.value === memfault.selectedProjectSlug) ??
+        emptyItem;
 
     return (
         <Main>
@@ -96,22 +124,51 @@ export default () => {
                                     Log out
                                 </Button>
                             </div>
-                            <div className="tw-flex tw-flex-row tw-gap-2">
-                                <Dropdown
-                                    label="Organization"
-                                    items={[]}
-                                    onSelect={setSelectedOrg}
-                                    selectedItem={selectedOrg}
-                                    size="sm"
-                                />
-                                <Dropdown
-                                    label="Project"
-                                    items={[]}
-                                    onSelect={setSelectedProject}
-                                    selectedItem={selectedProject}
-                                    size="sm"
-                                />
-                            </div>
+
+                            {memfault.status === 'loading' && (
+                                <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
+                                    <Spinner size="sm" />
+                                    <span>
+                                        Loading organizations and projects…
+                                    </span>
+                                </div>
+                            )}
+
+                            {memfault.status === 'error' && (
+                                <p className="tw-text-red">
+                                    {memfault.message ??
+                                        'Failed to load organizations and projects'}
+                                </p>
+                            )}
+
+                            {memfault.status === 'success' && (
+                                <div className="tw-flex tw-flex-row tw-gap-2">
+                                    <Dropdown
+                                        label="Organization"
+                                        items={orgItems}
+                                        onSelect={item =>
+                                            dispatch(
+                                                selectOrganization(item.value),
+                                            )
+                                        }
+                                        selectedItem={selectedOrgItem}
+                                        size="sm"
+                                    />
+                                    <Dropdown
+                                        label="Project"
+                                        items={projectItems}
+                                        onSelect={item =>
+                                            dispatch(
+                                                setSelectedProjectSlug(
+                                                    item.value,
+                                                ),
+                                            )
+                                        }
+                                        selectedItem={selectedProjectItem}
+                                        size="sm"
+                                    />
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <>
@@ -141,10 +198,24 @@ export default () => {
             </Main.Content>
             <Main.Footer>
                 <Back onClick={() => dispatch(prevSubStep())} />
-                <Next
-                    disabled={!account}
-                    onClick={() => dispatch(nextSubStep())}
-                />
+                {memfault.status === 'error' ? (
+                    <>
+                        <Skip onClick={() => dispatch(nextSubStep())} />
+                        <Next
+                            label="Retry"
+                            onClick={() => dispatch(connectMemfault())}
+                        />
+                    </>
+                ) : (
+                    <Next
+                        disabled={
+                            !account ||
+                            memfault.status !== 'success' ||
+                            !memfault.selectedProjectSlug
+                        }
+                        onClick={() => dispatch(nextSubStep())}
+                    />
+                )}
             </Main.Footer>
         </Main>
     );
