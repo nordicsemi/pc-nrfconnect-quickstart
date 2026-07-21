@@ -92,14 +92,11 @@ export default () => {
 
     return (
         <Main>
-            <Main.Content
-                heading="Register your device"
-                subHeading="Authenticate"
-            >
+            <Main.Content heading="Register your device" subHeading="">
                 <div className="tw-flex tw-flex-col tw-gap-3">
                     <p>
-                        Connect your device to your personal cloud project to
-                        capture crashes, push OTA updates, and debug remotely.
+                        Connect your device to cloud to capture crashes, push
+                        OTA updates, and debug remotely.
                     </p>
                     <ol className="tw-list-inside tw-list-disc">
                         <li>Over-the-air firmware updates</li>

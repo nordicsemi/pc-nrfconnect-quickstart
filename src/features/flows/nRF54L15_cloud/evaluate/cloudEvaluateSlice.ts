@@ -23,7 +23,7 @@ const LAST_SUB_STEP = CloudSubStep.DEVICE_REGISTRATION;
 export const cloudSubStepTelemetryName = (subStep: CloudSubStep) => {
     switch (subStep) {
         case CloudSubStep.ESTABLISH_CONNECTION:
-            return 'Remote connection - Establish remote connection';
+            return 'Remote connection - Use your phone as a gateway';
         case CloudSubStep.TRY_LBS:
             return 'Remote connection - Try the LED Button Service';
         case CloudSubStep.TEST_CRASH:

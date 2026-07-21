@@ -28,10 +28,7 @@ export default () => {
 
     return (
         <Main>
-            <Main.Content
-                heading="Register your device"
-                subHeading="Device registration"
-            >
+            <Main.Content heading="Register your device" subHeading="">
                 <div className="tw-flex tw-flex-col tw-gap-4">
                     {registration.status === 'pending' && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">

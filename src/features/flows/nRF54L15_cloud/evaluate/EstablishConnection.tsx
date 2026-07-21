@@ -20,7 +20,7 @@ export default () => {
         <Main>
             <Main.Content
                 heading="Remote connection"
-                subHeading="Establish remote connection"
+                subHeading="Use your phone as a gateway"
             >
                 <div className="tw-flex tw-flex-row tw-gap-3">
                     <div className="tw-flex tw-flex-shrink-0 tw-flex-col tw-items-center">
