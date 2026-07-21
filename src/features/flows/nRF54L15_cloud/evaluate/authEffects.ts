@@ -22,9 +22,7 @@ export const connectMemfault =
     (): AppThunk<RootState, Promise<void>> => async dispatch => {
         dispatch(setMemfaultLoading());
         try {
-            console.log('Starting authentication with Memfault...');
             const tokenRes = await auth.getAccessToken();
-            console.log('Access token received from auth:', tokenRes);
             if (!tokenRes.status) {
                 throw new Error(tokenRes.error);
             }

@@ -70,7 +70,6 @@ export default () => {
 
     // Logged in, but not connected to Memfault yet.
     useEffect(() => {
-        console.log('Account:', account, 'Memfault status:', memfault.status);
         if (account && memfault.status === 'idle') {
             dispatch(connectMemfault());
         }
@@ -187,7 +186,7 @@ export default () => {
                                 </div>
                             </Button>
                             {authError && (
-                                <p className="tw-text-red-500">{authError}</p>
+                                <p className="tw-text-red">{authError}</p>
                             )}
                         </>
                     )}
