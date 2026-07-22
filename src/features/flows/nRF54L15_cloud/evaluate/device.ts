@@ -7,7 +7,10 @@
 import {
     createSerialPort,
     logger,
+    shellParser,
+    xTerminalShellParserWrapper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Terminal } from '@xterm/headless';
 
 import { cleanShellOutput } from '../../../../common/cleanShellOutput';
 import { type DeviceWithSerialnumber } from '../../../device/deviceLib';
@@ -102,3 +105,51 @@ export const readDeviceInfo = (
                 reject(new Error('Failed to obtain device info.'));
             });
     });
+
+export const setDeviceProjectKey = async (
+    device: DeviceWithSerialnumber,
+    vComIndex: number,
+    projectKey: string,
+): Promise<void> => {
+    const path = device.serialPorts?.[vComIndex]?.comName;
+    if (!path) {
+        throw new Error('Failed to find a valid serialport');
+    }
+
+    const serialPort = await createSerialPort(
+        { path, baudRate: 115200 },
+        { overwrite: true, settingsLocked: true },
+    );
+    const parser = await shellParser(
+        serialPort,
+        xTerminalShellParserWrapper(
+            new Terminal({ allowProposedApi: true, cols: 999 }),
+        ),
+        {
+            logRegex:
+                /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
+            errorRegex: /ERROR/,
+            timeout: 1000,
+            columnWidth: 80,
+        },
+    );
+
+    try {
+        await new Promise<string>((resolve, reject) => {
+            parser.enqueueRequest(
+                `settings write string memfault/project_key ${projectKey}`,
+                {
+                    onSuccess: resolve,
+                    onError: reject,
+                    onTimeout: () => reject(new Error('timeout')),
+                },
+            );
+        });
+    } catch (e) {
+        logger.error(e);
+        throw e;
+    } finally {
+        parser.unregister();
+        serialPort.close();
+    }
+};

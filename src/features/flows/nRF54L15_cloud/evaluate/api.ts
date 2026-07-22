@@ -60,6 +60,12 @@ interface TokenExchangeResponse {
     access_token: string;
 }
 
+export interface RegisterDeviceParams {
+    deviceSerial: string;
+    hardwareVersion: string;
+    nickname?: string;
+}
+
 const bearer = (token: string) => ({ Authorization: `Bearer ${token}` });
 
 const mapCrash = ({
@@ -205,4 +211,64 @@ export const fetchProjects = async (
     }
     const { data } = (await res.json()) as { data: Project[] };
     return data;
+};
+
+export const fetchProjectKey = async (
+    memfaultToken: string,
+    orgSlug: string,
+    projectSlug: string,
+): Promise<string> => {
+    const res = await fetch(
+        `${BASE_URL}/organizations/${encodeURIComponent(
+            orgSlug,
+        )}/projects/${encodeURIComponent(projectSlug)}/data-routes`,
+        { headers: bearer(memfaultToken) },
+    );
+    if (!res.ok) {
+        throw new Error(`Failed to fetch project key (${res.status})`);
+    }
+    const { data } = (await res.json()) as { data: { token: string }[] };
+    const token = data[0]?.token;
+    if (!token) {
+        throw new Error('No project key found for this project');
+    }
+    return token;
+};
+
+export const postRegisterDevice = async (
+    memfaultToken: string,
+    orgSlug: string,
+    projectSlug: string,
+    params: RegisterDeviceParams,
+): Promise<void> => {
+    const body: {
+        device_serial: string;
+        hardware_version: string;
+        nickname?: string;
+    } = {
+        device_serial: params.deviceSerial,
+        hardware_version: params.hardwareVersion,
+    };
+    if (params.nickname) {
+        body.nickname = params.nickname;
+    }
+
+    const res = await fetch(
+        `${BASE_URL}/organizations/${encodeURIComponent(
+            orgSlug,
+        )}/projects/${encodeURIComponent(
+            projectSlug,
+        )}/quickstart/register-device`,
+        {
+            method: 'POST',
+            headers: {
+                ...bearer(memfaultToken),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        },
+    );
+    if (!res.ok) {
+        throw new Error(`Device registration failed (${res.status})`);
+    }
 };
