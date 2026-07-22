@@ -26,7 +26,7 @@ const programConfig = [
         name: 'Cloud Connectivity',
         type: 'jlink-batch',
         description:
-            "The Peripheral Memfault Diagnostic Service sample, configured to connect to a shared Memfault project (same project as for the OAT token). The device_id will be based on the hardware id of the device. It's based on two FICR words, and the value when the device shows up in memfault is opposite of what nrfutil prints, so they should be swapped when reading out from the quick start guide",
+            "This sample turns your nRF54L15 DK into a Bluetooth LE peripheral with cloud-based device health monitoring built in. The device reports heartbeats and, if it crashes, a coredump, all over Bluetooth. Once connected and paired, you'll see your board show up in nRF Cloud. Button 1 lets you trigger a fake crash, allowing a coredump to be viewed in nRF Cloud.",
         documentation: {
             label: 'Bluetooth: Peripheral Memfault Diagnostic Service (MDS)',
             href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/samples/bluetooth/peripheral_mds/README.html',

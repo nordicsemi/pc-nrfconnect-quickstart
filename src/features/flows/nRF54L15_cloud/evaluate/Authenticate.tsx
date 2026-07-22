@@ -93,18 +93,20 @@ export default () => {
         <Main>
             <Main.Content heading="Register your device" subHeading="">
                 <div className="tw-flex tw-flex-col tw-gap-3">
-                    <p>
-                        Connect your device to cloud to capture crashes, push
-                        OTA updates, and debug remotely.
-                    </p>
-                    <ol className="tw-list-inside tw-list-disc">
-                        <li>Over-the-air firmware updates</li>
-                        <li>Remote crash analysis and debugging</li>
-                        <li>
-                            Access to DevZone, technical documentation, and
-                            learning resources
-                        </li>
-                    </ol>
+                    <div className="tw-flex tw-flex-col tw-gap-2">
+                        <p>
+                            Connect your device to cloud to capture crashes,
+                            push OTA updates, and debug remotely.
+                        </p>
+                        <ol className="tw-list-inside tw-list-disc">
+                            <li>Over-the-air firmware updates</li>
+                            <li>Remote crash analysis and debugging</li>
+                            <li>
+                                Access to DevZone, technical documentation, and
+                                learning resources
+                            </li>
+                        </ol>
+                    </div>
                     {account ? (
                         <div className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-gray-200 tw-p-3">
                             <div className="tw-flex tw-flex-row tw-items-center tw-justify-between">
