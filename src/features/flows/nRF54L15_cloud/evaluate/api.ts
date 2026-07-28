@@ -6,8 +6,13 @@
 
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-// const BASE_URL = 'https://api.memfault.com/api/v0';
-const BASE_URL = 'http://127.0.0.1:8000';
+// Real:
+// const API_BASE = 'https://api.memfault.com/api/v0';
+// const MYNORDIC_BASE = 'https://api.memfault.com/mynordic';
+// Mock:
+const API_BASE = 'http://127.0.0.1:8000';
+const MYNORDIC_BASE = 'http://127.0.0.1:8000/mynordic';
+
 const POLL_INTERVAL_MS = 5000;
 
 export interface CrashFrame {
@@ -56,10 +61,6 @@ export interface Project {
     slug: string;
 }
 
-interface TokenExchangeResponse {
-    access_token: string;
-}
-
 interface UploadUrlResponse {
     data: { upload_url: string; token: string };
 }
@@ -101,11 +102,47 @@ const delay = (ms: number, signal: AbortSignal) =>
         signal.addEventListener('abort', onAbort, { once: true });
     });
 
+export const provisionMyNordicAccount = async (
+    idToken: string,
+): Promise<void> => {
+    const res = await fetch(`${MYNORDIC_BASE}/me`, {
+        method: 'POST',
+        headers: bearer(idToken),
+    });
+    if (!res.ok) {
+        throw new Error(`Failed to provision myNordic account (${res.status})`);
+    }
+};
+
+interface TokenResponse {
+    token_type: string;
+    access_token: string;
+    expires_in: number;
+    scope: string;
+}
+
+export const fetchMemfaultToken = async (
+    idToken: string,
+): Promise<{ accessToken: string; expiresIn: number }> => {
+    const res = await fetch(`${MYNORDIC_BASE}/token`, {
+        method: 'POST',
+        headers: bearer(idToken),
+    });
+    if (!res.ok) {
+        throw new Error(
+            `Failed to obtain Memfault access token (${res.status})`,
+        );
+    }
+    const { access_token: accessToken, expires_in: expiresIn } =
+        (await res.json()) as TokenResponse;
+    return { accessToken, expiresIn };
+};
+
 const fetchCrashReport = async (
     deviceSerial: string,
     signal: AbortSignal,
 ): Promise<CrashReportFetch> => {
-    const crashReportUrl = `${BASE_URL}/quickstart/crash-report?device_serial=${encodeURIComponent(
+    const crashReportUrl = `${API_BASE}/quickstart/crash-report?device_serial=${encodeURIComponent(
         deviceSerial,
     )}`;
 
@@ -174,25 +211,10 @@ export const pollCrashReport = (
     return attempt();
 };
 
-export const exchangeToken = async (
-    entraAccessToken: string,
-): Promise<string> => {
-    const res = await fetch(`${BASE_URL}/access-token/exchange`, {
-        method: 'POST',
-        headers: bearer(entraAccessToken),
-    });
-    if (!res.ok) {
-        throw new Error(`Token exchange failed (${res.status})`);
-    }
-    const { access_token: accessToken } =
-        (await res.json()) as TokenExchangeResponse;
-    return accessToken;
-};
-
 export const fetchOrganizations = async (
     memfaultToken: string,
 ): Promise<Organization[]> => {
-    const res = await fetch(`${BASE_URL}/organizations`, {
+    const res = await fetch(`${API_BASE}/organizations`, {
         headers: bearer(memfaultToken),
     });
     if (!res.ok) {
@@ -207,7 +229,7 @@ export const fetchProjects = async (
     orgSlug: string,
 ): Promise<Project[]> => {
     const res = await fetch(
-        `${BASE_URL}/organizations/${encodeURIComponent(orgSlug)}/projects`,
+        `${API_BASE}/organizations/${encodeURIComponent(orgSlug)}/projects`,
         { headers: bearer(memfaultToken) },
     );
     if (!res.ok) {
@@ -223,7 +245,7 @@ export const fetchProjectKey = async (
     projectSlug: string,
 ): Promise<string> => {
     const res = await fetch(
-        `${BASE_URL}/organizations/${encodeURIComponent(
+        `${API_BASE}/organizations/${encodeURIComponent(
             orgSlug,
         )}/projects/${encodeURIComponent(projectSlug)}/data-routes`,
         { headers: bearer(memfaultToken) },
@@ -258,7 +280,7 @@ export const postRegisterDevice = async (
     }
 
     const res = await fetch(
-        `${BASE_URL}/organizations/${encodeURIComponent(
+        `${API_BASE}/organizations/${encodeURIComponent(
             orgSlug,
         )}/projects/${encodeURIComponent(
             projectSlug,
@@ -283,7 +305,7 @@ export const requestSymbolUploadUrl = async (
     projectSlug: string,
 ): Promise<{ uploadUrl: string; uploadToken: string }> => {
     const res = await fetch(
-        `${BASE_URL}/organizations/${encodeURIComponent(
+        `${API_BASE}/organizations/${encodeURIComponent(
             orgSlug,
         )}/projects/${encodeURIComponent(projectSlug)}/upload`,
         {
@@ -341,7 +363,7 @@ export const finalizeSymbolFile = async (
     }
 
     const res = await fetch(
-        `${BASE_URL}/organizations/${encodeURIComponent(
+        `${API_BASE}/organizations/${encodeURIComponent(
             orgSlug,
         )}/projects/${encodeURIComponent(projectSlug)}/symbols`,
         {

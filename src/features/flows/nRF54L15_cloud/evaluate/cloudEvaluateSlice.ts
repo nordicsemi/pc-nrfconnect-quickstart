@@ -53,12 +53,19 @@ interface RegistrationState {
 interface MemfaultState {
     status: 'idle' | 'loading' | 'success' | 'error';
     accessToken?: string;
+    accessTokenExpiresAt?: number;
     organizations: Organization[];
     projects: Project[];
     selectedOrgSlug?: string;
     selectedProjectSlug?: string;
     message?: string;
 }
+
+const initialMemfault: MemfaultState = {
+    status: 'idle',
+    organizations: [],
+    projects: [],
+};
 
 interface State {
     subStep: CloudSubStep;
@@ -123,11 +130,8 @@ const slice = createSlice({
             state.registration = payload;
         },
         setMemfaultLoading: state => {
-            state.memfault = {
-                status: 'loading',
-                organizations: [],
-                projects: [],
-            };
+            state.memfault.status = 'loading';
+            state.memfault.message = undefined;
         },
         setMemfaultError: (state, { payload }: PayloadAction<string>) => {
             state.memfault.status = 'error';
@@ -138,14 +142,27 @@ const slice = createSlice({
             {
                 payload,
             }: PayloadAction<{
-                accessToken: string;
                 organizations: Organization[];
                 projects: Project[];
                 selectedOrgSlug: string;
                 selectedProjectSlug?: string;
             }>,
         ) => {
-            state.memfault = { status: 'success', ...payload };
+            state.memfault.status = 'success';
+            state.memfault.message = undefined;
+            state.memfault.organizations = payload.organizations;
+            state.memfault.projects = payload.projects;
+            state.memfault.selectedOrgSlug = payload.selectedOrgSlug;
+            state.memfault.selectedProjectSlug = payload.selectedProjectSlug;
+        },
+        setAccessToken: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{ accessToken: string; expiresAt: number }>,
+        ) => {
+            state.memfault.accessToken = payload.accessToken;
+            state.memfault.accessTokenExpiresAt = payload.expiresAt;
         },
         setProjects: (
             state,
@@ -165,14 +182,10 @@ const slice = createSlice({
         setSelectedProjectSlug: (state, { payload }: PayloadAction<string>) => {
             state.memfault.selectedProjectSlug = payload;
         },
-        resetMemfault: state => {
-            state.memfault = {
-                status: 'idle',
-                organizations: [],
-                projects: [],
-            };
-        },
 
+        resetMemfault: state => {
+            state.memfault = initialMemfault;
+        },
         reset: () => initialState,
     },
     extraReducers: builder => {
@@ -192,6 +205,7 @@ export const {
     setCrashReport,
     setRegistration,
     setMemfaultLoading,
+    setAccessToken,
     setMemfaultError,
     setMemfaultSuccess,
     setProjects,

@@ -25,6 +25,7 @@ import {
     requestSymbolUploadUrl,
     uploadSymbolBinary,
 } from './api';
+import { getValidAccessToken } from './authEffects';
 import {
     getDeviceInfo,
     getMemfault,
@@ -40,18 +41,18 @@ export const registerDevice =
         dispatch(setRegistration({ status: 'pending' }));
         try {
             const state = getState();
-            const { accessToken, selectedOrgSlug, selectedProjectSlug } =
-                getMemfault(state);
+            const { selectedOrgSlug, selectedProjectSlug } = getMemfault(state);
             const deviceInfo = getDeviceInfo(state);
             const device = getSelectedDeviceUnsafely(state);
 
-            // Protective checks (the component already gates, but just in case).
-            if (!accessToken || !selectedOrgSlug || !selectedProjectSlug) {
+            if (!selectedOrgSlug || !selectedProjectSlug) {
                 throw new Error('Missing authentication data');
             }
             if (deviceInfo.status !== 'success' || !deviceInfo.serialNumber) {
                 throw new Error('Missing device serial number');
             }
+
+            const accessToken = await dispatch(getValidAccessToken());
 
             // 1. project key
             const projectKey = await fetchProjectKey(

@@ -71,9 +71,7 @@ export default () => {
         if (registration.status === 'error') {
             return (
                 <>
-                    {retriedChain && (
-                        <Skip onClick={() => dispatch(nextSubStep())} />
-                    )}
+                    {retriedChain && <Skip />}
                     <Next
                         label="Retry"
                         onClick={() => {
@@ -84,12 +82,7 @@ export default () => {
                 </>
             );
         }
-        return (
-            <Next
-                disabled={registration.status !== 'success'}
-                onClick={() => dispatch(nextSubStep())}
-            />
-        );
+        return <Next disabled={registration.status !== 'success'} />;
     };
 
     const issueBox = (title: string) => (
