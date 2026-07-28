@@ -6,7 +6,7 @@
 
 import React from 'react';
 
-import qrImage from '../../../../../resources/cloud-qr.png';
+import qrImage from '../../../../../resources/cloud_qr.svg';
 import { useAppDispatch } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
