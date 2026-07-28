@@ -9,10 +9,22 @@ import {
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
+import fs from 'fs';
+import path from 'path';
 
 import { type AppThunk, type RootState } from '../../../../app/store';
-import { getSelectedDeviceUnsafely } from '../../../device/deviceSlice';
-import { fetchProjectKey, postRegisterDevice } from './api';
+import { getFirmwareFolder } from '../../../device/deviceGuides';
+import {
+    getChoice,
+    getSelectedDeviceUnsafely,
+} from '../../../device/deviceSlice';
+import {
+    fetchProjectKey,
+    finalizeSymbolFile,
+    postRegisterDevice,
+    requestSymbolUploadUrl,
+    uploadSymbolBinary,
+} from './api';
 import {
     getDeviceInfo,
     getMemfault,
@@ -64,6 +76,42 @@ export const registerDevice =
                         getPersistedNickname(device.serialNumber) || undefined,
                 },
             );
+
+            // 4. upload symbol file
+            const choice = getChoice(state);
+            const firmware =
+                choice?.type === 'jlink-batch'
+                    ? choice.programmingOptions.firmwareList.find(
+                          f => f.elfFile,
+                      )
+                    : undefined;
+
+            if (firmware?.elfFile) {
+                const elfPath = path.join(
+                    getFirmwareFolder(),
+                    firmware.elfFile,
+                );
+                const bytes = await fs.promises.readFile(elfPath);
+
+                const { uploadUrl, uploadToken } = await requestSymbolUploadUrl(
+                    accessToken,
+                    selectedOrgSlug,
+                    selectedProjectSlug,
+                );
+                await uploadSymbolBinary(uploadUrl, bytes);
+                await finalizeSymbolFile(
+                    accessToken,
+                    selectedOrgSlug,
+                    selectedProjectSlug,
+                    uploadToken,
+                    {
+                        version: deviceInfo.swVersion,
+                        softwareType: deviceInfo.swType,
+                    },
+                );
+            } else {
+                logger.warn('No ELF configured for symbol upload; skipping.');
+            }
 
             dispatch(setRegistration({ status: 'success', key: projectKey }));
         } catch (e) {

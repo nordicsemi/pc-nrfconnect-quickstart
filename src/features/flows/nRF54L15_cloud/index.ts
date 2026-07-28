@@ -36,6 +36,7 @@ const programConfig = [
                 {
                     core: 'Application',
                     file: 'nrf54l15dk_cloud.hex',
+                    elfFile: 'nrf54l15dk_cloud.elf',
                     link: {
                         label: 'Bluetooth: Peripheral Memfault Diagnostic Service (MDS)',
                         href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/samples/bluetooth/peripheral_mds/README.html',

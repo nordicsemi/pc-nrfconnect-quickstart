@@ -60,6 +60,10 @@ interface TokenExchangeResponse {
     access_token: string;
 }
 
+interface UploadUrlResponse {
+    data: { upload_url: string; token: string };
+}
+
 export interface RegisterDeviceParams {
     deviceSerial: string;
     hardwareVersion: string;
@@ -270,5 +274,91 @@ export const postRegisterDevice = async (
     );
     if (!res.ok) {
         throw new Error(`Device registration failed (${res.status})`);
+    }
+};
+
+export const requestSymbolUploadUrl = async (
+    memfaultToken: string,
+    orgSlug: string,
+    projectSlug: string,
+): Promise<{ uploadUrl: string; uploadToken: string }> => {
+    const res = await fetch(
+        `${BASE_URL}/organizations/${encodeURIComponent(
+            orgSlug,
+        )}/projects/${encodeURIComponent(projectSlug)}/upload`,
+        {
+            method: 'POST',
+            headers: {
+                ...bearer(memfaultToken),
+                'Content-Type': 'application/json',
+            },
+            body: '{}',
+        },
+    );
+    if (!res.ok) {
+        throw new Error(`Failed to request upload URL (${res.status})`);
+    }
+    const { data } = (await res.json()) as UploadUrlResponse;
+    const { upload_url: uploadUrl, token: uploadToken } = data;
+    return { uploadUrl, uploadToken };
+};
+
+export const uploadSymbolBinary = async (
+    uploadUrl: string,
+    bytes: Uint8Array,
+): Promise<void> => {
+    const res = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: new Blob([new Uint8Array(bytes)]),
+    });
+    if (!res.ok) {
+        throw new Error(`Failed to upload symbol file (${res.status})`);
+    }
+};
+
+export interface SoftwareVersion {
+    version?: string;
+    softwareType?: string;
+}
+
+export const finalizeSymbolFile = async (
+    memfaultToken: string,
+    orgSlug: string,
+    projectSlug: string,
+    uploadToken: string,
+    sw?: SoftwareVersion,
+): Promise<void> => {
+    const body: {
+        file: { token: string };
+        software_version?: { version?: string; software_type?: string };
+    } = { file: { token: uploadToken } };
+    if (sw && (sw.version || sw.softwareType)) {
+        body.software_version = {
+            version: sw.version,
+            software_type: sw.softwareType,
+        };
+    }
+
+    const res = await fetch(
+        `${BASE_URL}/organizations/${encodeURIComponent(
+            orgSlug,
+        )}/projects/${encodeURIComponent(projectSlug)}/symbols`,
+        {
+            method: 'POST',
+            headers: {
+                ...bearer(memfaultToken),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        },
+    );
+
+    // Symbol file already exists  — treat as success
+    if (res.status === 409) {
+        return;
+    }
+    if (!res.ok) {
+        throw new Error(`Failed to finalize symbol file (${res.status})`);
     }
 };
