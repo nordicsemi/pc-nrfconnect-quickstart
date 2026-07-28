@@ -12,7 +12,7 @@ import {
     Spinner,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
-    type AccountInfo,
+    type AuthState,
     inMain as auth,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/ipc/auth';
 
@@ -35,38 +35,33 @@ const emptyItem: DropdownItem<string> = { label: '', value: '' };
 export default () => {
     const dispatch = useAppDispatch();
     const memfault = useAppSelector(getMemfault);
-    const [account, setAccount] = useState<AccountInfo | null>(null);
-    const [isAuthenticating, setIsAuthenticating] = useState(false);
+    const [authState, setAuthState] = useState<AuthState | null>(null);
     const [authError, setAuthError] = useState<string | null>(null);
 
-    const refreshAccount = () =>
-        auth.getAccountInfo().then(res => {
-            setAccount(res.status ? res.data : null);
-        });
+    const account = authState?.account ?? null;
+    const isAuthenticating = authState?.status === 'signingIn';
 
     useEffect(() => {
-        refreshAccount();
+        auth.getAuthStatus().then(setAuthState); // pull при старт
+        auth.registerOnStateChanged(setAuthState); // push при промени
     }, []);
 
-    const login = () => {
-        setIsAuthenticating(true);
+    const login = async () => {
         setAuthError(null);
-        auth.startLogin().then(res => {
-            setIsAuthenticating(false);
-            if (!res.status) {
-                setAuthError(res.error);
-                return;
-            }
-            refreshAccount();
-            dispatch(resetMemfault());
-        });
+        const res = await auth.startLogin();
+        if (!res.status) {
+            setAuthError(res.error);
+            return;
+        }
+        dispatch(resetMemfault());
+        // account се обновява през registerOnStateChanged broadcast-а
     };
 
-    const logout = () =>
-        auth.localLogout().then(() => {
-            refreshAccount();
-            dispatch(resetMemfault());
-        });
+    const logout = async () => {
+        await auth.singleSignOut();
+        dispatch(resetMemfault());
+        // account се нулира през broadcast (signedOut)
+    };
 
     // Logged in, but not connected to Memfault yet.
     useEffect(() => {
