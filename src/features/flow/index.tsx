@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import {
     deviceInfo,
     logger,
@@ -34,7 +34,8 @@ const useLogSteps = () => {
     const flow = useAppSelector(getFlow);
 
     // Telemetry when user changes step
-    useEffect(() => {
+    // We use useLayoutEffect here to ensure that the telemetryThunk is sent before any telemetry from sub-steps.
+    useLayoutEffect(() => {
         const step = flow[currentStepIndex] || 'Connect';
 
         logger.debug(`Changed step: ${step}`);
