@@ -8,7 +8,6 @@ import {
     type AppThunk,
     deviceInfo,
     telemetry,
-    // telemetry,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { type RootState } from '../../app/store';
@@ -27,13 +26,12 @@ function reset() {
 
 export default (subStepName?: string): AppThunk<RootState> =>
     (_, getState) => {
-        const currentStepIndex = getCurrentStepIndex(getState());
-        const flow = getFlow(getState());
-        const step = flow[currentStepIndex] || 'Connect';
-        const connectedDevice = getSelectedDevice(getState());
-        const choise = getChoice(getState());
         const stepIndex = getCurrentStepIndex(getState());
-        const fw = choise?.name;
+        const flow = getFlow(getState());
+        const step = flow[stepIndex] || 'Connect';
+        const connectedDevice = getSelectedDevice(getState());
+        const choice = getChoice(getState());
+        const fw = choice?.name;
         const device = connectedDevice
             ? (deviceInfo(connectedDevice).name ?? 'Unknown device')
             : undefined;
