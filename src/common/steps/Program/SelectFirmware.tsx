@@ -18,6 +18,7 @@ import {
     getSelectedDeviceUnsafely,
     setChoice,
 } from '../../../features/device/deviceSlice';
+import telemetryThunk from '../../../features/flow/telemetryThunk';
 import { Back } from '../../Back';
 import Link from '../../Link';
 import { RadioSelect } from '../../listSelect/RadioSelect';
@@ -105,6 +106,7 @@ export default ({ choices }: { choices: Choice[] }) => {
                         });
 
                         dispatch(setChoice(selected));
+                        dispatch(telemetryThunk('Programing'));
                         dispatch(startProgramming());
                     }}
                 />

@@ -10,12 +10,17 @@ import { telemetry } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import vscodeIcon from '../../../../resources/vscode.svg';
 import vscodeAltIcon from '../../../../resources/vscode-alt.svg';
 import { useAppDispatch } from '../../../app/store';
+import telemetryThunk from '../../../features/flow/telemetryThunk';
 import { Back } from '../../Back';
 import { type ListItemVariant } from '../../listSelect/ListSelectItem';
 import { RadioSelect } from '../../listSelect/RadioSelect';
 import Main from '../../Main';
 import { Next, Skip } from '../../Next';
-import { DevelopState, setDevelopState } from './developSlice';
+import {
+    DevelopState,
+    developStateToString,
+    setDevelopState,
+} from './developSlice';
 import { detectVsCode } from './vsCodeEffects';
 
 type Item = ListItemVariant & {
@@ -98,8 +103,12 @@ export default () => {
                         telemetry.sendEvent('Selected developing option', {
                             option: selected.id,
                         });
-
                         dispatch(setDevelopState(selected.state));
+                        dispatch(
+                            telemetryThunk(
+                                developStateToString(selected.state),
+                            ),
+                        );
                     }}
                 />
             </Main.Footer>
