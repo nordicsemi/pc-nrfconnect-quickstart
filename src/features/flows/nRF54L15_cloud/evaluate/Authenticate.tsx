@@ -38,12 +38,16 @@ export default () => {
     const [authState, setAuthState] = useState<AuthState | null>(null);
     const [authError, setAuthError] = useState<string | null>(null);
 
+    const status = authState?.status;
     const account = authState?.account ?? null;
-    const isAuthenticating = authState?.status === 'signingIn';
+
+    const isSignedIn = status === 'signedIn' || status === 'signingOut';
+    const isAuthenticating = status === 'signingIn';
+    const needsReauth = status === 'interactionRequired';
 
     useEffect(() => {
-        auth.getAuthStatus().then(setAuthState); // pull при старт
-        auth.registerOnStateChanged(setAuthState); // push при промени
+        auth.getAuthStatus().then(setAuthState);
+        auth.registerOnStateChanged(setAuthState);
     }, []);
 
     const login = async () => {
@@ -54,21 +58,18 @@ export default () => {
             return;
         }
         dispatch(resetMemfault());
-        // account се обновява през registerOnStateChanged broadcast-а
     };
 
     const logout = async () => {
         await auth.singleSignOut();
         dispatch(resetMemfault());
-        // account се нулира през broadcast (signedOut)
     };
 
-    // Logged in, but not connected to Memfault yet.
     useEffect(() => {
-        if (account && memfault.status === 'idle') {
+        if (status === 'signedIn' && memfault.status === 'idle') {
             dispatch(connectMemfault());
         }
-    }, [account, memfault.status, dispatch]);
+    }, [status, memfault.status, dispatch]);
 
     const orgItems: DropdownItem<string>[] = memfault.organizations.map(o => ({
         label: o.name,
@@ -83,6 +84,10 @@ export default () => {
     const selectedProjectItem =
         projectItems.find(i => i.value === memfault.selectedProjectSlug) ??
         emptyItem;
+
+    const signInPrompt = needsReauth
+        ? 'Your session expired. Please sign in again.'
+        : 'Sign in to continue.';
 
     return (
         <Main>
@@ -102,19 +107,22 @@ export default () => {
                             </li>
                         </ol>
                     </div>
-                    {account ? (
+                    {isSignedIn ? (
                         <div className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-gray-200 tw-p-3">
                             <div className="tw-flex tw-flex-row tw-items-center tw-justify-between">
                                 <p>
                                     Logged in as{' '}
-                                    <b>{account.name ?? account.username}</b>
+                                    <b>{account?.name ?? account?.username}</b>
                                 </p>
                                 <Button
                                     variant="secondary"
                                     size="sm"
                                     onClick={logout}
+                                    disabled={status === 'signingOut'}
                                 >
-                                    Log out
+                                    {status === 'signingOut'
+                                        ? 'Logging out…'
+                                        : 'Log out'}
                                 </Button>
                             </div>
 
@@ -165,7 +173,9 @@ export default () => {
                         </div>
                     ) : (
                         <>
-                            <p>Sign in to continue.</p>
+                            <p className={needsReauth ? 'tw-text-red' : ''}>
+                                {signInPrompt}
+                            </p>
                             <Button
                                 variant="secondary"
                                 size="lg"
@@ -202,7 +212,7 @@ export default () => {
                 ) : (
                     <Next
                         disabled={
-                            !account ||
+                            status !== 'signedIn' ||
                             memfault.status !== 'success' ||
                             !memfault.selectedProjectSlug
                         }
