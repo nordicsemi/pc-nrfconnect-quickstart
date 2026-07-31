@@ -7,11 +7,11 @@
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 // Real:
-// const API_BASE = 'https://api.memfault.com/api/v0';
-// const MYNORDIC_BASE = 'https://api.memfault.com/mynordic';
+const API_BASE = 'https://api.memfault.com/api/v0';
+const MYNORDIC_BASE = 'https://api.memfault.com/mynordic';
 // Mock:
-const API_BASE = 'http://127.0.0.1:8000';
-const MYNORDIC_BASE = 'http://127.0.0.1:8000/mynordic';
+// const API_BASE = 'http://127.0.0.1:8000';
+// const MYNORDIC_BASE = 'http://127.0.0.1:8000/mynordic';
 
 const POLL_INTERVAL_MS = 5000;
 

@@ -136,14 +136,11 @@ export const setDeviceProjectKey = async (
 
     try {
         await new Promise<string>((resolve, reject) => {
-            parser.enqueueRequest(
-                `settings write string memfault/project_key ${projectKey}`,
-                {
-                    onSuccess: resolve,
-                    onError: reject,
-                    onTimeout: () => reject(new Error('timeout')),
-                },
-            );
+            parser.enqueueRequest(`mflt set_project_key ${projectKey}`, {
+                onSuccess: resolve,
+                onError: reject,
+                onTimeout: () => reject(new Error('timeout')),
+            });
         });
     } catch (e) {
         logger.error(e);
