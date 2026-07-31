@@ -69,7 +69,7 @@ export const connectMemfault =
             // 2. access token (/token)
             const accessToken = await dispatch(getValidAccessToken());
 
-            // 3. orgs/projects от /api/v0
+            // 3. orgs/projects from /api/v0
             const organizations = await fetchOrganizations(accessToken);
             if (organizations.length === 0) {
                 throw new Error('No organizations found for this account');
