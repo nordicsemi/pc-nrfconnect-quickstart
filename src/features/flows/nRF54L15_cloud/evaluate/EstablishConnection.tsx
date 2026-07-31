@@ -39,8 +39,8 @@ export default () => {
                         </p>
                         <ol className="tw-list-inside tw-list-decimal">
                             <li>
-                                <b>Download</b> nRF Connect for Mobile on your
-                                mobile device (iOS or Android).
+                                <b>Download</b> nRF Toolbox on your mobile
+                                device (iOS or Android).
                             </li>
                             <li>
                                 <b>Scan</b> for nearby devices and select your
