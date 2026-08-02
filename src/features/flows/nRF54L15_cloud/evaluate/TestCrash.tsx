@@ -23,6 +23,7 @@ import {
     setCrashReportBaseLine,
 } from './cloudEvaluateSlice';
 import { fetchDeviceInfo } from './deviceInfoEffects';
+import { reportEvaluateError } from './reportError';
 
 export default () => {
     const dispatch = useAppDispatch();
@@ -42,9 +43,9 @@ export default () => {
         fetchServerTime(serialNumber, controller.signal)
             .then(t => dispatch(setCrashReportBaseLine(t)))
             .catch(e => {
-                if ((e as Error).name !== 'AbortError') {
-                    setError(describeError(e));
-                }
+                if ((e as Error).name === 'AbortError') return;
+                reportEvaluateError('Test crash', e, 'baseline');
+                setError(describeError(e));
             });
         return () => controller.abort();
     }, [dispatch, serialNumber, crashReportBaseLine, error]);
@@ -62,9 +63,9 @@ export default () => {
         pollCrashReport(serialNumber, controller.signal, crashReportBaseLine)
             .then(crash => dispatch(setCrashReport(crash)))
             .catch(e => {
-                if ((e as Error).name !== 'AbortError') {
-                    setError(describeError(e));
-                }
+                if ((e as Error).name === 'AbortError') return;
+                reportEvaluateError('Test crash', e, 'poll-crash');
+                setError(describeError(e));
             });
         return () => controller.abort();
     }, [dispatch, serialNumber, crashReportBaseLine, crashReport, error]);

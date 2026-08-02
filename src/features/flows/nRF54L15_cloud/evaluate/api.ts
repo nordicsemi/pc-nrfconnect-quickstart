@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    describeError,
+    logger,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 // Real:
 const API_BASE = 'https://api.memfault.com/api/v0';
@@ -150,9 +153,6 @@ const fetchCrashReport = async (
         const res = await fetch(crashReportUrl, { signal });
 
         if (!res.ok) {
-            logger.error(
-                `Crash report request failed. Server response code ${res.status}`,
-            );
             throw new Error(
                 `Failed to fetch crash report from the cloud (${res.status})`,
             );
@@ -167,10 +167,11 @@ const fetchCrashReport = async (
             serverTime,
         };
     } catch (e) {
-        logger.error(
-            `Failed to fetch crash report from the cloud: ${(e as Error).message}`,
+        if ((e as Error).name === 'AbortError') throw e;
+
+        throw new Error(
+            `Failed to fetch crash report from the cloud. ${describeError(e)}`,
         );
-        throw new Error(`Failed to fetch crash report from the cloud.`);
     }
 };
 

@@ -16,6 +16,7 @@ import {
     setDeviceInfoFetching,
 } from './cloudEvaluateSlice';
 import { type DeviceInfo, readDeviceInfo } from './device';
+import { reportEvaluateError } from './reportError';
 
 const VCOM_INDEX = 1;
 const MAX_ATTEMPTS = 3;
@@ -33,7 +34,7 @@ const attemptRead = async (
     try {
         return await readDeviceInfo(device, VCOM_INDEX);
     } catch (e) {
-        logger.error(
+        logger.warn(
             `mflt get_device_info attempt ${attempt}/${MAX_ATTEMPTS} failed: ${describeError(
                 e,
             )}`,
@@ -54,6 +55,7 @@ export const fetchDeviceInfo =
         try {
             dispatch(setDeviceInfo(await attemptRead(device, 1)));
         } catch (e) {
+            reportEvaluateError('Device info', e);
             dispatch(setDeviceInfoError(describeError(e)));
         }
     };

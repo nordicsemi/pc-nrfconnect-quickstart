@@ -23,6 +23,7 @@ import {
     setProjects,
     setSelectedOrgSlug,
 } from './cloudEvaluateSlice';
+import { reportEvaluateError } from './reportError';
 
 const TOKEN_EXPIRY_BUFFER_MS = 60_000;
 
@@ -86,6 +87,7 @@ export const connectMemfault =
                 }),
             );
         } catch (e) {
+            reportEvaluateError('Authenticate', e, 'connect');
             dispatch(setMemfaultError(describeError(e)));
         }
     };
@@ -104,6 +106,7 @@ export const selectOrganization =
                 }),
             );
         } catch (e) {
+            reportEvaluateError('Authenticate', e, 'select-org');
             dispatch(setMemfaultError(describeError(e)));
         }
     };

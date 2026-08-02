@@ -6,7 +6,7 @@
 
 import {
     createSerialPort,
-    logger,
+    describeError,
     shellParser,
     xTerminalShellParserWrapper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -67,11 +67,10 @@ export const readDeviceInfo = (
                         const serialNumber = SN_REGEX.exec(cleaned)?.[1];
                         if (!serialNumber) {
                             finish(() => {
-                                logger.error(
-                                    'Could not parse device serial number.',
-                                );
                                 reject(
-                                    new Error('Failed to obtain device info.'),
+                                    new Error(
+                                        'Failed to obtain device info. The device did not return a serial number.',
+                                    ),
                                 );
                             });
                             return;
@@ -90,8 +89,11 @@ export const readDeviceInfo = (
                 timeout = setTimeout(
                     () =>
                         finish(() => {
-                            logger.error('Timed out reading device info.');
-                            reject(new Error('Failed to obtain device info.'));
+                            reject(
+                                new Error(
+                                    'Failed to obtain device info. The device did not respond in time.',
+                                ),
+                            );
                         }),
                     timeoutMs,
                 );
@@ -101,8 +103,11 @@ export const readDeviceInfo = (
                     .catch(e => finish(() => reject(e)));
             })
             .catch(e => {
-                logger.error(e);
-                reject(new Error('Failed to obtain device info.'));
+                reject(
+                    new Error(
+                        `Failed to obtain device info. ${describeError(e)}`,
+                    ),
+                );
             });
     });
 
@@ -142,9 +147,6 @@ export const setDeviceProjectKey = async (
                 onTimeout: () => reject(new Error('timeout')),
             });
         });
-    } catch (e) {
-        logger.error(e);
-        throw e;
     } finally {
         parser.unregister();
         serialPort.close();

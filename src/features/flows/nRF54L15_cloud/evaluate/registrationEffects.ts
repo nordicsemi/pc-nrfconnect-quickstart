@@ -32,6 +32,7 @@ import {
     setRegistration,
 } from './cloudEvaluateSlice';
 import { setDeviceProjectKey } from './device';
+import { reportEvaluateError } from './reportError';
 
 const VCOM_INDEX = 1;
 const HARDWARE_VERSION_FALLBACK = 'nrf54l15dk';
@@ -39,6 +40,7 @@ const HARDWARE_VERSION_FALLBACK = 'nrf54l15dk';
 export const registerDevice =
     (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
         dispatch(setRegistration({ status: 'pending' }));
+        let phase = 'validate';
         try {
             const state = getState();
             const { selectedOrgSlug, selectedProjectSlug } = getMemfault(state);
@@ -52,19 +54,20 @@ export const registerDevice =
                 throw new Error('Missing device serial number');
             }
 
+            phase = 'get-access-token';
             const accessToken = await dispatch(getValidAccessToken());
 
-            // 1. project key
+            phase = 'get-project-key';
             const projectKey = await fetchProjectKey(
                 accessToken,
                 selectedOrgSlug,
                 selectedProjectSlug,
             );
 
-            // 2. write the key to the device
+            phase = 'set-project-key';
             await setDeviceProjectKey(device, VCOM_INDEX, projectKey);
 
-            // 3. online registration
+            phase = 'register';
             await postRegisterDevice(
                 accessToken,
                 selectedOrgSlug,
@@ -78,7 +81,7 @@ export const registerDevice =
                 },
             );
 
-            // 4. upload symbol file
+            phase = 'upload-symbols';
             const choice = getChoice(state);
             const firmware =
                 choice?.type === 'jlink-batch'
@@ -86,14 +89,12 @@ export const registerDevice =
                           f => f.elfFile,
                       )
                     : undefined;
-
             if (firmware?.elfFile) {
                 const elfPath = path.join(
                     getFirmwareFolder(),
                     firmware.elfFile,
                 );
                 const bytes = await fs.promises.readFile(elfPath);
-
                 const { uploadUrl, uploadToken } = await requestSymbolUploadUrl(
                     accessToken,
                     selectedOrgSlug,
@@ -116,7 +117,7 @@ export const registerDevice =
 
             dispatch(setRegistration({ status: 'success', key: projectKey }));
         } catch (e) {
-            logger.error(describeError(e));
+            reportEvaluateError('Device registration', e, phase);
             dispatch(
                 setRegistration({ status: 'error', message: describeError(e) }),
             );

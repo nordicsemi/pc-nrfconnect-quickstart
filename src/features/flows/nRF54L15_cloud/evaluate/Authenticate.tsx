@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     Button,
+    describeError,
     Dropdown,
     type DropdownItem,
     Spinner,
@@ -29,6 +30,7 @@ import {
     resetMemfault,
     setSelectedProjectSlug,
 } from './cloudEvaluateSlice';
+import { reportEvaluateError } from './reportError';
 
 const emptyItem: DropdownItem<string> = { label: '', value: '' };
 
@@ -52,12 +54,18 @@ export default () => {
 
     const login = async () => {
         setAuthError(null);
-        const res = await auth.startLogin();
-        if (!res.status) {
-            setAuthError(res.error);
-            return;
+        try {
+            const res = await auth.startLogin();
+            if (!res.status) {
+                reportEvaluateError('Authenticate', res.error, 'sign-in');
+                setAuthError(res.error);
+                return;
+            }
+            dispatch(resetMemfault());
+        } catch (e) {
+            reportEvaluateError('Authenticate', e, 'sign-in');
+            setAuthError(describeError(e));
         }
-        dispatch(resetMemfault());
     };
 
     const logout = async () => {
