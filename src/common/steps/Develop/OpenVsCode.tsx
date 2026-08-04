@@ -87,7 +87,9 @@ export default ({ samples }: { samples: SampleWithRef[] }) => {
                             'vscode://nordic-semiconductor.nrf-connect/';
 
                         if (choice.ncsAddon) {
-                            openUrl(`${deepLink}${choice.ncsAddon}`);
+                            openUrl(
+                                `${deepLink}openFromAppIndex?${choice.ncsAddon}`,
+                            );
                         } else {
                             openUrl(
                                 `${deepLink}openSampleFromSDK?${queryParamsString(
