@@ -11,16 +11,24 @@ const Content = ({
     subHeading,
     className = '',
     children,
+    fill = false,
 }: {
     heading: string;
     subHeading?: string;
     className?: string;
     children: ReactNode;
+    fill?: boolean;
 }) => (
-    <div className="tw-flex tw-flex-col tw-items-start tw-justify-start tw-overflow-hidden tw-pb-8 tw-pr-6 tw-text-start tw-text-sm tw-text-gray-700">
+    <div
+        className={`tw-flex tw-flex-col tw-items-start tw-justify-start tw-overflow-hidden tw-pb-8 tw-pr-6 tw-text-start tw-text-sm tw-text-gray-700 ${fill ? 'tw-min-h-0 tw-flex-1' : ''}`}
+    >
         <h1 className="tw-pb-4 tw-text-2xl/6 tw-font-medium">{heading}</h1>
         <h2 className="tw-pb-8">{subHeading || '‎'}</h2>
-        <div className={`scrollbar tw-w-full ${className}`}>{children}</div>
+        <div
+            className={`scrollbar tw-w-full ${fill ? 'tw-min-h-0 tw-flex-1' : ''} ${className}`}
+        >
+            {children}
+        </div>
     </div>
 );
 

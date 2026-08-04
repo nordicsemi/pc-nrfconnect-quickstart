@@ -29,25 +29,49 @@ export default () => {
                         is connected in nRF Toolbox. Try both interactions
                         below.
                     </p>
-                    <div className="tw-flex tw-flex-row tw-gap-3">
-                        <div className="tw-flex tw-flex-1 tw-flex-col tw-gap-2 tw-border tw-border-gray-200 tw-p-3">
+                    <div className="tw-grid tw-grid-cols-2 tw-gap-3">
+                        <div className="tw-row-span-3 tw-grid tw-grid-rows-subgrid tw-gap-2 tw-px-3">
                             <span className="tw-font-bold">Press a button</span>
-                            <img
-                                src={cloudButtonState}
-                                alt="Press button state in nRF Toolbox"
-                            />
+
+                            <div className="tw-flex tw-h-full tw-flex-col">
+                                <div className="tw-flex tw-flex-1 tw-items-center tw-justify-center">
+                                    <div className="tw-flex tw-flex-col tw-items-center tw-justify-center">
+                                        <img
+                                            className="tw-h-auto tw-max-w-full"
+                                            src={cloudButtonState}
+                                            alt="Press button state in nRF Toolbox"
+                                        />
+                                        <div className="tw-mt-2 tw-text-center tw-text-xs tw-text-gray-500">
+                                            Screenshot
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <p className="tw-text-xs">
                                 Press Button 0 on the DK. nRF Toolbox shows the
                                 Button characteristic flip between Button
                                 released and Button pressed.
                             </p>
                         </div>
-                        <div className="tw-flex tw-flex-1 tw-flex-col tw-gap-2 tw-border tw-border-gray-200 tw-p-3">
+
+                        <div className="tw-row-span-3 tw-grid tw-grid-rows-subgrid tw-gap-2 tw-px-3">
                             <span className="tw-font-bold">Toggle the LED</span>
-                            <img
-                                src={cloudLedState}
-                                alt="Toggle LED toggle in nRF Toolbox"
-                            />
+
+                            <div className="tw-flex tw-h-full tw-flex-col">
+                                <div className="tw-flex tw-flex-1 tw-items-center tw-justify-center">
+                                    <img
+                                        className="tw-h-auto tw-max-w-full"
+                                        src={cloudLedState}
+                                        alt="Toggle LED toggle in nRF Toolbox"
+                                    />
+                                </div>
+
+                                <div className="tw-mt-2 tw-text-center tw-text-xs tw-text-gray-500">
+                                    Screenshot
+                                </div>
+                            </div>
+
                             <p className="tw-text-xs">
                                 Tap ON / OFF in nRF Toolbox to switch LED 2 on
                                 your DK on and off.

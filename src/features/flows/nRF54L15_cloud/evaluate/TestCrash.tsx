@@ -75,11 +75,15 @@ export default () => {
 
     return (
         <Main>
-            <Main.Content heading="Remote connection" subHeading="Test crash">
+            <Main.Content
+                heading="Remote connection"
+                subHeading="Test crash"
+                fill
+            >
                 <div className="tw-flex tw-flex-col tw-gap-4">
                     <div className="tw-flex tw-flex-col tw-gap-1">
-                        <span className="tw-text-base">
-                            Trigger a test crash by pressing <b>button 1</b>.
+                        <span>
+                            Trigger a test crash by pressing <b>Button 1</b>.
                         </span>
                         <span>
                             Your device will fault, reboot, and send the crash
@@ -89,13 +93,15 @@ export default () => {
                     {deviceInfo.status === 'fetching' && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
-                            <span>Reading device information…</span>
+                            <span className="tw-text-xs">
+                                Reading device information…
+                            </span>
                         </div>
                     )}
                     {waitingForCrash && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
-                            <span>
+                            <span className="tw-text-xs">
                                 Waiting for a crash report from the device. It
                                 may take a few moments…
                             </span>
@@ -131,7 +137,10 @@ export default () => {
                                 <div className="tw-p-2 tw-ps-5">
                                     <ul className="tw-flex tw-flex-col tw-gap-1 tw-text-sm">
                                         {crashReport.frames.map(f => (
-                                            <li key={f.index}>
+                                            <li
+                                                key={f.index}
+                                                className="tw-text-xs"
+                                            >
                                                 #{f.index}&emsp;{f.function} (
                                                 {f.file}:{f.lineno})
                                             </li>

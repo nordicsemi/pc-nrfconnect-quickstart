@@ -15,7 +15,6 @@ import {
     getDeviceInfo,
     getMemfault,
     getRegistration,
-    nextSubStep,
     prevSubStep,
 } from './cloudEvaluateSlice';
 import { fetchDeviceInfo } from './deviceInfoEffects';
@@ -52,13 +51,13 @@ export default () => {
 
     const primaryAction = () => {
         if (!hasAuth) {
-            return <Skip onClick={() => dispatch(nextSubStep())} />;
+            return <Skip />;
         }
         if (!hasSn) {
             if (deviceInfo.status === 'error') {
                 return (
                     <>
-                        <Skip onClick={() => dispatch(nextSubStep())} />
+                        <Skip />
                         <Next
                             label="Retry"
                             onClick={() => dispatch(fetchDeviceInfo())}
@@ -95,8 +94,74 @@ export default () => {
 
     return (
         <Main>
-            <Main.Content heading="Register your device" subHeading="">
-                <div className="tw-flex tw-flex-col tw-gap-3">
+            <Main.Content heading="Register your device" fill>
+                <div className="tw-flex tw-flex-col tw-gap-5">
+                    <div className="tw-flex tw-flex-col tw-gap-3">
+                        {memfault.selectedOrgSlug &&
+                            memfault.selectedProjectSlug && (
+                                <div className="tw-flex tw-flex-row">
+                                    <p className="tw-w-1/2">
+                                        <b>Organization</b>
+                                        <br />
+                                        {memfault.selectedOrgSlug}
+                                    </p>
+                                    <p className="tw-w-1/2">
+                                        <b>Project</b>
+                                        <br />
+                                        {memfault.selectedProjectSlug}
+                                    </p>
+                                </div>
+                            )}
+
+                        <div className="tw-flex tw-flex-col tw-gap-2">
+                            <p>
+                                You{' '}
+                                {registration.status === 'success'
+                                    ? 'connected'
+                                    : 'are connecting'}{' '}
+                                your device to the cloud to capture crashes,
+                                push OTA updates, and debug remotely.
+                            </p>
+                            <ol className="tw-list-inside tw-list-disc">
+                                <li>Over-the-air firmware updates</li>
+                                <li>Remote crash analysis and debugging</li>
+                                <li>
+                                    Access to DevZone, technical documentation,
+                                    and learning resources
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    {registration.status === 'success' && (
+                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-1 tw-text-green-500">
+                            <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
+                            <span>
+                                Your nRF54L15 DK is connected and configured.
+                            </span>
+                        </div>
+                    )}
+
+                    {hasAuth && hasSn && (
+                        <div>
+                            {registration.status === 'pending' && (
+                                <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
+                                    <Spinner size="sm" />
+                                    <span className="tw-text-xs">
+                                        Registering device online and
+                                        configuring the project key…
+                                    </span>
+                                </div>
+                            )}
+
+                            {registration.status === 'error' &&
+                                issueBox(
+                                    registration.message ??
+                                        'Failed to register your device. Please try again.',
+                                )}
+                        </div>
+                    )}
+
                     {!hasAuth &&
                         issueBox(
                             'Failed to obtain project details. The device cannot be registered. Please try again.',
@@ -112,74 +177,11 @@ export default () => {
                         ) : (
                             <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                                 <Spinner size="sm" />
-                                <span>Reading device information…</span>
+                                <span className="tw-text-xs">
+                                    Reading device information…
+                                </span>
                             </div>
                         ))}
-
-                    {hasAuth && hasSn && (
-                        <>
-                            {registration.status === 'pending' && (
-                                <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
-                                    <Spinner size="sm" />
-                                    <span>
-                                        Registering device online and
-                                        configuring the project key…
-                                    </span>
-                                </div>
-                            )}
-
-                            {registration.status === 'error' &&
-                                issueBox(
-                                    registration.message ??
-                                        'Failed to register your device. Please try again.',
-                                )}
-
-                            {registration.status === 'success' && (
-                                <>
-                                    <div className="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-1 tw-text-green-500">
-                                        <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
-                                        <span>
-                                            Your nRF54L15 DK is connected and
-                                            configured.
-                                        </span>
-                                    </div>
-                                    <div className="tw-flex tw-flex-row">
-                                        <p className="tw-w-1/2">
-                                            <b>Organization</b>
-                                            <br />
-                                            {memfault.selectedOrgSlug}
-                                        </p>
-                                        <p className="tw-w-1/2">
-                                            <b>Project</b>
-                                            <br />
-                                            {memfault.selectedProjectSlug}
-                                        </p>
-                                    </div>
-                                    <div className="tw-flex tw-flex-col tw-gap-2">
-                                        <p>
-                                            Connect your device to cloud to
-                                            capture crashes, push OTA updates,
-                                            and debug remotely.
-                                        </p>
-                                        <ol className="tw-list-inside tw-list-disc">
-                                            <li>
-                                                Over-the-air firmware updates
-                                            </li>
-                                            <li>
-                                                Remote crash analysis and
-                                                debugging
-                                            </li>
-                                            <li>
-                                                Access to DevZone, technical
-                                                documentation, and learning
-                                                resources
-                                            </li>
-                                        </ol>
-                                    </div>
-                                </>
-                            )}
-                        </>
-                    )}
                 </div>
             </Main.Content>
             <Main.Footer>

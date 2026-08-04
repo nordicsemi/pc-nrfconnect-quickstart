@@ -10,6 +10,7 @@ import {
     describeError,
     Dropdown,
     type DropdownItem,
+    IssueBox,
     Spinner,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
@@ -52,7 +53,7 @@ export default () => {
         auth.registerOnStateChanged(setAuthState);
     }, []);
 
-    const login = async () => {
+    const signIn = async () => {
         setAuthError(null);
         try {
             const res = await auth.startLogin();
@@ -68,7 +69,7 @@ export default () => {
         }
     };
 
-    const logout = async () => {
+    const signOut = async () => {
         await auth.singleSignOut();
         dispatch(resetMemfault());
     };
@@ -98,8 +99,8 @@ export default () => {
         : 'Sign in to continue.';
 
     return (
-        <Main>
-            <Main.Content heading="Register your device" subHeading="">
+        <Main className="tw-min-h-0 tw-flex-1">
+            <Main.Content heading="Register your device" fill>
                 <div className="tw-flex tw-flex-col tw-gap-3">
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <p>
@@ -116,38 +117,42 @@ export default () => {
                         </ol>
                     </div>
                     {isSignedIn ? (
-                        <div className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-gray-200 tw-p-3">
-                            <div className="tw-flex tw-flex-row tw-items-center tw-justify-between">
-                                <p>
-                                    Logged in as{' '}
+                        <div className="tw-flex tw-flex-col tw-gap-5 tw-border-t tw-border-gray-200 tw-pt-3">
+                            <div className="tw-flex tw-flex-row tw-justify-between">
+                                <p className="tw-leading-none">
+                                    Signed in as{' '}
                                     <b>{account?.name ?? account?.username}</b>
                                 </p>
                                 <Button
-                                    variant="secondary"
+                                    variant="link-button"
                                     size="sm"
-                                    onClick={logout}
+                                    onClick={signOut}
                                     disabled={status === 'signingOut'}
                                 >
                                     {status === 'signingOut'
-                                        ? 'Logging out…'
-                                        : 'Log out'}
+                                        ? 'Signing out…'
+                                        : 'Sign out'}
                                 </Button>
                             </div>
 
                             {memfault.status === 'loading' && (
                                 <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
                                     <Spinner size="sm" />
-                                    <span>
+                                    <span className="tw-text-xs">
                                         Loading organizations and projects…
                                     </span>
                                 </div>
                             )}
 
                             {memfault.status === 'error' && (
-                                <p className="tw-text-red">
-                                    {memfault.message ??
-                                        'Failed to load organizations and projects'}
-                                </p>
+                                <IssueBox
+                                    mdiIcon="mdi-lightbulb-alert-outline"
+                                    color="tw-text-red"
+                                    title={
+                                        memfault.message ??
+                                        'Failed to load organizations and projects'
+                                    }
+                                />
                             )}
 
                             {memfault.status === 'success' && (
@@ -184,25 +189,37 @@ export default () => {
                             <p className={needsReauth ? 'tw-text-red' : ''}>
                                 {signInPrompt}
                             </p>
-                            <Button
-                                variant="secondary"
-                                size="lg"
-                                onClick={login}
-                                className="tw-w-fit"
-                                disabled={isAuthenticating}
-                            >
-                                <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
-                                    <img src={Logomark} alt="myNordic logo" />
-                                    <span>
-                                        Sign in with myNordic to register your
-                                        device
-                                    </span>
-                                    {isAuthenticating && <Spinner size="sm" />}
-                                </div>
-                            </Button>
-                            {authError && (
-                                <p className="tw-text-red">{authError}</p>
-                            )}
+                            <div className="tw-flex tw-flex-col tw-gap-6">
+                                <Button
+                                    variant="link-button"
+                                    size="xl"
+                                    onClick={signIn}
+                                    className="tw-w-fit"
+                                    disabled={isAuthenticating}
+                                >
+                                    <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
+                                        <img
+                                            src={Logomark}
+                                            alt="myNordic logo"
+                                            className="tw-h-[17px] tw-w-[20px]"
+                                        />
+                                        <span>
+                                            Sign in with myNordic to register
+                                            your device
+                                        </span>
+                                        {isAuthenticating && (
+                                            <Spinner size="sm" />
+                                        )}
+                                    </div>
+                                </Button>
+                                {authError && (
+                                    <IssueBox
+                                        mdiIcon="mdi-lightbulb-alert-outline"
+                                        color="tw-text-red"
+                                        title={authError}
+                                    />
+                                )}
+                            </div>
                         </>
                     )}
                 </div>
