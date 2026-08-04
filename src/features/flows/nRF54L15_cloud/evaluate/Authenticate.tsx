@@ -56,7 +56,7 @@ export default () => {
     const signIn = async () => {
         setAuthError(null);
         try {
-            const res = await auth.startLogin();
+            const res = await auth.startSignIn();
             if (!res.status) {
                 reportEvaluateError('Authenticate', res.error, 'sign-in');
                 setAuthError(res.error);
