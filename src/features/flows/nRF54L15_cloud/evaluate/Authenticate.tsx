@@ -101,7 +101,7 @@ export default () => {
     return (
         <Main className="tw-min-h-0 tw-flex-1">
             <Main.Content heading="Register your device" fill>
-                <div className="tw-flex tw-flex-col tw-gap-3">
+                <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <p>
                             Connect your device to cloud to capture crashes,
@@ -117,7 +117,7 @@ export default () => {
                         </ol>
                     </div>
                     {isSignedIn ? (
-                        <div className="tw-flex tw-flex-col tw-gap-5 tw-border-t tw-border-gray-200 tw-pt-3">
+                        <div className="tw-flex tw-flex-col tw-gap-5 tw-border-t tw-border-gray-200 tw-pt-5">
                             <div className="tw-flex tw-flex-row tw-justify-between">
                                 <p className="tw-leading-none">
                                     Signed in as{' '}
@@ -142,17 +142,6 @@ export default () => {
                                         Loading organizations and projects…
                                     </span>
                                 </div>
-                            )}
-
-                            {memfault.status === 'error' && (
-                                <IssueBox
-                                    mdiIcon="mdi-lightbulb-alert-outline"
-                                    color="tw-text-red"
-                                    title={
-                                        memfault.message ??
-                                        'Failed to load organizations and projects'
-                                    }
-                                />
                             )}
 
                             {memfault.status === 'success' && (
@@ -182,6 +171,17 @@ export default () => {
                                         size="sm"
                                     />
                                 </div>
+                            )}
+
+                            {memfault.status === 'error' && (
+                                <IssueBox
+                                    mdiIcon="mdi-lightbulb-alert-outline"
+                                    color="tw-text-red"
+                                    title={
+                                        memfault.message ??
+                                        'Failed to load organizations and projects'
+                                    }
+                                />
                             )}
                         </div>
                     ) : (
