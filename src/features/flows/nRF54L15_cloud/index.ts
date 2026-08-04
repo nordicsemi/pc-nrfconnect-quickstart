@@ -31,6 +31,8 @@ const programConfig = [
             label: 'Bluetooth: Peripheral Memfault Diagnostic Service (MDS)',
             href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/samples/bluetooth/peripheral_mds/README.html',
         },
+        ncsAddon:
+            'app=quickstart-bluetooth&branch=main&manifest=&repo=https://github.com/nrfconnect/quickstart-bluetooth',
         programmingOptions: {
             firmwareList: [
                 {
@@ -97,7 +99,7 @@ const learnConfig = [
 const developConfig = [
     {
         ref: 'Cloud Connectivity',
-        sampleSource: 'nrf/samples/bluetooth/peripheral_lbs',
+        sampleSource: '',
     },
     {
         ref: 'Hello World',
