@@ -86,8 +86,10 @@ export default () => {
                             Trigger a test crash by pressing <b>Button 1</b>.
                         </span>
                         <span>
-                            Your device will fault, reboot, and send the crash
-                            report to cloud over BLE.
+                            Your device will fault, reboot and disconnect from
+                            the app. Then you need to reconnect the device to
+                            the app, which will send the crash report to the
+                            cloud over BLE.
                         </span>
                     </div>
                     {deviceInfo.status === 'fetching' && (
