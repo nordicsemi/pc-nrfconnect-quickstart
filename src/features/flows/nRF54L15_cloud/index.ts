@@ -98,10 +98,6 @@ const learnConfig = [
 
 const developConfig = [
     {
-        ref: 'Cloud Connectivity',
-        sampleSource: '',
-    },
-    {
         ref: 'Hello World',
         sampleSource: 'zephyr/samples/hello_world',
     },
