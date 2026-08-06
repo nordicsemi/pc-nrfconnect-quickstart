@@ -144,16 +144,12 @@ const slice = createSlice({
             }: PayloadAction<{
                 organizations: Organization[];
                 projects: Project[];
-                selectedOrgSlug: string;
-                selectedProjectSlug?: string;
             }>,
         ) => {
             state.memfault.status = 'success';
             state.memfault.message = undefined;
             state.memfault.organizations = payload.organizations;
             state.memfault.projects = payload.projects;
-            state.memfault.selectedOrgSlug = payload.selectedOrgSlug;
-            state.memfault.selectedProjectSlug = payload.selectedProjectSlug;
         },
         setAccessToken: (
             state,
@@ -170,11 +166,9 @@ const slice = createSlice({
                 payload,
             }: PayloadAction<{
                 projects: Project[];
-                selectedProjectSlug?: string;
             }>,
         ) => {
             state.memfault.projects = payload.projects;
-            state.memfault.selectedProjectSlug = payload.selectedProjectSlug;
         },
         setSelectedOrgSlug: (state, { payload }: PayloadAction<string>) => {
             state.memfault.selectedOrgSlug = payload;

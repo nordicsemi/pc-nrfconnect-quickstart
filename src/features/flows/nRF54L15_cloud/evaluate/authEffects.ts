@@ -21,7 +21,6 @@ import {
     setMemfaultLoading,
     setMemfaultSuccess,
     setProjects,
-    setSelectedOrgSlug,
 } from './cloudEvaluateSlice';
 import { reportEvaluateError } from './reportError';
 
@@ -66,40 +65,30 @@ export const connectMemfault =
 
             await provisionMyNordicAccount(idTokenRes.data);
             const accessToken = await dispatch(getValidAccessToken());
+
             const organizations = await fetchOrganizations(accessToken);
-
-            if (organizations.length === 0) {
+            if (organizations.length === 0)
                 throw new Error('No organizations found for this account');
-            }
-
-            const firstOrg = organizations[0];
-            const projects = await fetchProjects(accessToken, firstOrg.slug);
-
-            dispatch(
-                setMemfaultSuccess({
-                    organizations,
-                    projects,
-                    selectedOrgSlug: firstOrg.slug,
-                    selectedProjectSlug: projects[0]?.slug,
-                }),
+            const projects = await fetchProjects(
+                accessToken,
+                organizations[0].slug,
             );
+            dispatch(setMemfaultSuccess({ organizations, projects }));
         } catch (e) {
             reportEvaluateError('Authenticate', e, 'connect');
             dispatch(setMemfaultError(describeError(e)));
         }
     };
 
-export const selectOrganization =
+export const fetchProjectsForOrg =
     (orgSlug: string): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
-        dispatch(setSelectedOrgSlug(orgSlug));
         try {
             const accessToken = await dispatch(getValidAccessToken());
             const projects = await fetchProjects(accessToken, orgSlug);
             dispatch(
                 setProjects({
                     projects,
-                    selectedProjectSlug: projects[0]?.slug,
                 }),
             );
         } catch (e) {

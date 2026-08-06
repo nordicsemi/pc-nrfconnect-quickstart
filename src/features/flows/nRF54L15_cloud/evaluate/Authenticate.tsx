@@ -23,12 +23,13 @@ import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
-import { connectMemfault, selectOrganization } from './authEffects';
+import { connectMemfault, fetchProjectsForOrg } from './authEffects';
 import {
     getMemfault,
     nextSubStep,
     prevSubStep,
     resetMemfault,
+    setSelectedOrgSlug,
     setSelectedProjectSlug,
 } from './cloudEvaluateSlice';
 import { reportEvaluateError } from './reportError';
@@ -94,6 +95,38 @@ export default () => {
         projectItems.find(i => i.value === memfault.selectedProjectSlug) ??
         emptyItem;
 
+    useEffect(() => {
+        if (
+            memfault.status === 'success' &&
+            !memfault.selectedOrgSlug &&
+            memfault.organizations.length
+        ) {
+            dispatch(setSelectedOrgSlug(memfault.organizations[0].slug));
+        }
+    }, [
+        dispatch,
+        memfault.status,
+        memfault.selectedOrgSlug,
+        memfault.organizations,
+    ]);
+
+    useEffect(() => {
+        if (
+            memfault.status === 'success' &&
+            memfault.projects.length &&
+            !memfault.projects.some(
+                p => p.slug === memfault.selectedProjectSlug,
+            )
+        ) {
+            dispatch(setSelectedProjectSlug(memfault.projects[0].slug));
+        }
+    }, [
+        dispatch,
+        memfault.status,
+        memfault.selectedProjectSlug,
+        memfault.projects,
+    ]);
+
     const signInPrompt = needsReauth
         ? 'Your session expired. Please sign in again.'
         : 'Sign in to continue.';
@@ -149,11 +182,14 @@ export default () => {
                                     <Dropdown
                                         label="Organization"
                                         items={orgItems}
-                                        onSelect={item =>
+                                        onSelect={item => {
                                             dispatch(
-                                                selectOrganization(item.value),
-                                            )
-                                        }
+                                                setSelectedOrgSlug(item.value),
+                                            );
+                                            dispatch(
+                                                fetchProjectsForOrg(item.value),
+                                            );
+                                        }}
                                         selectedItem={selectedOrgItem}
                                         size="sm"
                                     />
