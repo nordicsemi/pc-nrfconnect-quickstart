@@ -42,12 +42,12 @@ export default () => {
     const [authState, setAuthState] = useState<AuthState | null>(null);
     const [authError, setAuthError] = useState<string | null>(null);
 
-    const status = authState?.status;
+    const authStatus = authState?.status;
     const account = authState?.account ?? null;
 
-    const isSignedIn = status === 'signedIn' || status === 'signingOut';
-    const isAuthenticating = status === 'signingIn';
-    const needsReauth = status === 'interactionRequired';
+    const isSignedIn = authStatus === 'signedIn' || authStatus === 'signingOut';
+    const isAuthenticating = authStatus === 'signingIn';
+    const needsReauth = authStatus === 'interactionRequired';
 
     useEffect(() => {
         auth.getAuthStatus().then(setAuthState);
@@ -57,10 +57,14 @@ export default () => {
     const signIn = async () => {
         setAuthError(null);
         try {
-            const res = await auth.startSignIn();
-            if (!res.status) {
-                reportEvaluateError('Authenticate', res.error, 'sign-in');
-                setAuthError(res.error);
+            const signInResult = await auth.startSignIn();
+            if (!signInResult.status) {
+                reportEvaluateError(
+                    'Authenticate',
+                    signInResult.error,
+                    'sign-in',
+                );
+                setAuthError(signInResult.error);
                 return;
             }
             dispatch(resetMemfault());
@@ -76,10 +80,10 @@ export default () => {
     };
 
     useEffect(() => {
-        if (status === 'signedIn' && memfault.status === 'idle') {
+        if (authStatus === 'signedIn' && memfault.status === 'idle') {
             dispatch(connectMemfault());
         }
-    }, [status, memfault.status, dispatch]);
+    }, [authStatus, memfault.status, dispatch]);
 
     const orgItems: DropdownItem<string>[] = memfault.organizations.map(o => ({
         label: o.name,
@@ -160,9 +164,9 @@ export default () => {
                                     variant="link-button"
                                     size="sm"
                                     onClick={signOut}
-                                    disabled={status === 'signingOut'}
+                                    disabled={authStatus === 'signingOut'}
                                 >
-                                    {status === 'signingOut'
+                                    {authStatus === 'signingOut'
                                         ? 'Signing out…'
                                         : 'Sign out'}
                                 </Button>
@@ -273,7 +277,7 @@ export default () => {
                 ) : (
                     <Next
                         disabled={
-                            status !== 'signedIn' ||
+                            authStatus !== 'signedIn' ||
                             memfault.status !== 'success' ||
                             !memfault.selectedProjectSlug
                         }

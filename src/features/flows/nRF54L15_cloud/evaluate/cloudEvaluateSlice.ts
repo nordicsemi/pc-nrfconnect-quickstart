@@ -8,7 +8,12 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { type RootState } from '../../../../app/store';
 import { setChoice } from '../../../device/deviceSlice';
-import { type CrashReport, type Organization, type Project } from './types';
+import {
+    type AsyncStatus,
+    type CrashReport,
+    type Organization,
+    type Project,
+} from './types';
 
 export enum CloudSubStep {
     ESTABLISH_CONNECTION,
@@ -36,7 +41,7 @@ export const cloudSubStepTelemetryName = (subStep: CloudSubStep) => {
 };
 
 interface DeviceInfoState {
-    status: 'idle' | 'fetching' | 'success' | 'error';
+    status: AsyncStatus;
     serialNumber?: string;
     swType?: string;
     swVersion?: string;
@@ -45,13 +50,13 @@ interface DeviceInfoState {
 }
 
 interface RegistrationState {
-    status: 'idle' | 'pending' | 'success' | 'error';
+    status: AsyncStatus;
     message?: string;
     key?: string;
 }
 
 interface MemfaultState {
-    status: 'idle' | 'loading' | 'success' | 'error';
+    status: AsyncStatus;
     accessToken?: string;
     accessTokenExpiresAt?: number;
     organizations: Organization[];
@@ -70,7 +75,7 @@ const initialMemfault: MemfaultState = {
 interface State {
     subStep: CloudSubStep;
     deviceInfo: DeviceInfoState;
-    crashReportBaseLine?: number;
+    crashReportBaselineTime?: number;
     crashReport?: CrashReport;
     registration: RegistrationState;
     memfault: MemfaultState;
@@ -104,7 +109,7 @@ const slice = createSlice({
             );
         },
         setDeviceInfoFetching: state => {
-            state.deviceInfo = { status: 'fetching' };
+            state.deviceInfo = { status: 'loading' };
         },
         setDeviceInfo: (
             state,
@@ -117,8 +122,11 @@ const slice = createSlice({
         setDeviceInfoError: (state, { payload }: PayloadAction<string>) => {
             state.deviceInfo = { status: 'error', message: payload };
         },
-        setCrashReportBaseLine: (state, { payload }: PayloadAction<number>) => {
-            state.crashReportBaseLine = payload;
+        setCrashReportBaselineTime: (
+            state,
+            { payload }: PayloadAction<number>,
+        ) => {
+            state.crashReportBaselineTime = payload;
         },
         setCrashReport: (state, { payload }: PayloadAction<CrashReport>) => {
             state.crashReport = payload;
@@ -195,7 +203,7 @@ export const {
     setDeviceInfoFetching,
     setDeviceInfo,
     setDeviceInfoError,
-    setCrashReportBaseLine,
+    setCrashReportBaselineTime,
     setCrashReport,
     setRegistration,
     setMemfaultLoading,
@@ -213,8 +221,8 @@ export const getSubStep = (state: RootState) =>
     state.flows.nrf54l15Cloud.subStep;
 export const getDeviceInfo = (state: RootState) =>
     state.flows.nrf54l15Cloud.deviceInfo;
-export const getCrashReportBaseLine = (state: RootState) =>
-    state.flows.nrf54l15Cloud.crashReportBaseLine;
+export const getCrashReportBaselineTime = (state: RootState) =>
+    state.flows.nrf54l15Cloud.crashReportBaselineTime;
 export const getCrashReport = (state: RootState) =>
     state.flows.nrf54l15Cloud.crashReport;
 export const getRegistration = (state: RootState) =>

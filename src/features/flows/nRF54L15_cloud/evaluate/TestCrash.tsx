@@ -15,12 +15,12 @@ import { Next, Skip } from '../../../../common/Next';
 import { fetchServerTime, pollCrashReport } from './api';
 import {
     getCrashReport,
-    getCrashReportBaseLine,
+    getCrashReportBaselineTime,
     getDeviceInfo,
     nextSubStep,
     prevSubStep,
     setCrashReport,
-    setCrashReportBaseLine,
+    setCrashReportBaselineTime,
 } from './cloudEvaluateSlice';
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { reportEvaluateError } from './reportError';
@@ -28,7 +28,7 @@ import { reportEvaluateError } from './reportError';
 export default () => {
     const dispatch = useAppDispatch();
     const deviceInfo = useAppSelector(getDeviceInfo);
-    const crashReportBaseLine = useAppSelector(getCrashReportBaseLine);
+    const crashReportBaselineTime = useAppSelector(getCrashReportBaselineTime);
     const crashReport = useAppSelector(getCrashReport);
     const [error, setError] = useState<string>();
 
@@ -36,23 +36,23 @@ export default () => {
         deviceInfo.status === 'success' ? deviceInfo.serialNumber : undefined;
 
     useEffect(() => {
-        if (crashReportBaseLine !== undefined || !serialNumber || error) {
+        if (crashReportBaselineTime !== undefined || !serialNumber || error) {
             return undefined;
         }
         const controller = new AbortController();
         fetchServerTime(serialNumber, controller.signal)
-            .then(t => dispatch(setCrashReportBaseLine(t)))
+            .then(t => dispatch(setCrashReportBaselineTime(t)))
             .catch(e => {
                 if ((e as Error).name === 'AbortError') return;
                 reportEvaluateError('Test crash', e, 'baseline');
                 setError(describeError(e));
             });
         return () => controller.abort();
-    }, [dispatch, serialNumber, crashReportBaseLine, error]);
+    }, [dispatch, serialNumber, crashReportBaselineTime, error]);
 
     useEffect(() => {
         if (
-            crashReportBaseLine === undefined ||
+            crashReportBaselineTime === undefined ||
             !serialNumber ||
             crashReport ||
             error
@@ -60,7 +60,11 @@ export default () => {
             return undefined;
         }
         const controller = new AbortController();
-        pollCrashReport(serialNumber, controller.signal, crashReportBaseLine)
+        pollCrashReport(
+            serialNumber,
+            controller.signal,
+            crashReportBaselineTime,
+        )
             .then(crash => dispatch(setCrashReport(crash)))
             .catch(e => {
                 if ((e as Error).name === 'AbortError') return;
@@ -68,7 +72,7 @@ export default () => {
                 setError(describeError(e));
             });
         return () => controller.abort();
-    }, [dispatch, serialNumber, crashReportBaseLine, crashReport, error]);
+    }, [dispatch, serialNumber, crashReportBaselineTime, crashReport, error]);
 
     const waitingForCrash =
         deviceInfo.status === 'success' && !crashReport && !error;
@@ -92,7 +96,7 @@ export default () => {
                             over Bluetooth LE.
                         </span>
                     </div>
-                    {deviceInfo.status === 'fetching' && (
+                    {deviceInfo.status === 'loading' && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
                             <span className="tw-text-xs">

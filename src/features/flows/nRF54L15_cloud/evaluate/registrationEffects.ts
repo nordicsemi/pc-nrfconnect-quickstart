@@ -39,7 +39,7 @@ const HARDWARE_VERSION_FALLBACK = 'nrf54l15dk';
 
 export const registerDevice =
     (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
-        dispatch(setRegistration({ status: 'pending' }));
+        dispatch(setRegistration({ status: 'loading' }));
         let phase = 'validate';
         try {
             const state = getState();

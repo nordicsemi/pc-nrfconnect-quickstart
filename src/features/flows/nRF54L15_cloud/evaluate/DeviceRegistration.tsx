@@ -36,7 +36,7 @@ export default () => {
 
     // Authenticated, but no SN yet
     useEffect(() => {
-        if (hasAuth && !hasSn && deviceInfo.status !== 'fetching' && !triedSn) {
+        if (hasAuth && !hasSn && deviceInfo.status !== 'loading' && !triedSn) {
             setTriedSn(true);
             dispatch(fetchDeviceInfo());
         }
@@ -144,7 +144,7 @@ export default () => {
 
                     {hasAuth && hasSn && (
                         <div>
-                            {registration.status === 'pending' && (
+                            {registration.status === 'loading' && (
                                 <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                                     <Spinner size="sm" />
                                     <span className="tw-text-xs">

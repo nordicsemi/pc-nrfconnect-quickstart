@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
+
 export interface CrashFrame {
     index: number;
     function: string;
