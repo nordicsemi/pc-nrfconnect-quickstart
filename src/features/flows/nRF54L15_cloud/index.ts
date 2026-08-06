@@ -15,6 +15,8 @@ import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
 import CloudEvaluate from './evaluate';
 
+const VCOM_INDEX = 1;
+
 const infoConfig = {
     title: 'nRF54L Series – nRF54L15 DK',
     markdownContent:
@@ -53,7 +55,7 @@ const verifyConfig = [
     {
         ref: 'Cloud Connectivity',
         config: {
-            vComIndex: 1,
+            vComIndex: VCOM_INDEX,
             regex: /(\*{3} Booting Quickstart Bluetooth .* \*{3}\r\n\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\n)/,
         },
     },
@@ -62,7 +64,7 @@ const verifyConfig = [
 const evaluateConfig = [
     {
         ref: 'Cloud Connectivity',
-        component: CloudEvaluate,
+        component: () => CloudEvaluate({ vComIndex: VCOM_INDEX }),
     },
 ];
 

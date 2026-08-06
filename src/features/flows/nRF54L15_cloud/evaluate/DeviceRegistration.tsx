@@ -20,7 +20,7 @@ import {
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { registerDevice } from './registrationEffects';
 
-export default () => {
+export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const memfault = useAppSelector(getMemfault);
     const deviceInfo = useAppSelector(getDeviceInfo);
@@ -38,16 +38,16 @@ export default () => {
     useEffect(() => {
         if (hasAuth && !hasSn && deviceInfo.status !== 'loading' && !triedSn) {
             setTriedSn(true);
-            dispatch(fetchDeviceInfo());
+            dispatch(fetchDeviceInfo(vComIndex));
         }
-    }, [hasAuth, hasSn, deviceInfo.status, triedSn, dispatch]);
+    }, [hasAuth, hasSn, deviceInfo.status, triedSn, vComIndex, dispatch]);
 
     // Authenticated and has SN, but not registered yet - start registration chain
     useEffect(() => {
         if (hasAuth && hasSn && registration.status === 'idle') {
-            dispatch(registerDevice());
+            dispatch(registerDevice(vComIndex));
         }
-    }, [hasAuth, hasSn, registration.status, dispatch]);
+    }, [hasAuth, hasSn, registration.status, vComIndex, dispatch]);
 
     const primaryAction = () => {
         if (!hasAuth) {
@@ -60,7 +60,7 @@ export default () => {
                         <Skip />
                         <Next
                             label="Retry"
-                            onClick={() => dispatch(fetchDeviceInfo())}
+                            onClick={() => dispatch(fetchDeviceInfo(vComIndex))}
                         />
                     </>
                 );
@@ -75,7 +75,7 @@ export default () => {
                         label="Retry"
                         onClick={() => {
                             setRetriedChain(true);
-                            dispatch(registerDevice());
+                            dispatch(registerDevice(vComIndex));
                         }}
                     />
                 </>

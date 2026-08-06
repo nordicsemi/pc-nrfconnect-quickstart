@@ -34,11 +34,11 @@ import {
 import { setDeviceProjectKey } from './device';
 import { reportEvaluateError } from './reportError';
 
-const VCOM_INDEX = 1;
 const HARDWARE_VERSION_FALLBACK = 'nrf54l15dk';
 
 export const registerDevice =
-    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
+    (vComIndex: number): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         dispatch(setRegistration({ status: 'loading' }));
         let phase = 'validate';
         try {
@@ -65,7 +65,7 @@ export const registerDevice =
             );
 
             phase = 'set-project-key';
-            await setDeviceProjectKey(device, VCOM_INDEX, projectKey);
+            await setDeviceProjectKey(device, vComIndex, projectKey);
 
             phase = 'register';
             await postRegisterDevice(

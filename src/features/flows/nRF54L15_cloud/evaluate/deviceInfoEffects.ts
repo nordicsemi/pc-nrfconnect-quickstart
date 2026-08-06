@@ -19,7 +19,6 @@ import { readDeviceInfo } from './device';
 import { reportEvaluateError } from './reportError';
 import { type DeviceInfo } from './types';
 
-const VCOM_INDEX = 1;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 1000;
 
@@ -30,10 +29,11 @@ const delay = (ms: number) =>
 
 const attemptRead = async (
     device: DeviceWithSerialnumber,
+    vComIndex: number,
     attempt: number,
 ): Promise<DeviceInfo> => {
     try {
-        return await readDeviceInfo(device, VCOM_INDEX);
+        return await readDeviceInfo(device, vComIndex);
     } catch (e) {
         logger.warn(
             `mflt get_device_info attempt ${attempt}/${MAX_ATTEMPTS} failed: ${describeError(
@@ -44,17 +44,18 @@ const attemptRead = async (
             throw e;
         }
         await delay(RETRY_DELAY_MS);
-        return attemptRead(device, attempt + 1);
+        return attemptRead(device, vComIndex, attempt + 1);
     }
 };
 
 export const fetchDeviceInfo =
-    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
+    (vComIndex: number): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         const device = getSelectedDeviceUnsafely(getState());
         dispatch(setDeviceInfoFetching());
 
         try {
-            dispatch(setDeviceInfo(await attemptRead(device, 1)));
+            dispatch(setDeviceInfo(await attemptRead(device, vComIndex, 1)));
         } catch (e) {
             reportEvaluateError('Device info', e);
             dispatch(setDeviceInfoError(describeError(e)));

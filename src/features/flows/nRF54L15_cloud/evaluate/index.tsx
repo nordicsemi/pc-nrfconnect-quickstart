@@ -22,7 +22,7 @@ import EstablishConnection from './EstablishConnection';
 import TestCrash from './TestCrash';
 import TryLbs from './TryLbs';
 
-export default () => {
+export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const subStep = useAppSelector(getSubStep);
     const deviceInfo = useAppSelector(getDeviceInfo);
@@ -34,9 +34,9 @@ export default () => {
 
     useEffect(() => {
         if (deviceInfo.status === 'idle') {
-            dispatch(fetchDeviceInfo());
+            dispatch(fetchDeviceInfo(vComIndex));
         }
-    }, [dispatch, deviceInfo.status]);
+    }, [dispatch, deviceInfo.status, vComIndex]);
 
     switch (subStep) {
         case CloudSubStep.ESTABLISH_CONNECTION:
@@ -44,10 +44,10 @@ export default () => {
         case CloudSubStep.TRY_LBS:
             return <TryLbs />;
         case CloudSubStep.TEST_CRASH:
-            return <TestCrash />;
+            return <TestCrash vComIndex={vComIndex} />;
         case CloudSubStep.AUTHENTICATE:
             return <Authenticate />;
         case CloudSubStep.DEVICE_REGISTRATION:
-            return <DeviceRegistration />;
+            return <DeviceRegistration vComIndex={vComIndex} />;
     }
 };

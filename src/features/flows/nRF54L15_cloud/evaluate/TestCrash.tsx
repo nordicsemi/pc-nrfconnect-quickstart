@@ -25,7 +25,7 @@ import {
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { reportEvaluateError } from './reportError';
 
-export default () => {
+export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const deviceInfo = useAppSelector(getDeviceInfo);
     const crashReportBaselineTime = useAppSelector(getCrashReportBaselineTime);
@@ -176,7 +176,7 @@ export default () => {
                 {deviceInfo.status === 'error' ? (
                     <Next
                         label="Retry"
-                        onClick={() => dispatch(fetchDeviceInfo())}
+                        onClick={() => dispatch(fetchDeviceInfo(vComIndex))}
                     />
                 ) : (
                     <Next
