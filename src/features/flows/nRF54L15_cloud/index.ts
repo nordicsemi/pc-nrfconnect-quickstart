@@ -7,6 +7,7 @@
 import Verify from '../../../common/steps/5xFamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
+import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -33,8 +34,6 @@ const programConfig = [
             label: 'nRF Cloud Bluetooth Quick Start',
             href: 'https://github.com/nrfconnect/quickstart-bluetooth',
         },
-        ncsAddon:
-            'app=quickstart-bluetooth&branch=v1.1.1&manifest=&repo=https://github.com/nrfconnect/quickstart-bluetooth',
         programmingOptions: {
             firmwareList: [
                 {
@@ -101,17 +100,26 @@ const learnConfig = [
 const developConfig = [
     {
         ref: 'Hello World',
-        sampleSource: 'zephyr/samples/hello_world',
+        type: 'sdk',
+        params: {
+            samplePath: 'zephyr/samples/hello_world',
+        },
     },
     {
         ref: 'Peripheral LED Button Service',
-        sampleSource: 'nrf/samples/bluetooth/peripheral_lbs',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/bluetooth/peripheral_lbs',
+        },
     },
     {
         ref: 'Peripheral UART',
-        sampleSource: 'nrf/samples/bluetooth/peripheral_uart',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/bluetooth/peripheral_uart',
+        },
     },
-];
+] satisfies SampleWithRef[];
 
 const appsConfig = [
     'pc-nrfconnect-programmer',

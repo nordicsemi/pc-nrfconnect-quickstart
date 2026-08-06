@@ -7,6 +7,7 @@
 import Verify from '../../../common/steps/5xFamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
+import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -214,17 +215,26 @@ const learnConfig = [
 const developConfig = [
     {
         ref: 'Hello World',
-        sampleSource: 'zephyr/samples/hello_world',
+        type: 'sdk',
+        params: {
+            samplePath: 'zephyr/samples/hello_world',
+        },
     },
     {
         ref: 'Wi-Fi Scan',
-        sampleSource: 'nrf/samples/wifi/scan',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/wifi/scan',
+        },
     },
     {
         ref: 'Wi-Fi Bluetooth LE Provisioning',
-        sampleSource: 'nrf/samples/wifi/provisioning/ble',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/wifi/provisioning/ble',
+        },
     },
-];
+] as SampleWithRef[];
 
 const appsConfig = [
     'pc-nrfconnect-programmer',

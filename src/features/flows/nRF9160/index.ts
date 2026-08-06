@@ -7,12 +7,16 @@
 import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
+import {
+    type SampleWithRef,
+    SDKType,
+} from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
-import { type Choice, SDKType } from '../../device/deviceSlice';
+import { type Choice } from '../../device/deviceSlice';
 import SIM from './SIM';
 
 const infoConfig = {
@@ -84,10 +88,6 @@ const programConfig = [
             title: 'Increased power consumption',
             content:
                 'Modem Trace is enabled; the current consumption will be higher than usual.',
-        },
-        sdk: {
-            type: SDKType.nRFConnectSDK,
-            version: '2.8.0',
         },
         programmingOptions: {
             actions: [
@@ -308,17 +308,27 @@ const learnConfig = [
 const developConfig = [
     {
         ref: 'AT Commands',
-        sampleSource: 'nrf/applications/serial_lte_modem',
+        params: {
+            samplePath: 'nrf/applications/serial_lte_modem',
+        },
     },
     {
         ref: 'Asset Tracking',
-        sampleSource: 'nrf/applications/asset_tracker_v2',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/applications/asset_tracker_v2',
+            sdkType: SDKType.nRFConnectSDK,
+            sdkVersion: '2.8.0',
+        },
     },
     {
         ref: 'Shell Command Line Interface',
-        sampleSource: 'nrf/samples/cellular/modem_shell',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/cellular/modem_shell',
+        },
     },
-];
+] as SampleWithRef[];
 
 const appsConfig = [
     'pc-nrfconnect-cellularmonitor',

@@ -7,12 +7,16 @@
 import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
+import {
+    type SampleWithRef,
+    SDKType,
+} from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
-import { type Choice, SDKType } from '../../device/deviceSlice';
+import { type Choice } from '../../device/deviceSlice';
 import {
     checkModemFirmwareVersion,
     onCancel,
@@ -36,10 +40,6 @@ const programConfig = [
         documentation: {
             label: 'Modem bypass',
             href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/samples/nrf93m1dk/modem_bypass/README.html',
-        },
-        sdk: {
-            version: '3.5.0-preview2',
-            type: SDKType.nRFConnectSDK,
         },
         programmingOptions: {
             actions: [
@@ -251,9 +251,14 @@ const learnConfig = [
 const developConfig = [
     {
         ref: 'AT Commands',
-        sampleSource: 'nrf/samples/nrf93m1dk/modem_bypass',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/nrf93m1dk/modem_bypass',
+            sdkVersion: '3.5.0-preview2',
+            sdkType: SDKType.nRFConnectSDK,
+        },
     },
-];
+] as SampleWithRef[];
 
 const appsConfig = [
     'pc-nrfconnect-serial-terminal',
