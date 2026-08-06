@@ -84,34 +84,54 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         return <Next disabled={registration.status !== 'success'} />;
     };
 
-    const issueBox = (title: string) => (
-        <IssueBox
-            mdiIcon="mdi-lightbulb-alert-outline"
-            color="tw-text-red"
-            title={title}
-        />
-    );
+    const loadingMessage = (() => {
+        if (hasAuth && !hasSn && deviceInfo.status !== 'error') {
+            return 'Reading device information…';
+        }
+        if (hasAuth && hasSn && registration.status === 'loading') {
+            return 'Registering device online and configuring the project key…';
+        }
+        return undefined;
+    })();
+
+    const errorMessage = (() => {
+        if (!hasAuth) {
+            return 'Error: Failed to obtain project details. The device cannot be registered. Please try again.';
+        }
+        if (!hasSn) {
+            return deviceInfo.status === 'error'
+                ? (deviceInfo.message ??
+                      'Error: Failed to obtain device information.')
+                : undefined; // still loading device info, no error
+        }
+        if (registration.status === 'error') {
+            return (
+                registration.message ??
+                'Error: Failed to register your device. Please try again.'
+            );
+        }
+        return undefined;
+    })();
 
     return (
         <Main>
             <Main.Content heading="Register your device" fillHeight>
                 <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-3">
-                        {memfault.selectedOrgSlug &&
-                            memfault.selectedProjectSlug && (
-                                <div className="tw-flex tw-flex-row">
-                                    <p className="tw-w-1/2">
-                                        <b>Organization</b>
-                                        <br />
-                                        {memfault.selectedOrgSlug}
-                                    </p>
-                                    <p className="tw-w-1/2">
-                                        <b>Project</b>
-                                        <br />
-                                        {memfault.selectedProjectSlug}
-                                    </p>
-                                </div>
-                            )}
+                        {hasAuth && (
+                            <div className="tw-flex tw-flex-row">
+                                <p className="tw-w-1/2">
+                                    <b>Organization</b>
+                                    <br />
+                                    {memfault.selectedOrgSlug ?? 'Unknown'}
+                                </p>
+                                <p className="tw-w-1/2">
+                                    <b>Project</b>
+                                    <br />
+                                    {memfault.selectedProjectSlug ?? 'Unknown'}
+                                </p>
+                            </div>
+                        )}
 
                         <div className="tw-flex tw-flex-col tw-gap-2">
                             <p>
@@ -142,46 +162,20 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         </div>
                     )}
 
-                    {hasAuth && hasSn && (
-                        <div>
-                            {registration.status === 'loading' && (
-                                <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
-                                    <Spinner size="sm" />
-                                    <span className="tw-text-xs">
-                                        Registering device online and
-                                        configuring the project key…
-                                    </span>
-                                </div>
-                            )}
-
-                            {registration.status === 'error' &&
-                                issueBox(
-                                    registration.message ??
-                                        'Failed to register your device. Please try again.',
-                                )}
+                    {loadingMessage && (
+                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
+                            <Spinner size="sm" />
+                            <span className="tw-text-xs">{loadingMessage}</span>
                         </div>
                     )}
 
-                    {!hasAuth &&
-                        issueBox(
-                            'Failed to obtain project details. The device cannot be registered. Please try again.',
-                        )}
-
-                    {hasAuth &&
-                        !hasSn &&
-                        (deviceInfo.status === 'error' ? (
-                            issueBox(
-                                deviceInfo.message ??
-                                    'Failed to obtain device information.',
-                            )
-                        ) : (
-                            <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
-                                <Spinner size="sm" />
-                                <span className="tw-text-xs">
-                                    Reading device information…
-                                </span>
-                            </div>
-                        ))}
+                    {errorMessage && (
+                        <IssueBox
+                            mdiIcon="mdi-lightbulb-alert-outline"
+                            color="tw-text-red"
+                            title={errorMessage}
+                        />
+                    )}
                 </div>
             </Main.Content>
             <Main.Footer>
