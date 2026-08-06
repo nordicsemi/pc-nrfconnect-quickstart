@@ -49,9 +49,9 @@ export default () => {
                             </div>
 
                             <p className="tw-text-xs">
-                                Press Button 0 on the DK. nRF Toolbox shows the
-                                Button characteristic flip between Button
-                                released and Button pressed.
+                                Press <b>Button 0</b> on the DK. nRF Toolbox
+                                shows the Button characteristic flip between
+                                Button released and Button pressed.
                             </p>
                         </div>
 
@@ -73,8 +73,8 @@ export default () => {
                             </div>
 
                             <p className="tw-text-xs">
-                                Tap ON / OFF in nRF Toolbox to switch LED 2 on
-                                your DK on and off.
+                                Tap the toggle in nRF Toolbox to switch{' '}
+                                <b>LED 2</b> on your DK on and off.
                             </p>
                         </div>
                     </div>

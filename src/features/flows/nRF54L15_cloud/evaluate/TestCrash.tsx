@@ -77,8 +77,8 @@ export default () => {
         <Main>
             <Main.Content
                 heading="Remote connection"
-                subHeading="Test crash"
-                fill
+                subHeading="Trigger a test crash"
+                fillHeight
             >
                 <div className="tw-flex tw-flex-col tw-gap-4">
                     <div className="tw-flex tw-flex-col tw-gap-1">
@@ -86,10 +86,10 @@ export default () => {
                             Trigger a test crash by pressing <b>Button 1</b>.
                         </span>
                         <span>
-                            Your device will fault, reboot and disconnect from
-                            the app. Then you need to reconnect the device to
-                            the app, which will send the crash report to the
-                            cloud over BLE.
+                            Your device will fault, reboot, and disconnect from
+                            the app. You need to reconnect the device to the
+                            app, which will send the crash report to the cloud
+                            over Bluetooth LE.
                         </span>
                     </div>
                     {deviceInfo.status === 'fetching' && (

@@ -14,13 +14,7 @@ import { Terminal } from '@xterm/headless';
 
 import { cleanShellOutput } from '../../../../common/cleanShellOutput';
 import { type DeviceWithSerialnumber } from '../../../device/deviceLib';
-
-export interface DeviceInfo {
-    serialNumber: string;
-    swType?: string;
-    swVersion?: string;
-    hwVersion?: string;
-}
+import { type DeviceInfo } from './types';
 
 const decoder = new TextDecoder();
 

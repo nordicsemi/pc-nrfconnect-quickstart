@@ -15,8 +15,9 @@ import {
     setDeviceInfoError,
     setDeviceInfoFetching,
 } from './cloudEvaluateSlice';
-import { type DeviceInfo, readDeviceInfo } from './device';
+import { readDeviceInfo } from './device';
 import { reportEvaluateError } from './reportError';
+import { type DeviceInfo } from './types';
 
 const VCOM_INDEX = 1;
 const MAX_ATTEMPTS = 3;

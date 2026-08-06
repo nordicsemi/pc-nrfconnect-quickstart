@@ -94,7 +94,7 @@ export default () => {
 
     return (
         <Main>
-            <Main.Content heading="Register your device" fill>
+            <Main.Content heading="Register your device" fillHeight>
                 <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-3">
                         {memfault.selectedOrgSlug &&

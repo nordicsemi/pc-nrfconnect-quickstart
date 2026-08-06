@@ -64,17 +64,14 @@ export const connectMemfault =
                 throw new Error(idTokenRes.error);
             }
 
-            // 1. provisioning (/me) — precondition
             await provisionMyNordicAccount(idTokenRes.data);
-
-            // 2. access token (/token)
             const accessToken = await dispatch(getValidAccessToken());
-
-            // 3. orgs/projects from /api/v0
             const organizations = await fetchOrganizations(accessToken);
+
             if (organizations.length === 0) {
                 throw new Error('No organizations found for this account');
             }
+
             const firstOrg = organizations[0];
             const projects = await fetchProjects(accessToken, firstOrg.slug);
 

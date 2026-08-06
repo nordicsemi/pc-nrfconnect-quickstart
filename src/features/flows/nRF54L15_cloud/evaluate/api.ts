@@ -9,6 +9,17 @@ import {
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import {
+    type CrashFrame,
+    type CrashReport,
+    type MemfaultToken,
+    type Organization,
+    type Project,
+    type RegisterDeviceParams,
+    type SoftwareVersion,
+    type SymbolUploadUrl,
+} from './types';
+
 // Real:
 const API_BASE = 'https://api.memfault.com/api/v0';
 const MYNORDIC_BASE = 'https://api.memfault.com/mynordic';
@@ -17,22 +28,6 @@ const MYNORDIC_BASE = 'https://api.memfault.com/mynordic';
 // const MYNORDIC_BASE = 'http://127.0.0.1:8000/mynordic';
 
 const POLL_INTERVAL_MS = 5000;
-
-export interface CrashFrame {
-    index: number;
-    function: string;
-    file: string;
-    lineno: number;
-    address: string;
-    module: string;
-}
-
-export interface CrashReport {
-    reason: string;
-    title: string;
-    capturedDate: string;
-    frames: CrashFrame[];
-}
 
 interface RawCrash {
     reason: string;
@@ -52,26 +47,29 @@ interface CrashReportFetch {
     serverTime: number;
 }
 
-export interface Organization {
-    id: number;
-    name: string;
-    slug: string;
-}
-
-export interface Project {
-    id: number;
-    name: string;
-    slug: string;
-}
-
 interface UploadUrlResponse {
     data: { upload_url: string; token: string };
 }
 
-export interface RegisterDeviceParams {
-    deviceSerial: string;
-    hardwareVersion: string;
+interface TokenResponse {
+    token_type: string;
+    access_token: string;
+    expires_in: number;
+    scope: string;
+}
+
+interface RegisterDeviceBody {
+    device_serial: string;
+    hardware_version: string;
     nickname?: string;
+}
+
+interface FinalizeSymbolBody {
+    file: { token: string };
+    software_version?: {
+        version?: string;
+        software_type?: string;
+    };
 }
 
 const bearer = (token: string) => ({ Authorization: `Bearer ${token}` });
@@ -117,16 +115,9 @@ export const provisionMyNordicAccount = async (
     }
 };
 
-interface TokenResponse {
-    token_type: string;
-    access_token: string;
-    expires_in: number;
-    scope: string;
-}
-
 export const fetchMemfaultToken = async (
     idToken: string,
-): Promise<{ accessToken: string; expiresIn: number }> => {
+): Promise<MemfaultToken> => {
     const res = await fetch(`${MYNORDIC_BASE}/token`, {
         method: 'POST',
         headers: bearer(idToken),
@@ -268,17 +259,11 @@ export const postRegisterDevice = async (
     projectSlug: string,
     params: RegisterDeviceParams,
 ): Promise<void> => {
-    const body: {
-        device_serial: string;
-        hardware_version: string;
-        nickname?: string;
-    } = {
+    const body: RegisterDeviceBody = {
         device_serial: params.deviceSerial,
         hardware_version: params.hardwareVersion,
+        ...(params.nickname ? { nickname: params.nickname } : {}),
     };
-    if (params.nickname) {
-        body.nickname = params.nickname;
-    }
 
     const res = await fetch(
         `${API_BASE}/organizations/${encodeURIComponent(
@@ -304,7 +289,7 @@ export const requestSymbolUploadUrl = async (
     memfaultToken: string,
     orgSlug: string,
     projectSlug: string,
-): Promise<{ uploadUrl: string; uploadToken: string }> => {
+): Promise<SymbolUploadUrl> => {
     const res = await fetch(
         `${API_BASE}/organizations/${encodeURIComponent(
             orgSlug,
@@ -340,11 +325,6 @@ export const uploadSymbolBinary = async (
     }
 };
 
-export interface SoftwareVersion {
-    version?: string;
-    softwareType?: string;
-}
-
 export const finalizeSymbolFile = async (
     memfaultToken: string,
     orgSlug: string,
@@ -352,16 +332,17 @@ export const finalizeSymbolFile = async (
     uploadToken: string,
     sw?: SoftwareVersion,
 ): Promise<void> => {
-    const body: {
-        file: { token: string };
-        software_version?: { version?: string; software_type?: string };
-    } = { file: { token: uploadToken } };
-    if (sw && (sw.version || sw.softwareType)) {
-        body.software_version = {
-            version: sw.version,
-            software_type: sw.softwareType,
-        };
-    }
+    const body: FinalizeSymbolBody = {
+        file: { token: uploadToken },
+        ...(sw && (sw.version || sw.softwareType)
+            ? {
+                  software_version: {
+                      version: sw.version,
+                      software_type: sw.softwareType,
+                  },
+              }
+            : {}),
+    };
 
     const res = await fetch(
         `${API_BASE}/organizations/${encodeURIComponent(

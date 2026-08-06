@@ -18,7 +18,7 @@ import {
     inMain as auth,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/ipc/auth';
 
-import Logomark from '../../../../../resources/Logomark.png';
+import Logomark from '../../../../../resources/Logomark.svg';
 import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
@@ -100,7 +100,7 @@ export default () => {
 
     return (
         <Main className="tw-min-h-0 tw-flex-1">
-            <Main.Content heading="Register your device" fill>
+            <Main.Content heading="Register your device" fillHeight>
                 <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <p>

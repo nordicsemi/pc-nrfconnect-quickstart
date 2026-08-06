@@ -34,8 +34,8 @@ export default () => {
                     <div className="-tw-mt-1 tw-flex tw-flex-col tw-gap-2">
                         <p>
                             Establish a remote connection gateway for your{' '}
-                            <b>nRF54L15 DK</b> using your mobile device as a BLE
-                            relay.
+                            <b>nRF54L15 DK</b> using your mobile device as a
+                            Bluetooth LE relay.
                         </p>
                         <ol className="tw-list-inside tw-list-decimal">
                             <li>

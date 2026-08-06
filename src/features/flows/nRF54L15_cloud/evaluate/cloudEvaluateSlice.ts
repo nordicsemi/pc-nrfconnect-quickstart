@@ -8,7 +8,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { type RootState } from '../../../../app/store';
 import { setChoice } from '../../../device/deviceSlice';
-import { type CrashReport, type Organization, type Project } from './api';
+import { type CrashReport, type Organization, type Project } from './types';
 
 export enum CloudSubStep {
     ESTABLISH_CONNECTION,
