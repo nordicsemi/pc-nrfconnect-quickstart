@@ -11,7 +11,7 @@
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
-        "nrfconnect": ">=5.2.0"
+        "nrfconnect": ">=5.4.0"
     },
     "main": "dist/bundle.js",
     "nrfConnectForDesktop": {
@@ -54,6 +54,6 @@
     },
     "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js",
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "github:nordicsemi/pc-nrfconnect-shared#feat/auth-ipc"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "github:nordicsemi/pc-nrfconnect-shared#feat/cloud-quickstart-integration"
     }
 }
