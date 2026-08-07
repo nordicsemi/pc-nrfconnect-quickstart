@@ -25,7 +25,7 @@ import {
     requestSymbolUploadUrl,
     uploadSymbolBinary,
 } from './api';
-import { getValidAccessToken } from './authEffects';
+import { withMemfaultToken } from './authEffects';
 import {
     getDeviceInfo,
     getMemfault,
@@ -46,39 +46,43 @@ export const registerDevice =
             const { selectedOrgSlug, selectedProjectSlug } = getMemfault(state);
             const deviceInfo = getDeviceInfo(state);
             const device = getSelectedDeviceUnsafely(state);
+            const serialNumber = deviceInfo.serialNumber;
 
             if (!selectedOrgSlug || !selectedProjectSlug) {
                 throw new Error('Missing authentication data');
             }
-            if (deviceInfo.status !== 'success' || !deviceInfo.serialNumber) {
+            if (deviceInfo.status !== 'success' || !serialNumber) {
                 throw new Error('Missing device serial number');
             }
 
-            phase = 'get-access-token';
-            const accessToken = await dispatch(getValidAccessToken());
-
             phase = 'get-project-key';
-            const projectKey = await fetchProjectKey(
-                accessToken,
-                selectedOrgSlug,
-                selectedProjectSlug,
+            const projectKey = await dispatch(
+                withMemfaultToken(t =>
+                    fetchProjectKey(t, selectedOrgSlug, selectedProjectSlug),
+                ),
             );
 
             phase = 'set-project-key';
             await setDeviceProjectKey(device, vComIndex, projectKey);
 
             phase = 'register';
-            await postRegisterDevice(
-                accessToken,
-                selectedOrgSlug,
-                selectedProjectSlug,
-                {
-                    deviceSerial: deviceInfo.serialNumber,
-                    hardwareVersion:
-                        deviceInfo.hwVersion ?? HARDWARE_VERSION_FALLBACK,
-                    nickname:
-                        getPersistedNickname(device.serialNumber) || undefined,
-                },
+            await dispatch(
+                withMemfaultToken(t =>
+                    postRegisterDevice(
+                        t,
+                        selectedOrgSlug,
+                        selectedProjectSlug,
+                        {
+                            deviceSerial: serialNumber,
+                            hardwareVersion:
+                                deviceInfo.hwVersion ??
+                                HARDWARE_VERSION_FALLBACK,
+                            nickname:
+                                getPersistedNickname(device.serialNumber) ||
+                                undefined,
+                        },
+                    ),
+                ),
             );
 
             phase = 'upload-symbols';
@@ -95,21 +99,29 @@ export const registerDevice =
                     firmware.elfFile,
                 );
                 const bytes = await fs.promises.readFile(elfPath);
-                const { uploadUrl, uploadToken } = await requestSymbolUploadUrl(
-                    accessToken,
-                    selectedOrgSlug,
-                    selectedProjectSlug,
+                const { uploadUrl, uploadToken } = await dispatch(
+                    withMemfaultToken(t =>
+                        requestSymbolUploadUrl(
+                            t,
+                            selectedOrgSlug,
+                            selectedProjectSlug,
+                        ),
+                    ),
                 );
                 await uploadSymbolBinary(uploadUrl, bytes);
-                await finalizeSymbolFile(
-                    accessToken,
-                    selectedOrgSlug,
-                    selectedProjectSlug,
-                    uploadToken,
-                    {
-                        version: deviceInfo.swVersion,
-                        softwareType: deviceInfo.swType,
-                    },
+                await dispatch(
+                    withMemfaultToken(t =>
+                        finalizeSymbolFile(
+                            t,
+                            selectedOrgSlug,
+                            selectedProjectSlug,
+                            uploadToken,
+                            {
+                                version: deviceInfo.swVersion,
+                                softwareType: deviceInfo.swType,
+                            },
+                        ),
+                    ),
                 );
             } else {
                 logger.warn('No ELF configured for symbol upload; skipping.');

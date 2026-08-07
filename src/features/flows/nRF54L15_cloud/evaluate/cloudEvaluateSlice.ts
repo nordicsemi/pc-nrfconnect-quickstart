@@ -58,7 +58,6 @@ interface RegistrationState {
 interface MemfaultState {
     status: AsyncStatus;
     accessToken?: string;
-    accessTokenExpiresAt?: number;
     organizations: Organization[];
     projects: Project[];
     selectedOrgSlug?: string;
@@ -159,14 +158,8 @@ const slice = createSlice({
             state.memfault.organizations = payload.organizations;
             state.memfault.projects = payload.projects;
         },
-        setAccessToken: (
-            state,
-            {
-                payload,
-            }: PayloadAction<{ accessToken: string; expiresAt: number }>,
-        ) => {
-            state.memfault.accessToken = payload.accessToken;
-            state.memfault.accessTokenExpiresAt = payload.expiresAt;
+        setAccessToken: (state, { payload }: PayloadAction<string>) => {
+            state.memfault.accessToken = payload;
         },
         setProjects: (
             state,

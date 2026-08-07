@@ -26,6 +26,16 @@ const MYNORDIC_BASE = 'https://api.memfault.com/mynordic';
 
 const POLL_INTERVAL_MS = 5000;
 
+export class HttpError extends Error {
+    constructor(
+        public status: number,
+        message: string,
+    ) {
+        super(message);
+        this.name = 'HttpError';
+    }
+}
+
 interface RawCrash {
     reason: string;
     title: string;
@@ -101,7 +111,10 @@ export const provisionMyNordicAccount = async (
         headers: bearer(idToken),
     });
     if (!res.ok) {
-        throw new Error(`Failed to provision myNordic account (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Failed to obtain your Memfault account (${res.status})`,
+        );
     }
 };
 
@@ -113,7 +126,8 @@ export const fetchMemfaultToken = async (
         headers: bearer(idToken),
     });
     if (!res.ok) {
-        throw new Error(
+        throw new HttpError(
+            res.status,
             `Failed to obtain Memfault access token (${res.status})`,
         );
     }
@@ -195,7 +209,10 @@ export const fetchOrganizations = async (
         headers: bearer(memfaultToken),
     });
     if (!res.ok) {
-        throw new Error(`Failed to fetch organizations (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Failed to fetch organizations (${res.status})`,
+        );
     }
     const { data } = (await res.json()) as { data: Organization[] };
     return data;
@@ -210,7 +227,10 @@ export const fetchProjects = async (
         { headers: bearer(memfaultToken) },
     );
     if (!res.ok) {
-        throw new Error(`Failed to fetch projects (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Failed to fetch projects (${res.status})`,
+        );
     }
     const { data } = (await res.json()) as { data: Project[] };
     return data;
@@ -228,7 +248,10 @@ export const fetchProjectKey = async (
         { headers: bearer(memfaultToken) },
     );
     if (!res.ok) {
-        throw new Error(`Failed to fetch project key (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Failed to fetch project key (${res.status})`,
+        );
     }
     const { data } = (await res.json()) as { data: { token: string }[] };
     const token = data[0]?.token;
@@ -266,7 +289,10 @@ export const postRegisterDevice = async (
         },
     );
     if (!res.ok) {
-        throw new Error(`Device registration failed (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Device registration failed (${res.status})`,
+        );
     }
 };
 
@@ -289,7 +315,10 @@ export const requestSymbolUploadUrl = async (
         },
     );
     if (!res.ok) {
-        throw new Error(`Failed to request upload URL (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Failed to request upload URL (${res.status})`,
+        );
     }
     const { data } = (await res.json()) as UploadUrlResponse;
     const { upload_url: uploadUrl, token: uploadToken } = data;
@@ -343,11 +372,15 @@ export const finalizeSymbolFile = async (
         },
     );
 
-    // Symbol file already exists  — treat as success
+    // Symbol file already exists — treat as success
     if (res.status === 409) {
         return;
     }
+
     if (!res.ok) {
-        throw new Error(`Failed to finalize symbol file (${res.status})`);
+        throw new HttpError(
+            res.status,
+            `Failed to finalize symbol file (${res.status})`,
+        );
     }
 };

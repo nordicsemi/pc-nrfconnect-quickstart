@@ -12,6 +12,7 @@ import {
     fetchMemfaultToken,
     fetchOrganizations,
     fetchProjects,
+    HttpError,
     provisionMyNordicAccount,
 } from './api';
 import {
@@ -24,34 +25,39 @@ import {
 } from './cloudEvaluateSlice';
 import { reportEvaluateError } from './reportError';
 
-const TOKEN_EXPIRY_BUFFER_MS = 60_000;
-
-export const getValidAccessToken =
-    (): AppThunk<RootState, Promise<string>> => async (dispatch, getState) => {
-        const { accessToken, accessTokenExpiresAt } = getMemfault(getState());
-
-        if (
-            accessToken &&
-            accessTokenExpiresAt &&
-            Date.now() < accessTokenExpiresAt - TOKEN_EXPIRY_BUFFER_MS
-        ) {
-            return accessToken;
-        }
-
+// Fetches a new Memfault access token. A failure here (incl. 401) is surfaced
+// as an error — it does NOT end the users session. The session depends solely
+// on the myNordic/Entra tokens (auth.getIdToken / the shared auth state).
+const refreshMemfaultToken =
+    (): AppThunk<RootState, Promise<string>> => async dispatch => {
         const idTokenRes = await auth.getIdToken();
         if (!idTokenRes.status) {
             throw new Error(idTokenRes.error);
         }
-        const { accessToken: fresh, expiresIn } = await fetchMemfaultToken(
-            idTokenRes.data,
-        );
-        dispatch(
-            setAccessToken({
-                accessToken: fresh,
-                expiresAt: Date.now() + expiresIn * 1000,
-            }),
-        );
-        return fresh;
+        const { accessToken } = await fetchMemfaultToken(idTokenRes.data);
+        dispatch(setAccessToken(accessToken));
+        return accessToken;
+    };
+
+// Runs a request with the stored access token; on 401 refreshes and retries once.
+export const withMemfaultToken =
+    <T>(
+        request: (accessToken: string) => Promise<T>,
+    ): AppThunk<RootState, Promise<T>> =>
+    async (dispatch, getState) => {
+        let token = getMemfault(getState()).accessToken;
+        if (!token) {
+            token = await dispatch(refreshMemfaultToken());
+        }
+        try {
+            return await request(token);
+        } catch (e) {
+            if (e instanceof HttpError && e.status === 401) {
+                const fresh = await dispatch(refreshMemfaultToken());
+                return request(fresh);
+            }
+            throw e;
+        }
     };
 
 export const connectMemfault =
@@ -62,16 +68,16 @@ export const connectMemfault =
             if (!idTokenRes.status) {
                 throw new Error(idTokenRes.error);
             }
-
             await provisionMyNordicAccount(idTokenRes.data);
-            const accessToken = await dispatch(getValidAccessToken());
 
-            const organizations = await fetchOrganizations(accessToken);
-            if (organizations.length === 0)
+            const organizations = await dispatch(
+                withMemfaultToken(t => fetchOrganizations(t)),
+            );
+            if (organizations.length === 0) {
                 throw new Error('No organizations found for this account');
-            const projects = await fetchProjects(
-                accessToken,
-                organizations[0].slug,
+            }
+            const projects = await dispatch(
+                withMemfaultToken(t => fetchProjects(t, organizations[0].slug)),
             );
             dispatch(setMemfaultSuccess({ organizations, projects }));
         } catch (e) {
@@ -84,13 +90,10 @@ export const fetchProjectsForOrg =
     (orgSlug: string): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
         try {
-            const accessToken = await dispatch(getValidAccessToken());
-            const projects = await fetchProjects(accessToken, orgSlug);
-            dispatch(
-                setProjects({
-                    projects,
-                }),
+            const projects = await dispatch(
+                withMemfaultToken(t => fetchProjects(t, orgSlug)),
             );
+            dispatch(setProjects({ projects }));
         } catch (e) {
             reportEvaluateError('Authenticate', e, 'select-org');
             dispatch(setMemfaultError(describeError(e)));
