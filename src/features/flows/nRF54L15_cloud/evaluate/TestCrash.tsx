@@ -12,15 +12,15 @@ import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
-import { fetchServerTime, pollCrashReport } from './api';
+import { pollCrashReport } from './api';
 import {
     getCrashReport,
-    getCrashReportBaselineTime,
+    getCrashReportBaselineDate,
     getDeviceInfo,
     nextSubStep,
     prevSubStep,
     setCrashReport,
-    setCrashReportBaselineTime,
+    setCrashReportBaselineDate,
 } from './cloudEvaluateSlice';
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { reportEvaluateError } from './reportError';
@@ -28,7 +28,7 @@ import { reportEvaluateError } from './reportError';
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const deviceInfo = useAppSelector(getDeviceInfo);
-    const crashReportBaselineTime = useAppSelector(getCrashReportBaselineTime);
+    const crashReportBaselineDate = useAppSelector(getCrashReportBaselineDate);
     const crashReport = useAppSelector(getCrashReport);
     const [error, setError] = useState<string>();
 
@@ -36,43 +36,27 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         deviceInfo.status === 'success' ? deviceInfo.serialNumber : undefined;
 
     useEffect(() => {
-        if (crashReportBaselineTime !== undefined || !serialNumber || error) {
+        if (!serialNumber || crashReport || error) {
             return undefined;
         }
-        const controller = new AbortController();
-        fetchServerTime(serialNumber, controller.signal)
-            .then(t => dispatch(setCrashReportBaselineTime(t)))
-            .catch(e => {
-                if ((e as Error).name === 'AbortError') return;
-                reportEvaluateError('Test crash', e, 'baseline');
-                setError(describeError(e));
-            });
-        return () => controller.abort();
-    }, [dispatch, serialNumber, crashReportBaselineTime, error]);
 
-    useEffect(() => {
-        if (
-            crashReportBaselineTime === undefined ||
-            !serialNumber ||
-            crashReport ||
-            error
-        ) {
-            return undefined;
-        }
         const controller = new AbortController();
-        pollCrashReport(
-            serialNumber,
-            controller.signal,
-            crashReportBaselineTime,
-        )
+        pollCrashReport(serialNumber, controller.signal, {
+            baseline: crashReportBaselineDate,
+            onBaseline: b => dispatch(setCrashReportBaselineDate(b)),
+        })
             .then(crash => dispatch(setCrashReport(crash)))
             .catch(e => {
-                if ((e as Error).name === 'AbortError') return;
+                if ((e as Error).name === 'AbortError') {
+                    return;
+                }
                 reportEvaluateError('Test crash', e, 'poll-crash');
                 setError(describeError(e));
             });
+
         return () => controller.abort();
-    }, [dispatch, serialNumber, crashReportBaselineTime, crashReport, error]);
+        // When the first poll establishes the baseline, the effect is triggered again and restarts the poll once (with the established baseline).
+    }, [dispatch, serialNumber, crashReport, error, crashReportBaselineDate]);
 
     const waitingForCrash =
         deviceInfo.status === 'success' && !crashReport && !error;
@@ -96,6 +80,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             over Bluetooth LE.
                         </span>
                     </div>
+
                     {deviceInfo.status === 'loading' && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
@@ -104,6 +89,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             </span>
                         </div>
                     )}
+
                     {waitingForCrash && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
@@ -113,6 +99,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             </span>
                         </div>
                     )}
+
                     {deviceInfo.status === 'error' && (
                         <IssueBox
                             mdiIcon="mdi-lightbulb-alert-outline"
@@ -123,6 +110,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             }
                         />
                     )}
+
                     {error && (
                         <IssueBox
                             mdiIcon="mdi-lightbulb-alert-outline"
@@ -130,6 +118,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             title={error}
                         />
                     )}
+
                     {crashReport && (
                         <div className="tw-flex tw-flex-col tw-gap-2">
                             <div className="tw-text-green-500">

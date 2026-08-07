@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    describeError,
-    logger,
-} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { describeError } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     type CrashFrame,
@@ -44,7 +41,6 @@ interface CrashReportResponse {
 interface CrashReportFetch {
     status: CrashReportResponse['status'];
     crash: CrashReport | null;
-    serverTime: number;
 }
 
 interface UploadUrlResponse {
@@ -72,23 +68,17 @@ interface FinalizeSymbolBody {
     };
 }
 
+interface PollBaseline {
+    baseline: string | null | undefined;
+    onBaseline: (capturedDate: string | null) => void;
+}
+
 const bearer = (token: string) => ({ Authorization: `Bearer ${token}` });
 
 const mapCrash = ({
     captured_date: capturedDate,
     ...rest
 }: RawCrash): CrashReport => ({ ...rest, capturedDate });
-
-const parseServerDate = (res: Response): number => {
-    const dateHeader = res.headers.get('date');
-    const time = dateHeader ? Date.parse(dateHeader) : NaN;
-    if (Number.isNaN(time)) {
-        throw new Error(
-            'Missing/unreadable server Date header (CORS: exposed?)',
-        );
-    }
-    return time;
-};
 
 const delay = (ms: number, signal: AbortSignal) =>
     new Promise<void>((resolve, reject) => {
@@ -148,14 +138,11 @@ const fetchCrashReport = async (
                 `Failed to fetch crash report from the cloud (${res.status})`,
             );
         }
-
-        const serverTime = parseServerDate(res);
         const data = (await res.json()) as CrashReportResponse;
 
         return {
             status: data.status,
             crash: data.crash ? mapCrash(data.crash) : null,
-            serverTime,
         };
     } catch (e) {
         if ((e as Error).name === 'AbortError') throw e;
@@ -166,32 +153,30 @@ const fetchCrashReport = async (
     }
 };
 
-export const fetchServerTime = async (
-    deviceSerial: string,
-    signal: AbortSignal,
-): Promise<number> => (await fetchCrashReport(deviceSerial, signal)).serverTime;
-
 export const pollCrashReport = (
     deviceSerial: string,
     signal: AbortSignal,
-    baseline: number,
+    { baseline, onBaseline }: PollBaseline,
     intervalMs = POLL_INTERVAL_MS,
 ): Promise<CrashReport> => {
+    let current = baseline;
+
     const attempt = async (): Promise<CrashReport> => {
         if (signal.aborted) {
-            logger.warn('pollCrashReport aborted');
             throw new DOMException('Aborted', 'AbortError');
         }
-
         const { status, crash } = await fetchCrashReport(deviceSerial, signal);
         const isTerminal = status === 'processed' || status === 'symbolicated';
 
-        if (isTerminal && crash) {
-            const capturedAt = Date.parse(crash.capturedDate);
-            if (!Number.isNaN(capturedAt) && capturedAt > baseline) {
-                logger.info(
-                    `Crash report captured at ${capturedAt} is newer than baseline ${baseline}`,
-                );
+        if (current === undefined) {
+            // The first request sets the baseline: the crash that exists now (if any) is old.
+            current = isTerminal && crash ? crash.capturedDate : null;
+            onBaseline(current);
+        } else if (isTerminal && crash) {
+            const isNew =
+                current === null ||
+                Date.parse(crash.capturedDate) > Date.parse(current);
+            if (isNew) {
                 return crash;
             }
         }

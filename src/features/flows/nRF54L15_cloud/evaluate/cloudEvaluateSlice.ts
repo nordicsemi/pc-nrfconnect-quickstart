@@ -75,7 +75,7 @@ const initialMemfault: MemfaultState = {
 interface State {
     subStep: CloudSubStep;
     deviceInfo: DeviceInfoState;
-    crashReportBaselineTime?: number;
+    crashReportBaselineDate?: string | null;
     crashReport?: CrashReport;
     registration: RegistrationState;
     memfault: MemfaultState;
@@ -122,11 +122,11 @@ const slice = createSlice({
         setDeviceInfoError: (state, { payload }: PayloadAction<string>) => {
             state.deviceInfo = { status: 'error', message: payload };
         },
-        setCrashReportBaselineTime: (
+        setCrashReportBaselineDate: (
             state,
-            { payload }: PayloadAction<number>,
+            { payload }: PayloadAction<string | null>,
         ) => {
-            state.crashReportBaselineTime = payload;
+            state.crashReportBaselineDate = payload;
         },
         setCrashReport: (state, { payload }: PayloadAction<CrashReport>) => {
             state.crashReport = payload;
@@ -203,7 +203,7 @@ export const {
     setDeviceInfoFetching,
     setDeviceInfo,
     setDeviceInfoError,
-    setCrashReportBaselineTime,
+    setCrashReportBaselineDate,
     setCrashReport,
     setRegistration,
     setMemfaultLoading,
@@ -221,8 +221,8 @@ export const getSubStep = (state: RootState) =>
     state.flows.nrf54l15Cloud.subStep;
 export const getDeviceInfo = (state: RootState) =>
     state.flows.nrf54l15Cloud.deviceInfo;
-export const getCrashReportBaselineTime = (state: RootState) =>
-    state.flows.nrf54l15Cloud.crashReportBaselineTime;
+export const getCrashReportBaselineDate = (state: RootState) =>
+    state.flows.nrf54l15Cloud.crashReportBaselineDate;
 export const getCrashReport = (state: RootState) =>
     state.flows.nrf54l15Cloud.crashReport;
 export const getRegistration = (state: RootState) =>
