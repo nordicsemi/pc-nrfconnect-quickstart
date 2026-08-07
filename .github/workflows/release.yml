@@ -9,6 +9,7 @@ on:
                 options:
                     - release-test (internal)
                     - test (internal)
+                    - internal-distribution (internal)
                     - official (external)
             ref:
                 description:
