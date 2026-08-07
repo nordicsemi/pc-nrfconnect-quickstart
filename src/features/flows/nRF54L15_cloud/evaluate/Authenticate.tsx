@@ -230,28 +230,39 @@ export default () => {
                                 {signInPrompt}
                             </p>
                             <div className="tw-flex tw-flex-col tw-gap-6">
-                                <Button
-                                    variant="link-button"
-                                    size="xl"
-                                    onClick={signIn}
-                                    className="tw-w-fit"
-                                    disabled={isAuthenticating}
-                                >
-                                    <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
-                                        <img
-                                            src={Logomark}
-                                            alt="myNordic logo"
-                                            className="tw-h-[17px] tw-w-[20px]"
-                                        />
-                                        <span>
-                                            Sign in with myNordic to register
-                                            your device
-                                        </span>
-                                        {isAuthenticating && (
-                                            <Spinner size="sm" />
-                                        )}
-                                    </div>
-                                </Button>
+                                <div className="tw-flex tw-flex-row tw-gap-2.5">
+                                    <Button
+                                        variant="link-button"
+                                        size="xl"
+                                        onClick={signIn}
+                                        className="tw-w-fit"
+                                        disabled={isAuthenticating}
+                                    >
+                                        <div className="tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
+                                            <img
+                                                src={Logomark}
+                                                alt="myNordic logo"
+                                                className="tw-h-[17px] tw-w-[20px]"
+                                            />
+                                            <span>
+                                                Sign in with myNordic to
+                                                register your device
+                                            </span>
+                                            {isAuthenticating && (
+                                                <Spinner size="sm" />
+                                            )}
+                                        </div>
+                                    </Button>
+                                    {isAuthenticating && (
+                                        <Button
+                                            variant="secondary"
+                                            size="lg"
+                                            onClick={() => auth.cancelSignIn()}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    )}
+                                </div>
                                 {authError && (
                                     <IssueBox
                                         mdiIcon="mdi-lightbulb-alert-outline"
