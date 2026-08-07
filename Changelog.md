@@ -1,3 +1,15 @@
+## 1.10.0 - UNRELEASED
+
+### Added
+
+- nRF Cloud support for the nRF54L15 DK.
+- Cloud Connectivity sample for the nRF54L15 DK.
+
+### Removed
+
+- Hello World, Peripheral LED Button Service, and Peripheral UART samples for
+  the nRF54L15 DK.
+
 ## 1.9.2 - 2026-07-01
 
 ### Changed
