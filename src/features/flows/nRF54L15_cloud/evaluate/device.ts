@@ -31,7 +31,7 @@ export const readDeviceInfo = (
     new Promise<DeviceInfo>((resolve, reject) => {
         const path = device.serialPorts?.[vComIndex]?.comName;
         if (!path) {
-            reject(new Error('Failed to find a valid serialport'));
+            reject(new Error('Failed to find a valid serial port'));
             return;
         }
 
@@ -63,7 +63,7 @@ export const readDeviceInfo = (
                             finish(() => {
                                 reject(
                                     new Error(
-                                        'Failed to obtain device info. The device did not return a serial number.',
+                                        'Failed to obtain device information. The device did not return a serial number.',
                                     ),
                                 );
                             });
@@ -85,7 +85,7 @@ export const readDeviceInfo = (
                         finish(() => {
                             reject(
                                 new Error(
-                                    'Failed to obtain device info. The device did not respond in time.',
+                                    'Failed to obtain device information. The device did not respond in time.',
                                 ),
                             );
                         }),
@@ -99,7 +99,7 @@ export const readDeviceInfo = (
             .catch(e => {
                 reject(
                     new Error(
-                        `Failed to obtain device info. ${describeError(e)}`,
+                        `Failed to obtain device information. ${describeError(e)}`,
                     ),
                 );
             });
@@ -112,7 +112,7 @@ export const setDeviceProjectKey = async (
 ): Promise<void> => {
     const path = device.serialPorts?.[vComIndex]?.comName;
     if (!path) {
-        throw new Error('Failed to find a valid serialport');
+        throw new Error('Failed to find a valid serial port');
     }
 
     const serialPort = await createSerialPort(

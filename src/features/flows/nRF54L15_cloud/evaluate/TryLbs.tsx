@@ -56,14 +56,16 @@ export default () => {
                         </div>
 
                         <div className="tw-row-span-3 tw-grid tw-grid-rows-subgrid tw-gap-2 tw-px-3">
-                            <span className="tw-font-bold">Toggle the LED</span>
+                            <span className="tw-font-bold">
+                                Turn the LED on and off
+                            </span>
 
                             <div className="tw-flex tw-h-full tw-flex-col">
                                 <div className="tw-flex tw-flex-1 tw-items-center tw-justify-center">
                                     <img
                                         className="tw-h-auto tw-max-w-full"
                                         src={cloudLedState}
-                                        alt="Toggle LED toggle in nRF Toolbox"
+                                        alt="Enable the LED toggle in nRF Toolbox"
                                     />
                                 </div>
 
@@ -73,7 +75,7 @@ export default () => {
                             </div>
 
                             <p className="tw-text-xs">
-                                Tap the toggle in nRF Toolbox to switch{' '}
+                                Tap the toggle in nRF Toolbox to turn{' '}
                                 <b>LED 2</b> on your DK on and off.
                             </p>
                         </div>

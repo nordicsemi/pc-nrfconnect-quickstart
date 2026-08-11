@@ -57,7 +57,7 @@ export const fetchDeviceInfo =
         try {
             dispatch(setDeviceInfo(await attemptRead(device, vComIndex, 1)));
         } catch (e) {
-            reportEvaluateError('Device info', e);
+            reportEvaluateError('Device information', e);
             dispatch(setDeviceInfoError(describeError(e)));
         }
     };

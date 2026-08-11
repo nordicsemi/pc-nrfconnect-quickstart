@@ -132,7 +132,7 @@ export default () => {
     ]);
 
     const signInPrompt = needsReauth
-        ? 'Your session expired. Please sign in again.'
+        ? 'Your session has expired. Sign in again.'
         : 'Sign in to continue.';
 
     return (
@@ -141,7 +141,7 @@ export default () => {
                 <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <p>
-                            Connect your device to cloud to capture crashes,
+                            Connect your device to the cloud to capture crashes,
                             push OTA updates, and debug remotely.
                         </p>
                         <ol className="tw-list-inside tw-list-disc">

@@ -32,7 +32,7 @@ export const cloudSubStepTelemetryName = (subStep: CloudSubStep) => {
         case CloudSubStep.TRY_LBS:
             return 'Remote connection - Try the LED Button Service';
         case CloudSubStep.TEST_CRASH:
-            return 'Remote connection - Test crash';
+            return 'Remote connection - Trigger a test crash';
         case CloudSubStep.AUTHENTICATE:
             return 'Register your device - Authenticate';
         case CloudSubStep.DEVICE_REGISTRATION:
