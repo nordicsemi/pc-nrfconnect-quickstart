@@ -122,7 +122,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                     {crashReport && (
                         <div className="tw-flex tw-flex-col tw-gap-2">
                             <div className="tw-text-green-500">
-                                Your crash reached the cloud.
+                                Information about your crash reached the cloud.
                             </div>
                             <div className="tw-flex tw-flex-col tw-border tw-border-gray-200">
                                 <div className="tw-border-b tw-border-gray-200 tw-bg-gray-50 tw-p-2">

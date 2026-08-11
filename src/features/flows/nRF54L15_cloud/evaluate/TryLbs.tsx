@@ -26,8 +26,7 @@ export default () => {
                 <div className="tw-flex tw-flex-col tw-gap-3">
                     <p>
                         The LED Button Service opens automatically once your DK
-                        is connected in nRF Toolbox. Try both interactions
-                        below.
+                        is connected in nRF Toolbox. Try the interactions below.
                     </p>
                     <div className="tw-grid tw-grid-cols-2 tw-gap-3">
                         <div className="tw-row-span-3 tw-grid tw-grid-rows-subgrid tw-gap-2 tw-px-3">
@@ -39,7 +38,7 @@ export default () => {
                                         <img
                                             className="tw-h-auto tw-max-w-full"
                                             src={cloudButtonState}
-                                            alt="Press button state in nRF Toolbox"
+                                            alt="Press button in nRF Toolbox"
                                         />
                                         <div className="tw-mt-2 tw-text-center tw-text-xs tw-text-gray-500">
                                             Screenshot
@@ -50,8 +49,8 @@ export default () => {
 
                             <p className="tw-text-xs">
                                 Press <b>Button 0</b> on the DK. nRF Toolbox
-                                shows the Button characteristic flip between
-                                Button released and Button pressed.
+                                shows the button characteristic change between
+                                button released and button pressed.
                             </p>
                         </div>
 
