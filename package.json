@@ -54,6 +54,6 @@
     },
     "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js",
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "github:nordicsemi/pc-nrfconnect-shared#feat/cloud-quickstart-integration"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^257.0.0"
     }
 }
