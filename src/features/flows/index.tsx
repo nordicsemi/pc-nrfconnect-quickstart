@@ -8,6 +8,7 @@ import type React from 'react';
 
 import NRF52 from './nRF52';
 import NRF54L15 from './nRF54L15';
+import NRF54LC10 from './nRF54LC10';
 import NRF54LM20 from './nRF54LM20';
 import NRF54LS05 from './nRF54LS05';
 import NRF54LV10 from './nRF54LV10';
@@ -38,6 +39,7 @@ export default {
     [NRF9151SMA.device]: NRF9151SMA.flow,
     [NRF54L15.device]: NRF54L15.flow,
     [NRF54LM20.device]: NRF54LM20.flow,
+    [NRF54LC10.device]: NRF54LC10.flow,
     [NRF54LV10.device]: NRF54LV10.flow,
     [NRF54LS05.device]: NRF54LS05.flow,
     [THINGY91X.device]: THINGY91X.flow,
