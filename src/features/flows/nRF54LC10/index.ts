@@ -114,14 +114,14 @@ const verifyConfig = [
     {
         ref: 'Hello World',
         config: {
-            vComIndex: 1,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf54lc10dk.*\r\n)/,
+            vComIndex: 0,
+            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello world from nrf54lc10dk.*\r\n)/,
         },
     },
     {
         ref: 'Peripheral LED Button Service',
         config: {
-            vComIndex: 1,
+            vComIndex: 0,
             regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Bluetooth Peripheral LBS sample)/,
         },
     },
@@ -131,7 +131,7 @@ const verifyConfig = [
     {
         ref: 'Peripheral UART',
         config: {
-            vComIndex: 1,
+            vComIndex: 0,
             regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Nordic UART service sample)/,
         },
     },
