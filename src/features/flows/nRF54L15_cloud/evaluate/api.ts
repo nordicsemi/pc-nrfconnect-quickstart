@@ -74,12 +74,11 @@ interface FinalizeSymbolBody {
     };
 }
 
-interface PollBaseline {
-    baseline: string | null | undefined;
-    onBaseline: (capturedDate: string | null) => void;
-}
-
 const bearer = (token: string) => ({ Authorization: `Bearer ${token}` });
+
+// A crash is only reportable once the cloud has finished ingesting it.
+const isTerminal = (status: CrashReportResponse['status']) =>
+    status === 'processed' || status === 'symbolicated';
 
 const mapCrash = ({
     captured_date: capturedDate,
@@ -134,7 +133,7 @@ export const fetchMemfaultToken = async (
 
 const fetchCrashReport = async (
     deviceSerial: string,
-    signal: AbortSignal,
+    signal?: AbortSignal,
 ): Promise<CrashReportFetch> => {
     const crashReportUrl = `${API_BASE}/quickstart/crash-report?device_serial=${encodeURIComponent(
         deviceSerial,
@@ -163,29 +162,33 @@ const fetchCrashReport = async (
     }
 };
 
+// Reads the crash that already exists in the cloud, if any, so that later polls
+// can tell it apart from the one the user is about to trigger. Must be resolved
+// before the user is asked to press Button 1: a crash landing before this runs
+// would be mistaken for the pre-existing one and then ignored for the session.
+export const fetchCrashBaseline = async (
+    deviceSerial: string,
+): Promise<string | null> => {
+    const { status, crash } = await fetchCrashReport(deviceSerial);
+    return isTerminal(status) && crash ? crash.capturedDate : null;
+};
+
 export const pollCrashReport = (
     deviceSerial: string,
     signal: AbortSignal,
-    { baseline, onBaseline }: PollBaseline,
+    baseline: string | null,
     intervalMs = POLL_INTERVAL_MS,
 ): Promise<CrashReport> => {
-    let current = baseline;
-
     const attempt = async (): Promise<CrashReport> => {
         if (signal.aborted) {
             throw new DOMException('Aborted', 'AbortError');
         }
         const { status, crash } = await fetchCrashReport(deviceSerial, signal);
-        const isTerminal = status === 'processed' || status === 'symbolicated';
 
-        if (current === undefined) {
-            // The first request sets the baseline: the crash that exists now (if any) is old.
-            current = isTerminal && crash ? crash.capturedDate : null;
-            onBaseline(current);
-        } else if (isTerminal && crash) {
+        if (isTerminal(status) && crash) {
             const isNew =
-                current === null ||
-                Date.parse(crash.capturedDate) > Date.parse(current);
+                baseline === null ||
+                Date.parse(crash.capturedDate) > Date.parse(baseline);
             if (isNew) {
                 return crash;
             }

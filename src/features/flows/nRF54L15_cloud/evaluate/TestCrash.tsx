@@ -14,37 +14,39 @@ import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
 import { pollCrashReport } from './api';
 import {
+    getCrashBaseline,
     getCrashReport,
-    getCrashReportBaselineDate,
     getDeviceInfo,
     nextSubStep,
     prevSubStep,
     setCrashReport,
-    setCrashReportBaselineDate,
 } from './cloudEvaluateSlice';
+import { fetchCrashReportBaseline } from './crashBaselineEffects';
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { reportEvaluateError } from './reportError';
 
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const deviceInfo = useAppSelector(getDeviceInfo);
-    const crashReportBaselineDate = useAppSelector(getCrashReportBaselineDate);
+    const crashBaseline = useAppSelector(getCrashBaseline);
     const crashReport = useAppSelector(getCrashReport);
     const [error, setError] = useState<string>();
 
     const serialNumber =
         deviceInfo.status === 'success' ? deviceInfo.serialNumber : undefined;
 
+    // Only once the baseline is known can a crash report be recognised as the
+    // one the user is about to trigger, so nothing is asked of them until then.
+    const baselineReady = crashBaseline.status === 'success';
+    const baselineDate = crashBaseline.capturedDate ?? null;
+
     useEffect(() => {
-        if (!serialNumber || crashReport || error) {
+        if (!serialNumber || !baselineReady || crashReport || error) {
             return undefined;
         }
 
         const controller = new AbortController();
-        pollCrashReport(serialNumber, controller.signal, {
-            baseline: crashReportBaselineDate,
-            onBaseline: b => dispatch(setCrashReportBaselineDate(b)),
-        })
+        pollCrashReport(serialNumber, controller.signal, baselineDate)
             .then(crash => dispatch(setCrashReport(crash)))
             .catch(e => {
                 if ((e as Error).name === 'AbortError') {
@@ -55,11 +57,30 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             });
 
         return () => controller.abort();
-        // When the first poll establishes the baseline, the effect is triggered again and restarts the poll once (with the established baseline).
-    }, [dispatch, serialNumber, crashReport, error, crashReportBaselineDate]);
+    }, [
+        dispatch,
+        serialNumber,
+        baselineReady,
+        baselineDate,
+        crashReport,
+        error,
+    ]);
 
-    const waitingForCrash =
-        deviceInfo.status === 'success' && !crashReport && !error;
+    const preparing =
+        deviceInfo.status === 'loading' ||
+        (deviceInfo.status === 'success' &&
+            (crashBaseline.status === 'idle' ||
+                crashBaseline.status === 'loading'));
+
+    const waitingForCrash = baselineReady && !crashReport && !error;
+
+    const retry = () => {
+        if (deviceInfo.status === 'error') {
+            dispatch(fetchDeviceInfo(vComIndex));
+        } else {
+            dispatch(fetchCrashReportBaseline());
+        }
+    };
 
     return (
         <Main>
@@ -69,23 +90,26 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                 fillHeight
             >
                 <div className="tw-flex tw-flex-col tw-gap-4">
-                    <div className="tw-flex tw-flex-col tw-gap-1">
-                        <span>
-                            Trigger a test crash by pressing <b>Button 1</b>.
-                        </span>
-                        <span>
-                            Your device will fault, reboot, and disconnect from
-                            the app. You need to reconnect the device to the
-                            app, which will send the crash report to the cloud
-                            over Bluetooth LE.
-                        </span>
-                    </div>
+                    {baselineReady && (
+                        <div className="tw-flex tw-flex-col tw-gap-1">
+                            <span>
+                                Trigger a test crash by pressing <b>Button 1</b>
+                                .
+                            </span>
+                            <span>
+                                Your device will fault, reboot, and disconnect
+                                from the app. You need to reconnect the device
+                                to the app, which will send the crash report to
+                                the cloud over Bluetooth LE.
+                            </span>
+                        </div>
+                    )}
 
-                    {deviceInfo.status === 'loading' && (
+                    {preparing && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
                             <span className="tw-text-xs">
-                                Reading device information…
+                                Preparing the crash report check…
                             </span>
                         </div>
                     )}
@@ -107,6 +131,17 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             title={
                                 deviceInfo.message ??
                                 'Failed to read device information'
+                            }
+                        />
+                    )}
+
+                    {crashBaseline.status === 'error' && (
+                        <IssueBox
+                            mdiIcon="mdi-lightbulb-alert-outline"
+                            color="tw-text-red"
+                            title={
+                                crashBaseline.message ??
+                                'Failed to reach the cloud. Retry before triggering a crash.'
                             }
                         />
                     )}
@@ -155,18 +190,18 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             </Main.Content>
             <Main.Footer>
                 <Back onClick={() => dispatch(prevSubStep())} />
-                {(error || deviceInfo.status === 'error') && (
+                {(error ||
+                    deviceInfo.status === 'error' ||
+                    crashBaseline.status === 'error') && (
                     <Skip
                         label="Skip"
                         onClick={() => dispatch(nextSubStep())}
                     />
                 )}
 
-                {deviceInfo.status === 'error' ? (
-                    <Next
-                        label="Retry"
-                        onClick={() => dispatch(fetchDeviceInfo(vComIndex))}
-                    />
+                {deviceInfo.status === 'error' ||
+                crashBaseline.status === 'error' ? (
+                    <Next label="Retry" onClick={retry} />
                 ) : (
                     <Next
                         disabled={!crashReport || !!error}

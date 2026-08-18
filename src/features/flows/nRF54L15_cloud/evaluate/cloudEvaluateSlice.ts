@@ -71,10 +71,17 @@ const initialMemfault: MemfaultState = {
     projects: [],
 };
 
+interface CrashBaselineState {
+    status: AsyncStatus;
+    // The crash already in the cloud when the step was entered, null if none.
+    capturedDate?: string | null;
+    message?: string;
+}
+
 interface State {
     subStep: CloudSubStep;
     deviceInfo: DeviceInfoState;
-    crashReportBaselineDate?: string | null;
+    crashBaseline: CrashBaselineState;
     crashReport?: CrashReport;
     registration: RegistrationState;
     memfault: MemfaultState;
@@ -83,6 +90,7 @@ interface State {
 const initialState: State = {
     subStep: CloudSubStep.ESTABLISH_CONNECTION,
     deviceInfo: { status: 'idle' },
+    crashBaseline: { status: 'idle' },
     registration: { status: 'idle' },
     memfault: {
         status: 'idle',
@@ -121,11 +129,17 @@ const slice = createSlice({
         setDeviceInfoError: (state, { payload }: PayloadAction<string>) => {
             state.deviceInfo = { status: 'error', message: payload };
         },
-        setCrashReportBaselineDate: (
+        setCrashBaselineFetching: state => {
+            state.crashBaseline = { status: 'loading' };
+        },
+        setCrashBaseline: (
             state,
             { payload }: PayloadAction<string | null>,
         ) => {
-            state.crashReportBaselineDate = payload;
+            state.crashBaseline = { status: 'success', capturedDate: payload };
+        },
+        setCrashBaselineError: (state, { payload }: PayloadAction<string>) => {
+            state.crashBaseline = { status: 'error', message: payload };
         },
         setCrashReport: (state, { payload }: PayloadAction<CrashReport>) => {
             state.crashReport = payload;
@@ -196,7 +210,9 @@ export const {
     setDeviceInfoFetching,
     setDeviceInfo,
     setDeviceInfoError,
-    setCrashReportBaselineDate,
+    setCrashBaselineFetching,
+    setCrashBaseline,
+    setCrashBaselineError,
     setCrashReport,
     setRegistration,
     setMemfaultLoading,
@@ -214,8 +230,8 @@ export const getSubStep = (state: RootState) =>
     state.flows.nrf54l15Cloud.subStep;
 export const getDeviceInfo = (state: RootState) =>
     state.flows.nrf54l15Cloud.deviceInfo;
-export const getCrashReportBaselineDate = (state: RootState) =>
-    state.flows.nrf54l15Cloud.crashReportBaselineDate;
+export const getCrashBaseline = (state: RootState) =>
+    state.flows.nrf54l15Cloud.crashBaseline;
 export const getCrashReport = (state: RootState) =>
     state.flows.nrf54l15Cloud.crashReport;
 export const getRegistration = (state: RootState) =>

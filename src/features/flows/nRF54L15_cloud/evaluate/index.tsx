@@ -13,9 +13,11 @@ import Authenticate from './Authenticate';
 import {
     CloudSubStep,
     cloudSubStepTelemetryName,
+    getCrashBaseline,
     getDeviceInfo,
     getSubStep,
 } from './cloudEvaluateSlice';
+import { fetchCrashReportBaseline } from './crashBaselineEffects';
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import DeviceRegistration from './DeviceRegistration';
 import EstablishConnection from './EstablishConnection';
@@ -26,6 +28,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const subStep = useAppSelector(getSubStep);
     const deviceInfo = useAppSelector(getDeviceInfo);
+    const crashBaseline = useAppSelector(getCrashBaseline);
 
     useEffect(() => {
         logger.debug(`Changed sub-step: ${cloudSubStepTelemetryName(subStep)}`);
@@ -37,6 +40,17 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             dispatch(fetchDeviceInfo(vComIndex));
         }
     }, [dispatch, deviceInfo.status, vComIndex]);
+
+    // Established here rather than on the test crash sub-step so that it is
+    // settled long before the user is told to press Button 1.
+    useEffect(() => {
+        if (
+            deviceInfo.status === 'success' &&
+            crashBaseline.status === 'idle'
+        ) {
+            dispatch(fetchCrashReportBaseline());
+        }
+    }, [dispatch, deviceInfo.status, crashBaseline.status]);
 
     switch (subStep) {
         case CloudSubStep.ESTABLISH_CONNECTION:
