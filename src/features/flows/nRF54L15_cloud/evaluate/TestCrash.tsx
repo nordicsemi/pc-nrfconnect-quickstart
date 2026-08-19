@@ -5,7 +5,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { IssueBox, Spinner } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    IssueBox,
+    NoticeBox,
+    Spinner,
+    useStopwatch,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/store';
@@ -25,12 +30,27 @@ import {
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { reportEvaluateError } from './reportError';
 
+const TIMEOUT_MS = 60000;
+
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const deviceInfo = useAppSelector(getDeviceInfo);
     const crashReportBaselineDate = useAppSelector(getCrashReportBaselineDate);
     const crashReport = useAppSelector(getCrashReport);
     const [error, setError] = useState<string>();
+
+    const { reset, pause, time } = useStopwatch({
+        autoStart: !crashReport,
+        resolution: TIMEOUT_MS,
+    });
+
+    const [takingTooLong, setTakingTooLong] = useState(false);
+
+    useEffect(() => {
+        if (time >= TIMEOUT_MS) {
+            setTakingTooLong(true);
+        }
+    }, [time]);
 
     const serialNumber =
         deviceInfo.status === 'success' ? deviceInfo.serialNumber : undefined;
@@ -59,7 +79,10 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                 crashReportBaselineDate,
                 controller.signal,
             )
-                .then(crash => dispatch(setCrashReport(crash)))
+                .then(crash => {
+                    pause();
+                    dispatch(setCrashReport(crash));
+                })
                 .catch(e => {
                     if ((e as Error).name === 'AbortError') {
                         return;
@@ -69,9 +92,20 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                 });
         }
 
-        return () => controller.abort();
+        return () => {
+            console.log('TestCrash: aborting fetch/poll for crash report');
+            controller.abort();
+        };
         // Once the baseline is established the effect re-runs and starts polling for a new crash.
-    }, [dispatch, serialNumber, crashReport, error, crashReportBaselineDate]);
+    }, [
+        dispatch,
+        serialNumber,
+        crashReport,
+        error,
+        crashReportBaselineDate,
+        reset,
+        pause,
+    ]);
 
     const preparingBaseline =
         deviceInfo.status === 'success' &&
@@ -136,6 +170,24 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         </div>
                     )}
 
+                    {!crashReport && takingTooLong && (
+                        <NoticeBox
+                            mdiIcon="mdi-information-outline"
+                            color="tw-text-primary"
+                            title="This is taking longer than expected."
+                            content={
+                                <div className="tw-flex tw-flex-col tw-gap-1">
+                                    <span>
+                                        Skip this step or wait for crash report
+                                        <br />
+                                        Important: Press <b>Button 1 </b>
+                                        and Reconnect to the mobile app.
+                                    </span>
+                                </div>
+                            }
+                        />
+                    )}
+
                     {deviceInfo.status === 'error' && (
                         <IssueBox
                             mdiIcon="mdi-lightbulb-alert-outline"
@@ -191,7 +243,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             </Main.Content>
             <Main.Footer>
                 <Back onClick={() => dispatch(prevSubStep())} />
-                {(error || deviceInfo.status === 'error') && (
+                {(error || deviceInfo.status === 'error' || takingTooLong) && (
                     <Skip
                         label="Skip"
                         onClick={() => dispatch(nextSubStep())}
