@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
-import { pollCrashReport } from './api';
+import { fetchCrashBaseline, pollForNewCrash } from './api';
 import {
     getCrashReport,
     getCrashReportBaselineDate,
@@ -41,25 +41,49 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         }
 
         const controller = new AbortController();
-        pollCrashReport(serialNumber, controller.signal, {
-            baseline: crashReportBaselineDate,
-            onBaseline: b => dispatch(setCrashReportBaselineDate(b)),
-        })
-            .then(crash => dispatch(setCrashReport(crash)))
-            .catch(e => {
-                if ((e as Error).name === 'AbortError') {
-                    return;
-                }
-                reportEvaluateError('Test crash', e, 'poll-crash');
-                setError(describeError(e));
-            });
+
+        if (crashReportBaselineDate === undefined) {
+            // First establish the baseline: whatever crash exists now is old.
+            fetchCrashBaseline(serialNumber, controller.signal)
+                .then(b => dispatch(setCrashReportBaselineDate(b)))
+                .catch(e => {
+                    if ((e as Error).name === 'AbortError') {
+                        return;
+                    }
+                    reportEvaluateError('Test crash', e, 'fetch-baseline');
+                    setError(describeError(e));
+                });
+        } else {
+            pollForNewCrash(
+                serialNumber,
+                crashReportBaselineDate,
+                controller.signal,
+            )
+                .then(crash => dispatch(setCrashReport(crash)))
+                .catch(e => {
+                    if ((e as Error).name === 'AbortError') {
+                        return;
+                    }
+                    reportEvaluateError('Test crash', e, 'poll-crash');
+                    setError(describeError(e));
+                });
+        }
 
         return () => controller.abort();
-        // When the first poll establishes the baseline, the effect is triggered again and restarts the poll once (with the established baseline).
+        // Once the baseline is established the effect re-runs and starts polling for a new crash.
     }, [dispatch, serialNumber, crashReport, error, crashReportBaselineDate]);
 
+    const preparingBaseline =
+        deviceInfo.status === 'success' &&
+        crashReportBaselineDate === undefined &&
+        !crashReport &&
+        !error;
+
     const waitingForCrash =
-        deviceInfo.status === 'success' && !crashReport && !error;
+        deviceInfo.status === 'success' &&
+        crashReportBaselineDate !== undefined &&
+        !crashReport &&
+        !error;
 
     return (
         <Main>
@@ -69,23 +93,36 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                 fillHeight
             >
                 <div className="tw-flex tw-flex-col tw-gap-4">
-                    <div className="tw-flex tw-flex-col tw-gap-1">
-                        <span>
-                            Trigger a test crash by pressing <b>Button 1</b>.
-                        </span>
-                        <span>
-                            Your device will fault, reboot, and disconnect from
-                            the app. You need to reconnect the device to the
-                            app, which will send the crash report to the cloud
-                            over Bluetooth LE.
-                        </span>
-                    </div>
+                    {!preparingBaseline && (
+                        <div className="tw-flex tw-flex-col tw-gap-1">
+                            <span>
+                                Trigger a test crash by pressing <b>Button 1</b>
+                                .
+                            </span>
+                            <span>
+                                Your device will fault, reboot, and disconnect
+                                from the app. You need to reconnect the device
+                                to the app, which will send the crash report to
+                                the cloud over Bluetooth LE.
+                            </span>
+                        </div>
+                    )}
 
                     {deviceInfo.status === 'loading' && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
                             <span className="tw-text-xs">
                                 Reading device information…
+                            </span>
+                        </div>
+                    )}
+
+                    {preparingBaseline && (
+                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
+                            <Spinner size="sm" />
+                            <span className="tw-text-xs">
+                                Syncronizing with the cloud to prepare to fetch
+                                a crash report.
                             </span>
                         </div>
                     )}
