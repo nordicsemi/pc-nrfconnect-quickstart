@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     getPersistedNickname,
     logger,
@@ -17,13 +17,13 @@ import Main from '../../../../common/Main';
 import { Next } from '../../../../common/Next';
 import { reset } from '../../../device/deviceLib';
 import { getSelectedDeviceUnsafely } from '../../../device/deviceSlice';
-import { getBtName, nextSubStep, setBtName } from './cloudEvaluateSlice';
+import { nextSubStep } from './cloudEvaluateSlice';
 import { setDeviceName } from './device';
 
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const device = useAppSelector(getSelectedDeviceUnsafely);
-    const btName = useAppSelector(getBtName);
+    const [btName, setBtName] = useState<string>();
 
     useEffect(() => {
         const persistedName = getPersistedNickname(device.serialNumber);
@@ -35,7 +35,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             )
                 .then(() => {
                     reset(device);
-                    dispatch(setBtName(persistedName));
+                    setBtName(persistedName);
                 })
                 .catch(logger.error);
         }
