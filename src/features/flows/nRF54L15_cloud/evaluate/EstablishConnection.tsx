@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
     getPersistedNickname,
     logger,
@@ -23,23 +23,19 @@ import { setDeviceName } from './device';
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const device = useAppSelector(getSelectedDeviceUnsafely);
-    const [btName, setBtName] = useState<string>();
+    const btName = useRef<string>();
 
     useEffect(() => {
         const persistedName = getPersistedNickname(device.serialNumber);
-        if (persistedName && btName !== persistedName) {
-            setDeviceName(
-                device,
-                vComIndex,
-                getPersistedNickname(device.serialNumber),
-            )
+        if (persistedName && btName.current !== persistedName) {
+            setDeviceName(device, vComIndex, persistedName)
                 .then(() => {
                     reset(device);
-                    setBtName(persistedName);
+                    btName.current = persistedName;
                 })
                 .catch(logger.error);
         }
-    }, [btName, device, dispatch, vComIndex]);
+    }, [device, vComIndex]);
 
     return (
         <Main>
