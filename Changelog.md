@@ -3,7 +3,7 @@
 ### Added
 
 - nRF Cloud support for the nRF54L15 DK.
-- Cloud Connectivity sample for the nRF54L15 DK.
+- nRF Cloud Bluetooth Quick Start Sample for the nRF54L15 DK.
 - Support for the nRF54LC10 DK.
 
 ### Removed

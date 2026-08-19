@@ -25,7 +25,7 @@ const infoConfig = {
 
 const programConfig = [
     {
-        name: 'Cloud Connectivity',
+        name: 'nRF Cloud Bluetooth Quick Start Sample',
         type: 'jlink-batch',
         description:
             "This sample turns your nRF54L15 DK into a Bluetooth LE peripheral with cloud-based device health monitoring built in. The device reports heartbeats over Bluetooth. Once connected and paired, you'll see your board in nRF Cloud. Pressing a button triggers a fake crash, which sends a coredump over Bluetooth to nRF Cloud.",
@@ -53,7 +53,7 @@ const programConfig = [
 
 const verifyConfig = [
     {
-        ref: 'Cloud Connectivity',
+        ref: 'nRF Cloud Bluetooth Quick Start Sample',
         config: {
             vComIndex: VCOM_INDEX,
             regex: /(\*{3} Booting Quickstart Bluetooth .* \*{3}\r\n\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\n)/,
@@ -63,7 +63,7 @@ const verifyConfig = [
 
 const evaluateConfig = [
     {
-        ref: 'Cloud Connectivity',
+        ref: 'nRF Cloud Bluetooth Quick Start Sample',
         component: () => CloudEvaluate({ vComIndex: VCOM_INDEX }),
     },
 ];
