@@ -72,6 +72,7 @@ const initialMemfault: MemfaultState = {
 };
 
 interface State {
+    btName?: string;
     subStep: CloudSubStep;
     deviceInfo: DeviceInfoState;
     crashReportBaselineDate?: string | null;
@@ -177,6 +178,9 @@ const slice = createSlice({
         setSelectedProjectSlug: (state, { payload }: PayloadAction<string>) => {
             state.memfault.selectedProjectSlug = payload;
         },
+        setBtName: (state, { payload }: PayloadAction<string>) => {
+            state.btName = payload;
+        },
 
         resetMemfault: state => {
             state.memfault = initialMemfault;
@@ -206,6 +210,7 @@ export const {
     setProjects,
     setSelectedOrgSlug,
     setSelectedProjectSlug,
+    setBtName,
     resetMemfault,
     reset,
 } = slice.actions;
@@ -222,5 +227,6 @@ export const getRegistration = (state: RootState) =>
     state.flows.nrf54l15Cloud.registration;
 export const getMemfault = (state: RootState) =>
     state.flows.nrf54l15Cloud.memfault;
+export const getBtName = (state: RootState) => state.flows.nrf54l15Cloud.btName;
 
 export default slice.reducer;
