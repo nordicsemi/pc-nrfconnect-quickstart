@@ -28,7 +28,7 @@ const programConfig = [
         name: 'Cloud Connectivity',
         type: 'jlink-batch',
         description:
-            "This sample turns your nRF54L15 DK into a Bluetooth LE peripheral with cloud-based device health monitoring built in. The device reports heartbeats and, if it crashes, a coredump, all over Bluetooth. Once connected and paired, you'll see your board show up in nRF Cloud. Button 1 lets you trigger a fake crash, allowing a coredump to be viewed in nRF Cloud.",
+            "This sample turns your nRF54L15 DK into a Bluetooth LE peripheral with cloud-based device health monitoring built in. The device reports heartbeats over Bluetooth. Once connected and paired, you'll see your board in nRF Cloud. Pressing a button triggers a fake crash, which sends a coredump over Bluetooth to nRF Cloud.",
         documentation: {
             label: 'Bluetooth: Peripheral Memfault Diagnostic Service (MDS)',
             href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/samples/bluetooth/peripheral_mds/README.html',
