@@ -49,6 +49,10 @@ export default () => {
                             <li>
                                 <b>Connect</b> to your device.
                             </li>
+                            <li>
+                                After connecting the device in the app, click{' '}
+                                <b>Continue</b> below.
+                            </li>
                         </ol>
                     </div>
                 </div>
