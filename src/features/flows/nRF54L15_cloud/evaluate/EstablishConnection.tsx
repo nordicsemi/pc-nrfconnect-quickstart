@@ -4,17 +4,38 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import {
+    getPersistedNickname,
+    logger,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import qrImage from '../../../../../resources/cloud_qr.svg';
-import { useAppDispatch } from '../../../../app/store';
+import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
 import { Next } from '../../../../common/Next';
+import { reset } from '../../../device/deviceLib';
+import { getSelectedDeviceUnsafely } from '../../../device/deviceSlice';
 import { nextSubStep } from './cloudEvaluateSlice';
+import { setDeviceName } from './device';
 
-export default () => {
+export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
+    const device = useAppSelector(getSelectedDeviceUnsafely);
+    const btName = useRef<string>();
+
+    useEffect(() => {
+        const persistedName = getPersistedNickname(device.serialNumber);
+        if (persistedName && btName.current !== persistedName) {
+            setDeviceName(device, vComIndex, persistedName)
+                .then(() => {
+                    reset(device);
+                    btName.current = persistedName;
+                })
+                .catch(logger.error);
+        }
+    }, [device, vComIndex]);
 
     return (
         <Main>

@@ -40,7 +40,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
 
     switch (subStep) {
         case CloudSubStep.ESTABLISH_CONNECTION:
-            return <EstablishConnection />;
+            return <EstablishConnection vComIndex={vComIndex} />;
         case CloudSubStep.TRY_LBS:
             return <TryLbs />;
         case CloudSubStep.TEST_CRASH:
