@@ -180,7 +180,9 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                     <span>
                                         This is taking longer than expected...
                                         <br />
-                                        Be sure to press <b>Button 1</b> and reconnect to the mobile app. Alternatively you can skip this step.
+                                        Be sure to press <b>Button 1</b> and
+                                        reconnect to the mobile app.
+                                        Alternatively you can skip this step.
                                     </span>
                                 </div>
                             }
