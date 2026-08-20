@@ -121,8 +121,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
                             <span className="tw-text-xs">
-                                Syncronizing with the cloud to prepare to fetch
-                                a crash report.
+                                Synchronising with the cloud...
                             </span>
                         </div>
                     )}
