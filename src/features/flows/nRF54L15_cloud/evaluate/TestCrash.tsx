@@ -178,10 +178,9 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                             content={
                                 <div className="tw-flex tw-flex-col tw-gap-1">
                                     <span>
-                                        Skip this step or wait for crash report
+                                        This is taking longer than expected...
                                         <br />
-                                        Important: Press <b>Button 1 </b>
-                                        and Reconnect to the mobile app.
+                                        Be sure to press <b>Button 1</b> and reconnect to the mobile app. Alternatively you can skip this step.
                                     </span>
                                 </div>
                             }
