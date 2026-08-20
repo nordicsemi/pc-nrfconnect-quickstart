@@ -15,6 +15,7 @@ const requiredTraits: DeviceTraits = {
     jlink: true,
     modem: true,
     nordicUsb: true,
+    usb: true, // TODO: remove
 };
 
 export type DeviceWithSerialnumber = NrfutilDevice & {
