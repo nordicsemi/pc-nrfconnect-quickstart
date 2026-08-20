@@ -105,10 +105,10 @@ export const readDeviceInfo = (
             });
     });
 
-export const setDeviceProjectKey = async (
+const runShellCommand = async (
     device: DeviceWithSerialnumber,
     vComIndex: number,
-    projectKey: string,
+    command: string,
 ): Promise<void> => {
     const path = device.serialPorts?.[vComIndex]?.comName;
     if (!path) {
@@ -135,7 +135,7 @@ export const setDeviceProjectKey = async (
 
     try {
         await new Promise<string>((resolve, reject) => {
-            parser.enqueueRequest(`mflt set_project_key ${projectKey}`, {
+            parser.enqueueRequest(command, {
                 onSuccess: resolve,
                 onError: reject,
                 onTimeout: () => reject(new Error('timeout')),
@@ -146,3 +146,16 @@ export const setDeviceProjectKey = async (
         serialPort.close();
     }
 };
+
+export const setDeviceProjectKey = (
+    device: DeviceWithSerialnumber,
+    vComIndex: number,
+    projectKey: string,
+): Promise<void> =>
+    runShellCommand(device, vComIndex, `mflt set_project_key ${projectKey}`);
+
+export const setDeviceName = (
+    device: DeviceWithSerialnumber,
+    vComIndex: number,
+    name: string,
+): Promise<void> => runShellCommand(device, vComIndex, `bt name "${name}"`);
