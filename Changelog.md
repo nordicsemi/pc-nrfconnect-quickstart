@@ -2,7 +2,7 @@
 
 ### Added
 
-- Support for the nRF54LC10 DK and nRF54LM20 Dongle.
+- Support for the nRF54LC10 DK and the nRF54LM20 Dongle.
 
 ## 1.9.2 - 2026-07-01
 
