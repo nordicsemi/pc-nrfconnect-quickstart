@@ -25,8 +25,7 @@ const programConfig = [
         name: 'Central UART',
         type: 'jlink-batch',
         description:
-            //  TODO: Put real description
-            '-',
+            'The Central UART sample on the nRF54LM20 Dongle replaces the typical SEGGER-based UART with a USB CDC ACM interface, exposing three virtual serial ports for console logging, NUS data transfer, and MCUmgr-based DFU. The Dongle uses a red LED to indicate DFU mode, a green LED that is solid when a NUS/BLE connection is active and blinks on data traffic, and a blue LED that blinks to indicate logging activity.',
         documentation: {
             label: 'Central UART',
             href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/samples/bluetooth/central_uart/README.html',
