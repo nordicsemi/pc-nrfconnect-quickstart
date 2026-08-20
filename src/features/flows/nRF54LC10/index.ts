@@ -20,6 +20,7 @@ const infoConfig = {
         '![nRF54LC10 DK](54LC10DK.png)  \n&nbsp;  \nThe nRF54LC10 DK enables development with the nRF54LC10A SoC.  \n&nbsp;  \nnRF54LC10A is part of the nRF54L Series. All wireless System-on-Chip (SoC) options in the series integrate an ultra-low-power, multiprotocol 2.4 GHz radio with MCU (Microcontroller Unit) functionality featuring a 128 MHz Arm® Cortex®-M33 processor.  \n&nbsp;  \n![nRF54LC10 DK Technologies](54SeriesTech.png)  \nnRF54LC10A is designed for applications requiring multiprotocol radio and only an essential peripheral set such as asset trackers, tags, radio coprocessor in larger systems, or 802.15.4 networked sensor nodes. For devices with enclosed batteries, the system hibernation mode extends shelf life.  \n&nbsp;  \nFor the datasheet and more information, see the web pages for the [nRF54LC10A SoC](https://www.nordicsemi.com/Products/nRF54LC10A) and the [nRF54LC10 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF54LC10-DK). ',
 };
 
+// todo: check if need to add ncs addon URIs
 const programConfig = [
     {
         name: 'Hello World',

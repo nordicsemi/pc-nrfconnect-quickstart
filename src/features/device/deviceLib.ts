@@ -15,7 +15,8 @@ const requiredTraits: DeviceTraits = {
     jlink: true,
     modem: true,
     nordicUsb: true,
-    usb: true, // TODO: remove
+    // @ts-expect-error TODO: update shared; validate that we want to use this trait.
+    devkit: true,
 };
 
 export type DeviceWithSerialnumber = NrfutilDevice & {
