@@ -5,14 +5,19 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { IssueBox, Spinner } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    IssueBox,
+    NoticeBox,
+    Spinner,
+    useStopwatch,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
-import { pollCrashReport } from './api';
+import { fetchCrashBaseline, pollForNewCrash } from './api';
 import {
     getCrashReport,
     getCrashReportBaselineDate,
@@ -25,12 +30,27 @@ import {
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { reportEvaluateError } from './reportError';
 
+const TIMEOUT_MS = 60000;
+
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
     const deviceInfo = useAppSelector(getDeviceInfo);
     const crashReportBaselineDate = useAppSelector(getCrashReportBaselineDate);
     const crashReport = useAppSelector(getCrashReport);
     const [error, setError] = useState<string>();
+
+    const { reset, pause, time } = useStopwatch({
+        autoStart: !crashReport,
+        resolution: TIMEOUT_MS,
+    });
+
+    const [takingTooLong, setTakingTooLong] = useState(false);
+
+    useEffect(() => {
+        if (time >= TIMEOUT_MS) {
+            setTakingTooLong(true);
+        }
+    }, [time]);
 
     const serialNumber =
         deviceInfo.status === 'success' ? deviceInfo.serialNumber : undefined;
@@ -41,25 +61,63 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         }
 
         const controller = new AbortController();
-        pollCrashReport(serialNumber, controller.signal, {
-            baseline: crashReportBaselineDate,
-            onBaseline: b => dispatch(setCrashReportBaselineDate(b)),
-        })
-            .then(crash => dispatch(setCrashReport(crash)))
-            .catch(e => {
-                if ((e as Error).name === 'AbortError') {
-                    return;
-                }
-                reportEvaluateError('Test crash', e, 'poll-crash');
-                setError(describeError(e));
-            });
 
-        return () => controller.abort();
-        // When the first poll establishes the baseline, the effect is triggered again and restarts the poll once (with the established baseline).
-    }, [dispatch, serialNumber, crashReport, error, crashReportBaselineDate]);
+        if (crashReportBaselineDate === undefined) {
+            // First establish the baseline: whatever crash exists now is old.
+            fetchCrashBaseline(serialNumber, controller.signal)
+                .then(b => dispatch(setCrashReportBaselineDate(b)))
+                .catch(e => {
+                    if ((e as Error).name === 'AbortError') {
+                        return;
+                    }
+                    reportEvaluateError('Test crash', e, 'fetch-baseline');
+                    setError(describeError(e));
+                });
+        } else {
+            pollForNewCrash(
+                serialNumber,
+                crashReportBaselineDate,
+                controller.signal,
+            )
+                .then(crash => {
+                    pause();
+                    dispatch(setCrashReport(crash));
+                })
+                .catch(e => {
+                    if ((e as Error).name === 'AbortError') {
+                        return;
+                    }
+                    reportEvaluateError('Test crash', e, 'poll-crash');
+                    setError(describeError(e));
+                });
+        }
+
+        return () => {
+            console.log('TestCrash: aborting fetch/poll for crash report');
+            controller.abort();
+        };
+        // Once the baseline is established the effect re-runs and starts polling for a new crash.
+    }, [
+        dispatch,
+        serialNumber,
+        crashReport,
+        error,
+        crashReportBaselineDate,
+        reset,
+        pause,
+    ]);
+
+    const preparingBaseline =
+        deviceInfo.status === 'success' &&
+        crashReportBaselineDate === undefined &&
+        !crashReport &&
+        !error;
 
     const waitingForCrash =
-        deviceInfo.status === 'success' && !crashReport && !error;
+        deviceInfo.status === 'success' &&
+        crashReportBaselineDate !== undefined &&
+        !crashReport &&
+        !error;
 
     return (
         <Main>
@@ -69,23 +127,35 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                 fillHeight
             >
                 <div className="tw-flex tw-flex-col tw-gap-4">
-                    <div className="tw-flex tw-flex-col tw-gap-1">
-                        <span>
-                            Trigger a test crash by pressing <b>Button 1</b>.
-                        </span>
-                        <span>
-                            Your device will fault, reboot, and disconnect from
-                            the app. You need to reconnect the device to the
-                            app, which will send the crash report to the cloud
-                            over Bluetooth LE.
-                        </span>
-                    </div>
+                    {!preparingBaseline && (
+                        <div className="tw-flex tw-flex-col tw-gap-1">
+                            <span>
+                                Trigger a test crash by pressing <b>Button 1</b>
+                                .
+                            </span>
+                            <span>
+                                Your device will fault, reboot, and disconnect
+                                from the app. You need to reconnect the device
+                                to the app, which will send the crash report to
+                                the cloud over Bluetooth LE.
+                            </span>
+                        </div>
+                    )}
 
                     {deviceInfo.status === 'loading' && (
                         <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
                             <Spinner size="sm" />
                             <span className="tw-text-xs">
                                 Reading device information…
+                            </span>
+                        </div>
+                    )}
+
+                    {preparingBaseline && (
+                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-3">
+                            <Spinner size="sm" />
+                            <span className="tw-text-xs">
+                                Synchronising with the cloud...
                             </span>
                         </div>
                     )}
@@ -98,6 +168,25 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                 may take a few moments…
                             </span>
                         </div>
+                    )}
+
+                    {!crashReport && takingTooLong && (
+                        <NoticeBox
+                            mdiIcon="mdi-information-outline"
+                            color="tw-text-primary"
+                            title="This is taking longer than expected."
+                            content={
+                                <div className="tw-flex tw-flex-col tw-gap-1">
+                                    <span>
+                                        This is taking longer than expected...
+                                        <br />
+                                        Be sure to press <b>Button 1</b> and
+                                        reconnect to the mobile app.
+                                        Alternatively you can skip this step.
+                                    </span>
+                                </div>
+                            }
+                        />
                     )}
 
                     {deviceInfo.status === 'error' && (
@@ -155,7 +244,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             </Main.Content>
             <Main.Footer>
                 <Back onClick={() => dispatch(prevSubStep())} />
-                {(error || deviceInfo.status === 'error') && (
+                {(error || deviceInfo.status === 'error' || takingTooLong) && (
                     <Skip
                         label="Skip"
                         onClick={() => dispatch(nextSubStep())}
