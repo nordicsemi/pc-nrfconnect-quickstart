@@ -244,12 +244,13 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             </Main.Content>
             <Main.Footer>
                 <Back onClick={() => dispatch(prevSubStep())} />
-                {(error || deviceInfo.status === 'error' || takingTooLong) && (
-                    <Skip
-                        label="Skip"
-                        onClick={() => dispatch(nextSubStep())}
-                    />
-                )}
+                {(error || deviceInfo.status === 'error' || takingTooLong) &&
+                    !crashReport && (
+                        <Skip
+                            label="Skip"
+                            onClick={() => dispatch(nextSubStep())}
+                        />
+                    )}
 
                 {deviceInfo.status === 'error' ? (
                     <Next
