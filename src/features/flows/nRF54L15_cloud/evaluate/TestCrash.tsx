@@ -39,7 +39,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
     const crashReport = useAppSelector(getCrashReport);
     const [error, setError] = useState<string>();
 
-    const { reset, pause, time } = useStopwatch({
+    const { reset, pause, start, time } = useStopwatch({
         autoStart: !crashReport,
         resolution: TIMEOUT_MS,
     });
@@ -67,6 +67,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             fetchCrashBaseline(serialNumber, controller.signal)
                 .then(b => dispatch(setCrashReportBaselineDate(b)))
                 .catch(e => {
+                    pause();
                     if ((e as Error).name === 'AbortError') {
                         return;
                     }
@@ -80,7 +81,6 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                 controller.signal,
             )
                 .then(crash => {
-                    pause();
                     dispatch(setCrashReport(crash));
                 })
                 .catch(e => {
@@ -89,6 +89,9 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                     }
                     reportEvaluateError('Test crash', e, 'poll-crash');
                     setError(describeError(e));
+                })
+                .finally(() => {
+                    pause();
                 });
         }
 
@@ -106,6 +109,12 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         reset,
         pause,
     ]);
+
+    useEffect(() => {
+        if (!error) {
+            start(0);
+        }
+    }, [error, start]);
 
     const preparingBaseline =
         deviceInfo.status === 'success' &&
@@ -252,10 +261,16 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         />
                     )}
 
-                {deviceInfo.status === 'error' ? (
+                {error || deviceInfo.status === 'error' ? (
                     <Next
                         label="Retry"
-                        onClick={() => dispatch(fetchDeviceInfo(vComIndex))}
+                        onClick={() => {
+                            if (error) {
+                                setError(undefined);
+                            } else {
+                                dispatch(fetchDeviceInfo(vComIndex));
+                            }
+                        }}
                     />
                 ) : (
                     <Next
