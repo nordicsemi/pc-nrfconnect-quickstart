@@ -6,7 +6,7 @@
 
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { type AppThunk, type RootState } from '../../../app/store';
+import { type AppThunk } from '../../../app/store';
 import {
     type DeviceWithSerialnumber,
     reset,
@@ -27,19 +27,18 @@ import {
     setProgrammingProgress,
 } from './programSlice';
 
-const checkDeviceConnected =
-    (): AppThunk<RootState, boolean> => (dispatch, getState) => {
-        if (!selectedDeviceIsConnected(getState())) {
-            dispatch(
-                setError({
-                    icon: 'mdi-lightbulb-alert-outline',
-                    text: 'No development kit detected',
-                }),
-            );
-            return false;
-        }
-        return true;
-    };
+const checkDeviceConnected = (): AppThunk<boolean> => (dispatch, getState) => {
+    if (!selectedDeviceIsConnected(getState())) {
+        dispatch(
+            setError({
+                icon: 'mdi-lightbulb-alert-outline',
+                text: 'No development kit detected',
+            }),
+        );
+        return false;
+    }
+    return true;
+};
 
 export interface ProgrammingConfig {
     run: (device: DeviceWithSerialnumber) => unknown;

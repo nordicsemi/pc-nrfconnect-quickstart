@@ -12,7 +12,7 @@ import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfu
 import path from 'path';
 
 import { alwaysProgramMwfNoATCheck } from '../../../../app/devOptions';
-import { type AppThunk, type RootState } from '../../../../app/store';
+import { type AppThunk } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../../features/device/deviceGuides';
 import {
     type DeviceWithSerialnumber,
@@ -34,10 +34,7 @@ import {
 } from '../programSlice';
 
 const runResetAction =
-    (
-        index: number,
-        device: DeviceWithSerialnumber,
-    ): AppThunk<RootState, Promise<void>> =>
+    (index: number, device: DeviceWithSerialnumber): AppThunk<Promise<void>> =>
     async dispatch => {
         dispatch(
             setProgrammingProgress({
@@ -73,7 +70,7 @@ const runWaitAction =
         index: number,
         device: DeviceWithSerialnumber,
         config: WaitAction,
-    ): AppThunk<RootState, Promise<void>> =>
+    ): AppThunk<Promise<void>> =>
     async dispatch => {
         await new Promise(resolve => {
             setTimeout(resolve, config.durationMs);
@@ -87,7 +84,7 @@ const runProgramAction =
         index: number,
         device: DeviceWithSerialnumber,
         config: ProgrammingAction,
-    ): AppThunk<RootState, Promise<void>> =>
+    ): AppThunk<Promise<void>> =>
     async dispatch => {
         const { core, coreLabel, file } = config.firmware;
         try {
@@ -121,7 +118,7 @@ const runModemFirmwareAction =
         index: number,
         device: DeviceWithSerialnumber,
         config: ProgramModemFirmwareAction,
-    ): AppThunk<RootState, Promise<void>> =>
+    ): AppThunk<Promise<void>> =>
     async dispatch => {
         const { file, core, coreLabel } = config.firmware;
         const serialportPath = device.serialPorts?.[config.vComIndex]?.comName;

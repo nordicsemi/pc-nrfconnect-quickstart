@@ -12,7 +12,7 @@ import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging
 import fs from 'fs';
 import path from 'path';
 
-import { type AppThunk, type RootState } from '../../../../app/store';
+import { type AppThunk } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../device/deviceGuides';
 import {
     getChoice,
@@ -37,7 +37,7 @@ import { reportEvaluateError } from './reportError';
 const HARDWARE_VERSION_FALLBACK = 'nrf54l15dk';
 
 export const registerDevice =
-    (vComIndex: number): AppThunk<RootState, Promise<void>> =>
+    (vComIndex: number): AppThunk<Promise<void>> =>
     async (dispatch, getState) => {
         dispatch(setRegistration({ status: 'loading' }));
         let phase = 'validate';
