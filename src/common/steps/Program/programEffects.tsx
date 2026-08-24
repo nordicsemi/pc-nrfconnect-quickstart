@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import { type AppThunk, type RootState } from '../../../app/store';
 import {
     type DeviceWithSerialnumber,
@@ -18,6 +20,7 @@ import actionList from './actionVariants/actionList';
 import jlinkBatch from './actionVariants/jlinkBatch';
 import {
     prepareProgramming,
+    type ProgrammingStep,
     removeError,
     type RetryRef,
     setError,
@@ -38,21 +41,16 @@ const checkDeviceConnected =
         return true;
     };
 
-interface ProgrammingInfo {
-    title: string;
-    link?: { label: string; href: string };
-}
-
 export interface ProgrammingConfig {
-    run: (device: DeviceWithSerialnumber) => Promise<unknown>;
-    actions: ProgrammingInfo[];
+    run: (device: DeviceWithSerialnumber) => unknown;
+    actions: ProgrammingStep[];
 }
 
 export const startProgramming = (): AppThunk => (dispatch, getState) => {
     const choice = getChoiceUnsafely(getState());
     dispatch(removeError(undefined));
 
-    let config: ProgrammingConfig;
+    let config;
 
     switch (choice.type) {
         case 'jlink-batch':
@@ -77,7 +75,10 @@ export const startProgramming = (): AppThunk => (dispatch, getState) => {
 
     if (!dispatch(checkDeviceConnected())) return;
 
-    return config.run(getSelectedDeviceUnsafely(getState())).catch(() => {
+    try {
+        config.run(getSelectedDeviceUnsafely(getState()));
+    } catch (e) {
+        logger.error(e);
         if (!getState().steps.program.error) {
             dispatch(
                 setError({
@@ -86,7 +87,7 @@ export const startProgramming = (): AppThunk => (dispatch, getState) => {
                 }),
             );
         }
-    });
+    }
 };
 
 export const retry =
@@ -110,7 +111,7 @@ const resetDevice = (): AppThunk => (dispatch, getState) => {
     const batchLength = getState().steps.program.programmingActions?.length;
     // length 0 is alse an invalid state
     if (!batchLength) {
-        console.error('Could not find valid programming progress batch');
+        logger.error('Could not find valid programming progress batch');
         dispatch(
             setError({
                 icon: 'mdi-lightbulb-alert-outline',

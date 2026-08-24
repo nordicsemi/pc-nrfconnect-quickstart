@@ -7,15 +7,24 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { type RootState } from '../../../app/store';
+import { type ActionListEntry } from '../../../features/device/deviceSlice';
 
-type ProgrammingAction = {
+type ProgressInfo = {
     title: string;
     link?: { label: string; href: string };
+    progress: number;
 };
 
-type ProgrammingActionWithProgress = ProgrammingAction & {
-    progress?: number;
-};
+export interface ActionListProgrammingStep {
+    displayInfo?: ProgressInfo;
+    config: ActionListEntry;
+}
+
+export type ProgrammingStep =
+    | ActionListProgrammingStep
+    | {
+          displayInfo: ProgressInfo;
+      };
 
 export type RetryRef = 'reset' | 'standard';
 interface Error {
@@ -26,12 +35,12 @@ interface Error {
 }
 
 interface State {
-    programmingActions?: ProgrammingActionWithProgress[];
+    programmingActions: ProgrammingStep[];
     error?: Error;
 }
 
 const initialState: State = {
-    programmingActions: undefined,
+    programmingActions: [],
     error: undefined,
 };
 
@@ -41,7 +50,7 @@ const slice = createSlice({
     reducers: {
         prepareProgramming: (
             state,
-            action: PayloadAction<ProgrammingActionWithProgress[]>,
+            action: PayloadAction<ProgrammingStep[]>,
         ) => {
             state.programmingActions = action.payload;
         },
@@ -56,13 +65,12 @@ const slice = createSlice({
             if (!state.programmingActions) return;
 
             const updatedFirmwareWithProgress = state.programmingActions.map(
-                (f, index) =>
-                    index === action.payload.index
-                        ? {
-                              ...f,
-                              progress: action.payload.progress,
-                          }
-                        : f,
+                (f, index) => {
+                    if (index === action.payload.index && f.displayInfo) {
+                        f.displayInfo.progress = action.payload.progress;
+                    }
+                    return f;
+                },
             );
 
             state.programmingActions = updatedFirmwareWithProgress;
@@ -86,8 +94,12 @@ export const {
     reset,
 } = slice.actions;
 
-export const getProgrammingProgress = (state: RootState) =>
+export const getProgrammingActions = (state: RootState) =>
     state.steps.program.programmingActions;
+export const getProgrammingProgress = (state: RootState): ProgressInfo[] =>
+    state.steps.program.programmingActions
+        .map(a => a.displayInfo)
+        .filter(v => v !== undefined);
 export const getError = (state: RootState) => state.steps.program.error;
 
 export default slice.reducer;

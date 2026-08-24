@@ -35,8 +35,6 @@ export default () => {
     const programProgress = useAppSelector(getProgrammingProgress);
     const failed = !!useAppSelector(getError);
 
-    if (!programProgress) return null;
-
     return (
         <div
             className={`tw-flex tw-w-full tw-flex-col ${
@@ -49,7 +47,7 @@ export default () => {
                         <p>{title}</p>
                         {link && <Link label={link.label} href={link.href} />}
                     </div>
-                    <ProgressBar percentage={progress || 0} failed={failed} />
+                    <ProgressBar percentage={progress} failed={failed} />
                 </div>
             ))}
         </div>
