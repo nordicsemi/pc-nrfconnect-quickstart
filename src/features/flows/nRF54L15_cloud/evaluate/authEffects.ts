@@ -7,7 +7,7 @@
 import { inMain as auth } from '@nordicsemiconductor/pc-nrfconnect-shared/ipc/auth';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
-import { type AppThunk, type RootState } from '../../../../app/store';
+import { type AppThunk } from '../../../../app/store';
 import {
     fetchMemfaultToken,
     fetchOrganizations,
@@ -29,7 +29,7 @@ import { reportEvaluateError } from './reportError';
 // as an error — it does NOT end the users session. The session depends solely
 // on the myNordic/Entra tokens (auth.getIdToken / the shared auth state).
 const refreshMemfaultToken =
-    (): AppThunk<RootState, Promise<string>> => async dispatch => {
+    (): AppThunk<Promise<string>> => async dispatch => {
         const idTokenRes = await auth.getIdToken();
         if (!idTokenRes.status) {
             throw new Error(idTokenRes.error);
@@ -41,9 +41,7 @@ const refreshMemfaultToken =
 
 // Runs a request with the stored access token; on 401 refreshes and retries once.
 export const withMemfaultToken =
-    <T>(
-        request: (accessToken: string) => Promise<T>,
-    ): AppThunk<RootState, Promise<T>> =>
+    <T>(request: (accessToken: string) => Promise<T>): AppThunk<Promise<T>> =>
     async (dispatch, getState) => {
         let token = getMemfault(getState()).accessToken;
         if (!token) {
@@ -61,7 +59,7 @@ export const withMemfaultToken =
     };
 
 export const connectMemfault =
-    (): AppThunk<RootState, Promise<void>> => async dispatch => {
+    (): AppThunk<Promise<void>> => async dispatch => {
         dispatch(setMemfaultLoading());
         try {
             const idTokenRes = await auth.getIdToken();
@@ -87,7 +85,7 @@ export const connectMemfault =
     };
 
 export const fetchProjectsForOrg =
-    (orgSlug: string): AppThunk<RootState, Promise<void>> =>
+    (orgSlug: string): AppThunk<Promise<void>> =>
     async dispatch => {
         try {
             const projects = await dispatch(

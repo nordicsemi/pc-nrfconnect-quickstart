@@ -10,7 +10,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import path from 'path';
 
-import { type AppThunk, type RootState } from '../../../../app/store';
+import { type AppThunk } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../../features/device/deviceGuides';
 import { type Firmware } from '../../../../features/device/deviceSlice';
 import type { ProgrammingConfig } from '../programEffects';
