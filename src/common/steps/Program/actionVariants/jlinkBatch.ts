@@ -16,9 +16,7 @@ import { type Firmware } from '../../../../features/device/deviceSlice';
 import type { ProgrammingConfig } from '../programEffects';
 import { setError, setProgrammingProgress } from '../programSlice';
 
-export default (
-        firmwares: Firmware[],
-    ): AppThunk<RootState, ProgrammingConfig> =>
+export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
     dispatch => {
         const batch = NrfutilDeviceLib.batch();
 
@@ -124,6 +122,6 @@ export default (
                     link: f.link,
                 })),
                 { title: 'Reset device' },
-            ],
+            ].map(v => ({ displayInfo: { ...v, progress: 0 } })),
         };
     };

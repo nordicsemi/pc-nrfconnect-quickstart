@@ -13,7 +13,8 @@ import { getProgrammingProgress } from './programSlice';
 import SelectFirmware from './SelectFirmware';
 
 const ProgramStep = ({ choices }: { choices: Choice[] }) => {
-    const hasStartedProgramming = !!useAppSelector(getProgrammingProgress);
+    const hasStartedProgramming =
+        useAppSelector(getProgrammingProgress).length > 0;
 
     return hasStartedProgramming ? (
         <Program />
