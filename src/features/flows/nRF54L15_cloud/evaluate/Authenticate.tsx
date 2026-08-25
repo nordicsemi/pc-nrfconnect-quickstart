@@ -137,7 +137,11 @@ export default () => {
 
     return (
         <Main className="tw-min-h-0 tw-flex-1">
-            <Main.Content heading="Register your device" fillHeight noScrollBar>
+            <Main.Content
+                heading="Register your device"
+                fillHeight
+                noScrollBar={memfault.status === 'success'}
+            >
                 <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <p>
