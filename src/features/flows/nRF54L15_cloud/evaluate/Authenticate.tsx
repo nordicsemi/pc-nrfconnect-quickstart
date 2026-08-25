@@ -137,7 +137,7 @@ export default () => {
 
     return (
         <Main className="tw-min-h-0 tw-flex-1">
-            <Main.Content heading="Register your device" fillHeight>
+            <Main.Content heading="Register your device" fillHeight noScrollBar>
                 <div className="tw-flex tw-flex-col tw-gap-5">
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <p>
@@ -194,6 +194,7 @@ export default () => {
                                                 fetchProjectsForOrg(item.value),
                                             );
                                         }}
+                                        numItemsBeforeScroll={4}
                                         selectedItem={selectedOrgItem}
                                         size="sm"
                                     />
@@ -207,6 +208,7 @@ export default () => {
                                                 ),
                                             )
                                         }
+                                        numItemsBeforeScroll={4}
                                         selectedItem={selectedProjectItem}
                                         size="sm"
                                     />
