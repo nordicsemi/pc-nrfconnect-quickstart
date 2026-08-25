@@ -27,6 +27,8 @@ After installing and opening the app from nRF Connect for Desktop, connect your 
 - nRF52833 DK
 - nRF52 DK
 
+The Quick Start app lets you also register your nRF54L15 DK device with [nRF Cloud](https://nrfcloud.nordicsemi.com/).
+
 ## Application source code
 
 The code of the application is open source and [available on GitHub](https://github.com/nordicsemi/pc-nrfconnect-quickstart).
