@@ -94,7 +94,7 @@ export default ({ samples }: { samples: SampleWithRef[] }) => {
                             openUrl(
                                 `${deepLink}openSampleFromSDK?${queryParamsString(
                                     {
-                                        sample,
+                                        samplePath: sample,
                                         sdkVersion: choice.sdk?.version,
                                         sdkType: choice.sdk?.type,
                                     },
