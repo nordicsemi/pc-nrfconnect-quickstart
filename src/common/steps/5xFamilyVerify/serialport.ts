@@ -31,7 +31,7 @@ export default (
         const path = device.serialPorts?.[vComIndex].comName;
 
         if (!path) {
-            throw new Error('Failed to find a valid serialport');
+            throw new Error('Failed to find a valid serial port');
         }
 
         let sp: Awaited<ReturnType<typeof createSerialPort>>;

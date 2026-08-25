@@ -14,6 +14,7 @@ export interface Firmware {
     core?: DeviceCore;
     coreLabel?: string;
     file: string;
+    elfFile?: string;
     link?: { label: string; href: string };
 }
 

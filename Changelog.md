@@ -2,7 +2,14 @@
 
 ### Added
 
+- nRF Cloud support for the nRF54L15 DK.
+- nRF Cloud Bluetooth Quick Start sample for the nRF54L15 DK.
 - Support for the nRF54LC10 DK.
+
+### Removed
+
+- Hello World, Peripheral LED Button Service, and Peripheral UART samples for
+  the nRF54L15 DK.
 
 ## 1.9.2 - 2026-07-01
 

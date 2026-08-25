@@ -5,22 +5,40 @@
  */
 
 import React, { type ReactNode } from 'react';
+import { classNames } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 const Content = ({
     heading,
     subHeading,
     className = '',
     children,
+    fillHeight = false,
+    noScrollBar = false,
 }: {
     heading: string;
     subHeading?: string;
     className?: string;
     children: ReactNode;
+    fillHeight?: boolean;
+    noScrollBar?: boolean;
 }) => (
-    <div className="tw-flex tw-flex-col tw-items-start tw-justify-start tw-overflow-hidden tw-pb-8 tw-pr-6 tw-text-start tw-text-sm tw-text-gray-700">
+    <div
+        className={classNames(
+            fillHeight && 'tw-flex- tw-min-h-0',
+            !noScrollBar && 'tw-overflow-hidden',
+            `tw-flex tw-flex-col tw-items-start tw-justify-start tw-pb-8 tw-pr-6 tw-text-start tw-text-sm tw-text-gray-700`,
+        )}
+    >
         <h1 className="tw-pb-4 tw-text-2xl/6 tw-font-medium">{heading}</h1>
         <h2 className="tw-pb-8">{subHeading || '‎'}</h2>
-        <div className={`scrollbar tw-w-full ${className}`}>{children}</div>
+        <div
+            className={classNames(
+                !noScrollBar && 'scrollbar',
+                `tw-w-full ${fillHeight ? 'tw-min-h-0 tw-flex-1' : ''} ${className}`,
+            )}
+        >
+            {children}
+        </div>
     </div>
 );
 
