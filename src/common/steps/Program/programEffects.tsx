@@ -19,6 +19,7 @@ import {
 import actionList from './actionVariants/actionList';
 import jlinkBatch from './actionVariants/jlinkBatch';
 import {
+    addNote,
     prepareProgramming,
     type ProgrammingStep,
     removeError,
@@ -71,6 +72,9 @@ export const startProgramming = (): AppThunk => (dispatch, getState) => {
     }
 
     dispatch(prepareProgramming(config.actions));
+    if (choice.firmwareNote) {
+        dispatch(addNote(choice.firmwareNote));
+    }
 
     if (!dispatch(checkDeviceConnected())) return;
 
