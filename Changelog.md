@@ -1,3 +1,9 @@
+## Unreleased
+
+### Added
+
+- Support for the nRF93M1 DK.
+
 ## 1.10.0 - UNRELEASED
 
 ### Added
