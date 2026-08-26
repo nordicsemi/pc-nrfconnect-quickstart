@@ -24,7 +24,7 @@ const Content = ({
 }) => (
     <div
         className={classNames(
-            fillHeight && 'tw-flex- tw-min-h-0',
+            fillHeight && 'tw-min-h-0 tw-flex-1',
             !noScrollBar && 'tw-overflow-hidden',
             `tw-flex tw-flex-col tw-items-start tw-justify-start tw-pb-8 tw-pr-6 tw-text-start tw-text-sm tw-text-gray-700`,
         )}
