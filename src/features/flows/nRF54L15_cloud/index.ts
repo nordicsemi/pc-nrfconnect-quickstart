@@ -34,7 +34,7 @@ const programConfig = [
             href: 'https://github.com/nrfconnect/quickstart-bluetooth',
         },
         ncsAddon:
-            'app=quickstart-bluetooth&branch=v1.1.0&manifest=&repo=https://github.com/nrfconnect/quickstart-bluetooth',
+            'app=quickstart-bluetooth&branch=v1.1.1&manifest=&repo=https://github.com/nrfconnect/quickstart-bluetooth',
         programmingOptions: {
             firmwareList: [
                 {
