@@ -172,14 +172,21 @@ const slice = createSlice({
             state.memfault.projects = payload.projects;
         },
         setSelectedOrgSlug: (state, { payload }: PayloadAction<string>) => {
+            if (state.memfault.selectedOrgSlug !== payload) {
+                state.registration = { status: 'idle' };
+            }
             state.memfault.selectedOrgSlug = payload;
         },
         setSelectedProjectSlug: (state, { payload }: PayloadAction<string>) => {
+            if (state.memfault.selectedProjectSlug !== payload) {
+                state.registration = { status: 'idle' };
+            }
             state.memfault.selectedProjectSlug = payload;
         },
 
         resetMemfault: state => {
             state.memfault = initialMemfault;
+            state.registration = { status: 'idle' };
         },
         reset: () => initialState,
     },
