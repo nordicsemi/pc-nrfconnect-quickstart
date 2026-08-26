@@ -180,6 +180,7 @@ const slice = createSlice({
 
         resetMemfault: state => {
             state.memfault = initialMemfault;
+            state.registration = { status: 'idle' };
         },
         reset: () => initialState,
     },
