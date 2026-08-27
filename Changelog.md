@@ -1,10 +1,9 @@
-## 1.10.0 - UNRELEASED
+## 1.10.0 - 2026-08-27
 
 ### Added
 
 - nRF Cloud support for the nRF54L15 DK.
 - nRF Cloud Bluetooth Quick Start sample for the nRF54L15 DK.
-- Support for the nRF54LC10 DK.
 
 ### Removed
 
