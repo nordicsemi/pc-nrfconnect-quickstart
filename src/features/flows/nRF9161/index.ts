@@ -7,12 +7,16 @@
 import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
+import {
+    type SampleWithRef,
+    SDKType,
+} from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
-import { type Choice, SDKType } from '../../device/deviceSlice';
+import { type Choice } from '../../device/deviceSlice';
 import CustomEvaluate from './Evaluate';
 import SIM from './SIM';
 
@@ -37,8 +41,6 @@ const programConfig = [
             content:
                 'Modem Trace is enabled; the current consumption will be higher than usual.',
         },
-        ncsAddon:
-            'app=asset-tracker-template&branch=v1.2.1&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
         programmingOptions: {
             actions: [
                 {
@@ -186,10 +188,6 @@ const programConfig = [
             title: 'Increased power consumption',
             content:
                 'Modem Trace is enabled; the current consumption will be higher than usual.',
-        },
-        sdk: {
-            type: SDKType.nRFConnectSDK,
-            version: '2.8.0',
         },
         programmingOptions: {
             actions: [
@@ -378,18 +376,34 @@ const learnConfig = [
 
 const developConfig = [
     {
+        ref: 'Asset Tracker',
+        type: 'ncsAddon',
+        link: 'app=asset-tracker-template&branch=v1.2.1&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
+    },
+    {
         ref: 'nRF Cloud multi-service',
-        sampleSource: 'nrf/samples/cellular/nrf_cloud_multi_service',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/cellular/nrf_cloud_multi_service',
+        },
     },
     {
         ref: 'Shell Command Line Interface',
-        sampleSource: 'nrf/samples/cellular/modem_shell',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/cellular/modem_shell',
+        },
     },
     {
         ref: 'Legacy Asset Tracker',
-        sampleSource: 'nrf/applications/asset_tracker_v2',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/applications/asset_tracker_v2',
+            sdkType: SDKType.nRFConnectSDK,
+            sdkVersion: '2.8.0',
+        },
     },
-];
+] as SampleWithRef[];
 
 const appsConfig = [
     'pc-nrfconnect-cellularmonitor',
