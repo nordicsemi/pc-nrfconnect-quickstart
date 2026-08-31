@@ -7,7 +7,7 @@
 import Verify from '../../../common/steps/5xFamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
-import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
+import { type DevelopConfig } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -48,24 +48,20 @@ const programConfig = [
             ],
         },
     },
-] as Choice[];
+] satisfies Choice[];
 
-const verifyConfig = [
-    {
-        ref: 'nRF Cloud Bluetooth Quick Start',
-        config: {
-            vComIndex: VCOM_INDEX,
-            regex: /(\*{3} Booting Quickstart Bluetooth .* \*{3}\r\n\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\n)/,
-        },
+const verifyConfig = {
+    'nRF Cloud Bluetooth Quick Start': {
+        vComIndex: VCOM_INDEX,
+        regex: /(\*{3} Booting Quickstart Bluetooth .* \*{3}\r\n\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\n)/,
     },
-];
+};
 
-const evaluateConfig = [
-    {
-        ref: 'nRF Cloud Bluetooth Quick Start',
-        component: () => CloudEvaluate({ vComIndex: VCOM_INDEX }),
+const evaluateConfig = {
+    'nRF Cloud Bluetooth Quick Start': {
+        customNode: () => CloudEvaluate({ vComIndex: VCOM_INDEX }),
     },
-];
+};
 
 const learnConfig = [
     {
@@ -97,29 +93,26 @@ const learnConfig = [
     },
 ];
 
-const developConfig = [
-    {
-        ref: 'Hello World',
+const developConfig = {
+    'Hello World': {
         type: 'sdk',
         params: {
             samplePath: 'zephyr/samples/hello_world',
         },
     },
-    {
-        ref: 'Peripheral LED Button Service',
+    'Peripheral LED Button Service': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/bluetooth/peripheral_lbs',
         },
     },
-    {
-        ref: 'Peripheral UART',
+    'Peripheral UART': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/bluetooth/peripheral_uart',
         },
     },
-] satisfies SampleWithRef[];
+} satisfies DevelopConfig;
 
 const appsConfig = [
     'pc-nrfconnect-programmer',

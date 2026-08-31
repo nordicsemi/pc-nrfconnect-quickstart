@@ -37,29 +37,26 @@ const isExternalLinkResource = (
     resource: AppResource | ExternalLinkResource,
 ): resource is ExternalLinkResource => 'mainLink' in resource;
 
-interface ResourcePage {
-    ref: string;
-    resources: (AppResource | ExternalLinkResource)[];
-}
+type ResourcePage = (AppResource | ExternalLinkResource)[];
 
 interface ResourceComponent {
-    ref: string;
-    component: () => React.ReactNode;
+    customNode: () => React.ReactNode;
 }
 
 const EvaluateStep = ({
+    config,
     ref,
-    resources,
 }: {
+    config: ResourcePage;
     ref: string;
-    resources: (AppResource | ExternalLinkResource)[];
 }) => {
     const [busy, setBusy] = useState(false);
+    console.log(config, ref);
     return (
         <Main>
             <Main.Content heading={`Evaluate ${ref}`}>
                 <div className="tw-flex tw-flex-col tw-gap-6">
-                    {resources.map(resource =>
+                    {config.map(resource =>
                         isExternalLinkResource(resource) ? (
                             <ResourceWithButton
                                 key={resource.title}
@@ -105,18 +102,11 @@ const EvaluateStep = ({
     );
 };
 
-export default (resourcePages: (ResourcePage | ResourceComponent)[]) => ({
+export default (configs: Record<string, ResourcePage | ResourceComponent>) => ({
     name: 'Evaluate',
     component: () =>
-        StepByChoice({
-            steps: resourcePages.reduce(
-                (acc, next) => ({
-                    ...acc,
-                    [next.ref]: (next as ResourceComponent).component
-                        ? (next as ResourceComponent).component
-                        : () => EvaluateStep({ ...(next as ResourcePage) }),
-                }),
-                {},
-            ),
+        StepByChoice<ResourcePage>({
+            defaultNode: EvaluateStep,
+            configs,
         }),
 });
