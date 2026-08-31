@@ -51,17 +51,19 @@ interface SDKParams {
         sdkType?: SDKType;
     };
 }
-export type SampleWithRef = {
-    ref: string;
+
+type Sample = {
     type: 'sdk' | 'ncsAddon';
 } & (NCSAddon | SDKParams);
 
-export default ({ samples }: { samples: SampleWithRef[] }) => {
+export type DevelopConfig = Record<string, Sample>;
+
+export default ({ samples }: { samples: DevelopConfig }) => {
     const dispatch = useAppDispatch();
     const isVsCodeInstalled = useAppSelector(getIsVsCodeInstalled);
     const choice = useAppSelector(getChoiceUnsafely);
 
-    const sample = samples.find(s => s.ref === choice.name);
+    const sample = samples[choice.name];
 
     useEffect(
         () => detectVsCodeRepeatedly(dispatch, isVsCodeInstalled),

@@ -7,7 +7,7 @@
 import Verify from '../../../common/steps/5xFamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
-import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
+import { type DevelopConfig } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -91,96 +91,80 @@ const programConfig = [
             ],
         },
     },
-] as Choice[];
+] satisfies Choice[];
 
-const verifyConfig = [
-    {
-        ref: 'Hello World',
-        config: {
-            vComIndex: 1,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf5340dk\/nrf5340\/cpuapp)/,
-        },
+const verifyConfig = {
+    'Hello World': {
+        vComIndex: 1,
+        regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf5340dk\/nrf5340\/cpuapp)/,
     },
-    {
-        ref: 'Wi-Fi Scan',
-        config: {
-            vComIndex: 1,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3})/,
-        },
-    },
-    {
-        ref: 'Wi-Fi Bluetooth LE Provisioning',
-        config: {
-            vComIndex: 1,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3})/,
-        },
-    },
-];
 
-const evaluateConfig = [
-    {
-        ref: 'Hello World',
-        resources: [
-            {
-                title: 'Test the sample',
-                description:
-                    'Open the nRF Connect Serial Terminal application and press reset on the device to print the output.',
-                app: 'pc-nrfconnect-serial-terminal',
-                vComIndex: 1,
-            },
-            {
-                title: 'Documentation',
-                description: 'Read the complete documentation for the sample.',
-                mainLink: {
-                    label: 'Open documentation',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/samples/hello_world/README.html',
-                },
-            },
-        ],
+    'Wi-Fi Scan': {
+        vComIndex: 1,
+        regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3})/,
     },
-    {
-        ref: 'Wi-Fi Scan',
-        resources: [
-            {
-                title: 'Test the sample',
-                description:
-                    'Open the nRF Connect Serial Terminal application to view the scan results of nearby Wi-Fi access points.',
-                app: 'pc-nrfconnect-serial-terminal',
-                vComIndex: 1,
-            },
-            {
-                title: 'Documentation',
-                description: 'Read the complete documentation for the sample.',
-                mainLink: {
-                    label: 'Open documentation',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/wifi/scan/README.html',
-                },
-            },
-        ],
+
+    'Wi-Fi Bluetooth LE Provisioning': {
+        vComIndex: 1,
+        regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3})/,
     },
-    {
-        ref: 'Wi-Fi Bluetooth LE Provisioning',
-        resources: [
-            {
-                title: 'Test the sample',
-                description:
-                    'Follow the testing steps to provision Wi-Fi credentials over Bluetooth LE.',
-                mainLink: {
-                    label: 'Testing steps',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/wifi/provisioning/ble/README.html#testing',
-                },
+};
+
+const evaluateConfig = {
+    'Hello World': [
+        {
+            title: 'Test the sample',
+            description:
+                'Open the nRF Connect Serial Terminal application and press reset on the device to print the output.',
+            app: 'pc-nrfconnect-serial-terminal',
+            vComIndex: 1,
+        },
+        {
+            title: 'Documentation',
+            description: 'Read the complete documentation for the sample.',
+            mainLink: {
+                label: 'Open documentation',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/samples/hello_world/README.html',
             },
-            {
-                title: 'Documentation',
-                description: 'Read the complete documentation for the sample.',
-                mainLink: {
-                    label: 'Open documentation',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/wifi/provisioning/ble/README.html',
-                },
+        },
+    ],
+    'Wi-Fi Scan': [
+        {
+            title: 'Test the sample',
+            description:
+                'Open the nRF Connect Serial Terminal application to view the scan results of nearby Wi-Fi access points.',
+            app: 'pc-nrfconnect-serial-terminal',
+            vComIndex: 1,
+        },
+        {
+            title: 'Documentation',
+            description: 'Read the complete documentation for the sample.',
+            mainLink: {
+                label: 'Open documentation',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/wifi/scan/README.html',
             },
-        ],
-    },
-];
+        },
+    ],
+    'Wi-Fi Bluetooth LE Provisioning': [
+        {
+            title: 'Test the sample',
+            description:
+                'Follow the testing steps to provision Wi-Fi credentials over Bluetooth LE.',
+            mainLink: {
+                label: 'Testing steps',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/wifi/provisioning/ble/README.html#testing',
+            },
+        },
+        {
+            title: 'Documentation',
+            description: 'Read the complete documentation for the sample.',
+            mainLink: {
+                label: 'Open documentation',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/wifi/provisioning/ble/README.html',
+            },
+        },
+    ],
+};
 
 const learnConfig = [
     {
@@ -212,29 +196,26 @@ const learnConfig = [
     },
 ];
 
-const developConfig = [
-    {
-        ref: 'Hello World',
+const developConfig = {
+    'Hello World': {
         type: 'sdk',
         params: {
             samplePath: 'zephyr/samples/hello_world',
         },
     },
-    {
-        ref: 'Wi-Fi Scan',
+    'Wi-Fi Scan': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/wifi/scan',
         },
     },
-    {
-        ref: 'Wi-Fi Bluetooth LE Provisioning',
+    'Wi-Fi Bluetooth LE Provisioning': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/wifi/provisioning/ble',
         },
     },
-] as SampleWithRef[];
+} as DevelopConfig;
 
 const appsConfig = [
     'pc-nrfconnect-programmer',
