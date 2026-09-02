@@ -8,7 +8,7 @@ import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
 import {
-    type SampleWithRef,
+    type DevelopConfig,
     SDKType,
 } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
@@ -225,31 +225,27 @@ const programConfig = [
             ],
         },
     },
-] as Choice[];
+] satisfies Choice[];
 
 const verificationConfig = {
-    settings: [
-        {
-            ref: 'Asset Tracker',
+    settings: {
+        'Asset Tracker': {
             vComIndex: 0,
             mode: 'SHELL' as const,
         },
-        {
-            ref: 'AT Commands',
+        'AT Commands': {
             vComIndex: 0,
             mode: 'LINE' as const,
         },
-        {
-            ref: 'Shell Command Line Interface',
+        'Shell Command Line Interface': {
             vComIndex: 0,
             mode: 'SHELL' as const,
         },
-        {
-            ref: 'Legacy Asset Tracker',
+        'Legacy Asset Tracker': {
             vComIndex: 0,
             mode: 'LINE' as const,
         },
-    ],
+    },
     commands: [
         {
             title: 'Manufacturer',
@@ -270,79 +266,71 @@ const verificationConfig = {
     ],
 };
 
-const evaluationConfig = [
-    {
-        ref: 'Asset Tracker',
-        component: CustomEvaluate,
+const evaluationConfig = {
+    'Asset Tracker': {
+        customNode: CustomEvaluate,
     },
-    {
-        ref: 'AT Commands',
-        resources: [
-            {
-                app: 'pc-nrfconnect-serial-terminal',
-                description:
-                    'Use the Serial Terminal desktop application as a serial interface to send AT commands to the device.',
-                vComIndex: 0,
-                supplementaryLinks: [
-                    {
-                        label: 'AT Commands reference manual',
-                        href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
-                    },
-                    {
-                        label: 'IP AT Commands Documentation',
-                        href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/doc/AT_commands.html',
-                    },
-                ],
-            },
-            {
-                app: 'pc-nrfconnect-cellularmonitor',
-                description: 'Automatically connect and evaluate parameters.',
-            },
-        ],
-    },
-    {
-        ref: 'Shell Command Line Interface',
-        resources: [
-            {
-                app: 'pc-nrfconnect-serial-terminal',
-                description: 'Serial interface to send commands to the device.',
-                vComIndex: 0,
-                supplementaryLinks: [
-                    {
-                        label: 'Modem shell commands',
-                        href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/modem_shell/README.html#overview',
-                    },
-                    {
-                        label: 'AT Commands reference manual',
-                        href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
-                    },
-                ],
-            },
-            {
-                app: 'pc-nrfconnect-cellularmonitor',
-                description: 'Automatically connect and evaluate parameters.',
-            },
-        ],
-    },
-    {
-        ref: 'Legacy Asset Tracker',
-        resources: [
-            {
-                title: 'Cellular IoT Fundamentals',
-                mainLink: {
-                    label: 'Open course',
-                    href: 'https://academy.nordicsemi.com/courses/cellular-iot-fundamentals/lessons/lesson-1-cellular-fundamentals/topic/lesson-1-exercise-1/',
+    'AT Commands': [
+        {
+            app: 'pc-nrfconnect-serial-terminal',
+            description:
+                'Use the Serial Terminal desktop application as a serial interface to send AT commands to the device.',
+            vComIndex: 0,
+            supplementaryLinks: [
+                {
+                    label: 'AT Commands reference manual',
+                    href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
                 },
-                description:
-                    'Follow Exercise 1 in the Cellular IoT Fundamentals course to evaluate cloud connectivity.',
+                {
+                    label: 'IP AT Commands Documentation',
+                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/doc/AT_commands.html',
+                },
+            ],
+        },
+        {
+            app: 'pc-nrfconnect-cellularmonitor',
+            description: 'Automatically connect and evaluate parameters.',
+        },
+    ],
+
+    'Shell Command Line Interface': [
+        {
+            app: 'pc-nrfconnect-serial-terminal',
+            description: 'Serial interface to send commands to the device.',
+            vComIndex: 0,
+            supplementaryLinks: [
+                {
+                    label: 'Modem shell commands',
+                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/modem_shell/README.html#overview',
+                },
+                {
+                    label: 'AT Commands reference manual',
+                    href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
+                },
+            ],
+        },
+        {
+            app: 'pc-nrfconnect-cellularmonitor',
+            description: 'Automatically connect and evaluate parameters.',
+        },
+    ],
+
+    'Legacy Asset Tracker': [
+        {
+            title: 'Cellular IoT Fundamentals',
+            mainLink: {
+                label: 'Open course',
+                href: 'https://academy.nordicsemi.com/courses/cellular-iot-fundamentals/lessons/lesson-1-cellular-fundamentals/topic/lesson-1-exercise-1/',
             },
-            {
-                app: 'pc-nrfconnect-cellularmonitor',
-                description: 'Automatically connect and evaluate parameters.',
-            },
-        ],
-    },
-];
+            description:
+                'Follow Exercise 1 in the Cellular IoT Fundamentals course to evaluate cloud connectivity.',
+        },
+        {
+            app: 'pc-nrfconnect-cellularmonitor',
+            description: 'Automatically connect and evaluate parameters.',
+        },
+    ],
+};
 
 const learnConfig = [
     {
@@ -374,28 +362,24 @@ const learnConfig = [
     },
 ];
 
-const developConfig = [
-    {
-        ref: 'Asset Tracker',
+const developConfig = {
+    'Asset Tracker': {
         type: 'ncsAddon',
         link: 'app=asset-tracker-template&branch=v1.2.1&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
     },
-    {
-        ref: 'nRF Cloud multi-service',
+    'nRF Cloud multi-service': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/cellular/nrf_cloud_multi_service',
         },
     },
-    {
-        ref: 'Shell Command Line Interface',
+    'Shell Command Line Interface': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/cellular/modem_shell',
         },
     },
-    {
-        ref: 'Legacy Asset Tracker',
+    'Legacy Asset Tracker': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/applications/asset_tracker_v2',
@@ -403,7 +387,7 @@ const developConfig = [
             sdkVersion: '2.8.0',
         },
     },
-] as SampleWithRef[];
+} satisfies DevelopConfig;
 
 const appsConfig = [
     'pc-nrfconnect-cellularmonitor',
