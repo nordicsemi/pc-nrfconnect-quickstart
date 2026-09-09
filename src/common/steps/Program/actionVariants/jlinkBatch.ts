@@ -14,7 +14,11 @@ import { type AppThunk } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../../features/device/deviceGuides';
 import { type Firmware } from '../../../../features/device/deviceSlice';
 import type { ProgrammingConfig } from '../programEffects';
-import { setError, setProgrammingProgress } from '../programSlice';
+import {
+    increaseCurrentIndex,
+    setError,
+    setProgrammingProgress,
+} from '../programSlice';
 
 export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
     dispatch => {
@@ -28,13 +32,11 @@ export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
             batch.recover(core as DeviceCore, {
                 onTaskBegin: () => {
                     dispatch(
-                        setProgrammingProgress({
-                            index: 0,
+                        setProgrammingProgress(
                             // + 1 because we should show some progress on the first action
-                            progress:
-                                ((index + 1) / (nonDuplicateCores.length + 1)) *
+                            ((index + 1) / (nonDuplicateCores.length + 1)) *
                                 100,
-                        }),
+                        ),
                     );
                 },
                 onTaskEnd: end => {
@@ -50,10 +52,11 @@ export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
             });
         });
         batch.collect(nonDuplicateCores.length, () => {
-            dispatch(setProgrammingProgress({ index: 0, progress: 100 }));
+            dispatch(setProgrammingProgress(100));
+            dispatch(increaseCurrentIndex());
         });
 
-        firmwares.forEach(({ file, core, coreLabel }, index) => {
+        firmwares.forEach(({ file, core, coreLabel }) => {
             batch.program(
                 path.join(getFirmwareFolder(), file),
                 core === 'Modem' ? 'Application' : (core as DeviceCore),
@@ -61,13 +64,9 @@ export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
                 undefined,
                 {
                     onProgress: ({ totalProgressPercentage: progress }) =>
-                        dispatch(
-                            setProgrammingProgress({
-                                index: index + 1,
-                                progress,
-                            }),
-                        ),
+                        dispatch(setProgrammingProgress(progress)),
                     onTaskEnd: end => {
+                        dispatch(increaseCurrentIndex());
                         if (end.error) {
                             dispatch(
                                 setError({
@@ -84,21 +83,13 @@ export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
         // use 'RESET_DEFAULT' which is default when not passing anything for reset argument
         batch.reset('Application', undefined, {
             onTaskBegin: () => {
-                dispatch(
-                    setProgrammingProgress({
-                        index: 1 + firmwares.length,
-                        progress: 50,
-                    }),
-                );
+                dispatch(setProgrammingProgress(50));
             },
             onTaskEnd: end => {
                 if (end.result === 'success') {
-                    dispatch(
-                        setProgrammingProgress({
-                            index: 1 + firmwares.length,
-                            progress: 100,
-                        }),
-                    );
+                    dispatch(setProgrammingProgress(100));
+                    // Do not increase index here!
+                    // We must keep correct index of reset action in order to retry in the case of only resetting again correctly
                 }
                 if (end.error) {
                     dispatch(

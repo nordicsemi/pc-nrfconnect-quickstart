@@ -83,6 +83,9 @@ const slice = createSlice({
             action: PayloadAction<ProgrammingStep[]>,
         ) => {
             state.programmingActions = action.payload;
+            state.notes = [];
+            state.error = undefined;
+            state.currentIndex = 0;
         },
         addNote: (
             state,
@@ -128,11 +131,8 @@ const slice = createSlice({
         increaseCurrentIndex: state => {
             state.currentIndex += 1;
         },
-        setError: (state, action: PayloadAction<Error>) => {
+        setError: (state, action: PayloadAction<Error | undefined>) => {
             state.error = action.payload;
-        },
-        removeError: state => {
-            state.error = undefined;
         },
         reset: () => initialState,
     },
@@ -147,7 +147,6 @@ export const {
     skipProgrammingAction,
     setError,
     addNote,
-    removeError,
     reset,
 } = slice.actions;
 
