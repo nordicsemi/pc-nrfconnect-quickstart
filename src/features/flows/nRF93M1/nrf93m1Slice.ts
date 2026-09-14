@@ -10,28 +10,17 @@ import { type RootState } from '../../../app/store';
 import { setChoice } from '../../device/deviceSlice';
 
 interface State {
-    /* Verify step */
-    responses: string[];
-    verifyFailed?: string;
-    showSkip: boolean;
-
-    /* Evaluate step */
-    deviceUuid?: string;
-    uuidFailed?: string;
-    teamId: string;
-    regJwt?: string;
-    jwtFailed?: string;
+    failed?: string;
+    uuid?: string;
+    teamID?: string;
+    registrationToken?: string;
 }
 
 const initialState: State = {
-    responses: [],
-    verifyFailed: undefined,
-    showSkip: false,
-    deviceUuid: undefined,
-    uuidFailed: undefined,
-    teamId: '',
-    regJwt: undefined,
-    jwtFailed: undefined,
+    failed: undefined,
+    uuid: undefined,
+    teamID: undefined,
+    registrationToken: undefined,
 };
 
 const slice = createSlice({
@@ -39,48 +28,15 @@ const slice = createSlice({
     initialState,
     reducers: {
         setResponses: (state, { payload }: PayloadAction<string[]>) => {
-            state.responses = payload;
-            state.verifyFailed = undefined;
-            state.showSkip = false;
+            state.uuid = payload[0];
+            state.registrationToken = payload[1];
         },
-        setVerifyFailed: (state, { payload }: PayloadAction<string>) => {
-            state.verifyFailed = payload;
-            /* Keep showSkip true once a verification attempt has failed. */
-            state.showSkip = !(state.showSkip === false && !state.verifyFailed);
+        setFailed: (state, { payload }: PayloadAction<string | undefined>) => {
+            state.failed = payload;
         },
-        resetVerification: state => {
-            state.responses = [];
-            state.verifyFailed = undefined;
-            state.showSkip = false;
+        setTeamID: (state, { payload }: PayloadAction<string>) => {
+            state.teamID = payload;
         },
-
-        setDeviceUuid: (state, { payload }: PayloadAction<string>) => {
-            state.deviceUuid = payload;
-            state.uuidFailed = undefined;
-        },
-        setUuidFailed: (state, { payload }: PayloadAction<string>) => {
-            state.uuidFailed = payload;
-        },
-        resetDeviceUuid: state => {
-            state.deviceUuid = undefined;
-            state.uuidFailed = undefined;
-        },
-
-        setTeamId: (state, { payload }: PayloadAction<string>) => {
-            state.teamId = payload;
-        },
-        setRegJwt: (state, { payload }: PayloadAction<string>) => {
-            state.regJwt = payload;
-            state.jwtFailed = undefined;
-        },
-        setJwtFailed: (state, { payload }: PayloadAction<string>) => {
-            state.jwtFailed = payload;
-        },
-        resetRegJwt: state => {
-            state.regJwt = undefined;
-            state.jwtFailed = undefined;
-        },
-
         reset: () => initialState,
     },
     extraReducers: builder => {
@@ -88,31 +44,12 @@ const slice = createSlice({
     },
 });
 
-export const {
-    setResponses,
-    setVerifyFailed,
-    resetVerification,
-    setDeviceUuid,
-    setUuidFailed,
-    resetDeviceUuid,
-    setTeamId,
-    setRegJwt,
-    setJwtFailed,
-    resetRegJwt,
-    reset,
-} = slice.actions;
+export const { setResponses, setFailed, setTeamID, reset } = slice.actions;
 
-export const getResponses = (state: RootState) => state.flows.nrf93m1.responses;
-export const getVerifyFailed = (state: RootState) =>
-    state.flows.nrf93m1.verifyFailed;
-export const getShowSkip = (state: RootState) => state.flows.nrf93m1.showSkip;
-
-export const getDeviceUuid = (state: RootState) =>
-    state.flows.nrf93m1.deviceUuid;
-export const getUuidFailed = (state: RootState) =>
-    state.flows.nrf93m1.uuidFailed;
-export const getTeamId = (state: RootState) => state.flows.nrf93m1.teamId;
-export const getRegJwt = (state: RootState) => state.flows.nrf93m1.regJwt;
-export const getJwtFailed = (state: RootState) => state.flows.nrf93m1.jwtFailed;
+export const getFailed = (state: RootState) => state.flows.nrf93m1.failed;
+export const getDeviceUUID = (state: RootState) => state.flows.nrf93m1.uuid;
+export const getTeamID = (state: RootState) => state.flows.nrf93m1.teamID;
+export const getRegistrationToken = (state: RootState) =>
+    state.flows.nrf93m1.registrationToken;
 
 export default slice.reducer;
