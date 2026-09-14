@@ -4,47 +4,36 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     Button,
     IssueBox,
     logger,
-    openUrl,
-    Spinner,
     telemetry,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
 import { useAppDispatch, useAppSelector } from '../../../app/store';
-import { AcademyExerciseLink } from '../../../common/AcademyExerciseLink';
 import { Back } from '../../../common/Back';
 import Copy from '../../../common/Copy';
 import Link from '../../../common/Link';
 import Main from '../../../common/Main';
-import { Next } from '../../../common/Next';
+import { Next, Skip } from '../../../common/Next';
 import runVerification from '../../../common/sendATCommands';
 import {
     getSelectedDeviceUnsafely,
     selectedDeviceIsConnected,
 } from '../../device/deviceSlice';
 import {
-    getDeviceUuid,
-    getJwtFailed,
-    getRegJwt,
-    getTeamId,
-    getUuidFailed,
-    resetDeviceUuid,
-    resetRegJwt,
-    setDeviceUuid,
-    setJwtFailed,
-    setRegJwt,
-    setTeamId,
-    setUuidFailed,
+    getDeviceUUID,
+    getFailed,
+    getRegistrationToken,
+    getTeamID,
+    setFailed,
+    setResponses,
+    setTeamID,
 } from './nrf93m1Slice';
 
 const NRF_CLOUD_SETUP_LINK = 'https://start.nrfcloud.com/nRF93M1-DK';
-const AT_COMMAND_REFERENCE_LINK =
-    'https://www.nordicsemi.com/-/media/Software-and-other-downloads/Product-Briefs/nrf93m1_cellular_at_commands_v0.9.pdf';
 
 /*
  * In modem bypass mode the nRF93M1 UART is routed to the USB CDC-ACM port,
@@ -52,233 +41,169 @@ const AT_COMMAND_REFERENCE_LINK =
  */
 const MODEM_VCOM_INDEX = 1;
 
-const TruncatedValue = ({ value, width }: { value: string; width: string }) => (
-    <p className="tw-flex tw-flex-row tw-items-center tw-gap-1">
-        <b
-            title={value}
-            className={`tw-block ${width} tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap`}
-        >
-            {value}
-        </b>
-        <Copy copyText={value} />
-    </p>
+const TruncatedValue = ({
+    field,
+    value,
+    busy,
+    failed,
+}: {
+    field: string;
+    value?: string;
+    busy: boolean;
+    failed: boolean;
+}) => (
+    <div key={field} className="tw-flex tw-flex-row tw-items-center tw-gap-1">
+        <i>{field}: </i>
+        {busy && <p className="ellipsis" />}
+        {!busy && !value && !failed && <i>(Waiting for Team ID)</i>}
+        {!!value && !busy && !failed && (
+            <>
+                <b
+                    title={value}
+                    className="tw-block tw-w-60 tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap"
+                >
+                    {value}
+                </b>
+                <Copy copyText={value} />
+            </>
+        )}
+        {failed && <b>ERROR</b>}
+    </div>
 );
 
 export default () => {
     const dispatch = useAppDispatch();
     const device = useAppSelector(getSelectedDeviceUnsafely);
     const deviceConnected = useAppSelector(selectedDeviceIsConnected);
+    const teamID = useAppSelector(getTeamID);
+    const registrationToken = useAppSelector(getRegistrationToken);
+    const uuid = useAppSelector(getDeviceUUID);
+    const failed = useAppSelector(getFailed);
 
-    const uuid = useAppSelector(getDeviceUuid);
-    const uuidFailed = useAppSelector(getUuidFailed);
-    const teamId = useAppSelector(getTeamId);
-    const regJwt = useAppSelector(getRegJwt);
-    const jwtFailed = useAppSelector(getJwtFailed);
+    const [busy, setBusy] = useState(false);
 
-    const [gettingUuid, setGettingUuid] = useState(false);
-    const [gettingJwt, setGettingJwt] = useState(false);
-
-    const busy = gettingUuid || gettingJwt;
-
-    const sendCommand = useCallback(
-        (command: string, responseRegex: string) => {
-            if (!deviceConnected) {
-                return Promise.reject(
-                    new Error('No development kit connected.'),
-                );
-            }
-
-            const comName = device.serialPorts?.[MODEM_VCOM_INDEX]?.comName;
-
-            if (!comName) {
-                return Promise.reject(
-                    new Error('Could not find the modem serial port.'),
-                );
-            }
-
-            return runVerification(
-                [{ command, responseRegex }],
-                comName,
-                'LINE',
-            ).then(res => res[0]);
-        },
-        [device, deviceConnected],
-    );
-
-    const getUuid = useCallback(() => {
-        dispatch(resetDeviceUuid());
-        setGettingUuid(true);
-
-        sendCommand('AT%DEVICEUUID', '%DEVICEUUID: (.*)')
-            .then(res => {
-                dispatch(setDeviceUuid(res));
-            })
-            .catch(e => {
-                logger.error(describeError(e));
-                dispatch(setUuidFailed('Failed to read the device UUID.'));
-            })
-            .finally(() => setGettingUuid(false));
-    }, [dispatch, sendCommand]);
-
-    const getRegistrationToken = useCallback(() => {
-        const trimmedTeamId = teamId.trim();
-
-        if (!trimmedTeamId) {
+    const getValues = useCallback(() => {
+        if (!deviceConnected) {
+            dispatch(setFailed('No development kit connected.'));
             return;
         }
 
-        dispatch(resetRegJwt());
-        setGettingJwt(true);
+        const path = device.serialPorts?.[MODEM_VCOM_INDEX]?.comName;
+        if (!path) {
+            logger.error(
+                `Serial port not found. Tried to find vComIndex ${MODEM_VCOM_INDEX}, device serial ports: ${device.serialPorts}`,
+            );
+            dispatch(setFailed('Failed to communicate with the device.'));
+            return;
+        }
 
-        sendCommand(`AT%REGJWT=${trimmedTeamId}`, '%REGJWT: (.*)')
+        setBusy(true);
+        dispatch(setFailed());
+
+        runVerification(
+            [
+                {
+                    command: 'AT%DEVICEUUID',
+                    responseRegex: '%DEVICEUUID: (.*)',
+                },
+                {
+                    // @ts-expect-error teamID can never be undefined here
+                    command: `AT%REGJWT="${teamID.trim()}"`,
+                    responseRegex: '%REGJWT: (.*)',
+                },
+            ],
+            path,
+            'LINE',
+        )
             .then(res => {
-                dispatch(setRegJwt(res));
+                dispatch(setResponses(res));
+            })
+            .catch(e => {
+                logger.error(e);
                 telemetry.sendEvent(
                     'Generated the nRF Cloud registration token',
                 );
-            })
-            .catch(e => {
-                logger.error(describeError(e));
                 dispatch(
-                    setJwtFailed(
-                        'Failed to generate the registration token. Check that the team ID is correct and that the modem has connected to the network.',
-                    ),
+                    setFailed('Verify the Team ID and the modem connection.'),
                 );
             })
-            .finally(() => setGettingJwt(false));
-    }, [dispatch, sendCommand, teamId]);
-
-    useEffect(() => {
-        if (!uuid && !uuidFailed && !gettingUuid) {
-            getUuid();
-        }
-    }, [uuid, uuidFailed, gettingUuid, getUuid]);
+            .finally(() => {
+                setBusy(false);
+            });
+    }, [device, deviceConnected, dispatch, teamID]);
 
     return (
         <Main>
-            <Main.Content
-                heading="Connect to nRF Cloud"
-                subHeading="Location, observability, device management, and modem firmware updates over AT commands."
-            >
-                <div className="tw-flex tw-flex-col tw-gap-4">
-                    <p>
-                        The nRF93M1 connects to nRF Cloud directly. Adding it to
-                        your account requires two values. The Quick Start app
-                        automatically reads both values from the modem.
-                    </p>
-
-                    <div>
-                        <b>1. Device UUID</b>
-                        <p className={gettingUuid ? 'ellipsis' : ''}>
-                            {uuid && (
-                                <TruncatedValue value={uuid} width="tw-w-72" />
-                            )}
-                            <b>{uuidFailed && 'ERROR'}</b>
-                        </p>
-                    </div>
-
-                    <div>
-                        <b>2. Team ID</b>
-                        <p>
-                            In nRF Cloud, complete the following steps: 1. Open{' '}
-                            <b>Fleet</b> <b>Devices</b> <b>Add New Devices</b>.
-                            2. Select nRF93M1.
-                            <br />
-                            The dialog shows your team ID. 3. Paste the team ID
-                            below.
-                        </p>
-                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-pt-1">
-                            <input
-                                placeholder="Team ID"
-                                type="text"
-                                value={teamId}
-                                onChange={event =>
-                                    dispatch(setTeamId(event.target.value))
-                                }
-                                className="tw-h-8 tw-w-72 tw-border tw-border-solid tw-border-gray-300 tw-px-2 focus:tw-outline-0"
+            <Main.Content heading="Connect to nRF Cloud">
+                <div>
+                    Complete the following steps to add nRF93M1 to nRF Cloud:
+                    <ol className="tw-mt-2 tw-flex tw-list-inside tw-list-decimal tw-flex-col tw-gap-2 tw-pl-2">
+                        <li>
+                            In{' '}
+                            <Link
+                                label="nRF Cloud"
+                                href={NRF_CLOUD_SETUP_LINK}
                             />
-                            <Button
-                                variant="primary"
-                                size="lg"
-                                disabled={busy || !teamId.trim()}
-                                onClick={getRegistrationToken}
-                            >
-                                {regJwt ? 'Regenerate token' : 'Generate token'}
-                            </Button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <b>3. Registration token</b>
-                        <p className={gettingJwt ? 'ellipsis' : ''}>
-                            {regJwt && (
-                                <TruncatedValue
-                                    value={regJwt}
-                                    width="tw-w-96"
+                            , go to <b>Fleet</b> &gt; <b>Devices</b> &gt;{' '}
+                            <b>Add New Devices</b> &gt; <b>nRF93M1</b> to see
+                            the Team ID.
+                        </li>
+                        <li>
+                            Copy-paste the Team ID and click{' '}
+                            <b>Generate values</b>.
+                            <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
+                                <input
+                                    placeholder="Paste Team ID here"
+                                    type="text"
+                                    value={teamID}
+                                    onChange={event =>
+                                        dispatch(setTeamID(event.target.value))
+                                    }
+                                    className="tw-h-8 tw-w-72 tw-border tw-border-solid tw-border-gray-300 tw-px-2 focus:tw-outline-0"
                                 />
-                            )}
-                            <b>{jwtFailed && 'ERROR'}</b>
-                        </p>
-                        <p>
-                            Paste the device UUID and this token back into nRF
-                            Cloud to finish claiming the kit. It appears under
-                            Fleet, Devices within a few seconds.
-                        </p>
-                    </div>
-
-                    <Button
-                        variant="link-button"
-                        size="xl"
-                        onClick={() => {
-                            telemetry.sendEvent('Opened evaluation link', {
-                                link: NRF_CLOUD_SETUP_LINK,
-                            });
-                            openUrl(NRF_CLOUD_SETUP_LINK);
-                        }}
-                        className="tw-w-fit"
-                    >
-                        Set up your kit on nRF Cloud
-                    </Button>
-
-                    <div className="tw-text-xs">
-                        <Link
-                            label="nRF93M1 Command Reference Guide"
-                            href={AT_COMMAND_REFERENCE_LINK}
-                            color="tw-text-primary"
-                        />
-                    </div>
-
-                    <AcademyExerciseLink />
-
-                    {uuidFailed && (
-                        <IssueBox
-                            mdiIcon="mdi-lightbulb-alert-outline"
-                            color="tw-text-red"
-                            title={uuidFailed}
-                        />
-                    )}
-                    {jwtFailed && (
-                        <IssueBox
-                            mdiIcon="mdi-lightbulb-alert-outline"
-                            color="tw-text-red"
-                            title={jwtFailed}
-                        />
+                                <Button
+                                    variant="primary"
+                                    size="lg"
+                                    disabled={busy || !teamID?.trim()}
+                                    onClick={getValues}
+                                >
+                                    Generate values
+                                </Button>
+                            </div>
+                            <TruncatedValue
+                                field="Device UUID"
+                                value={uuid}
+                                busy={busy}
+                                failed={!!failed}
+                            />
+                            <TruncatedValue
+                                field="Registration Token"
+                                value={registrationToken}
+                                busy={busy}
+                                failed={!!failed}
+                            />
+                        </li>
+                        <li>
+                            Copy-paste UUID and the token into nRF Cloud. The
+                            kit is listed under <b>Fleet</b> &gt; <b>Devices</b>
+                            .
+                        </li>
+                    </ol>
+                    {failed && (
+                        <div className="tw-pt-1">
+                            <IssueBox
+                                mdiIcon="mdi-lightbulb-alert-outline"
+                                color="tw-text-red"
+                                title={failed}
+                            />
+                        </div>
                     )}
                 </div>
             </Main.Content>
             <Main.Footer>
-                {busy && (
-                    <div className="tw-flex tw-flex-row tw-items-center tw-pr-4 tw-text-primary">
-                        <Spinner size="lg" />
-                    </div>
-                )}
                 <Back disabled={busy} />
-                {!regJwt && <Next label="Skip" variant="link-button" />}
-                {uuidFailed && !uuid ? (
-                    <Next label="Retry" disabled={busy} onClick={getUuid} />
-                ) : (
-                    <Next disabled={busy} />
-                )}
+                {failed && <Skip />}
+                <Next disabled={!!failed || busy} />
             </Main.Footer>
         </Main>
     );
