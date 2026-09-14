@@ -109,7 +109,7 @@ export default (firmwares: Firmware[]): AppThunk<ProgrammingConfig> =>
             actions: [
                 { title: 'Erase device' },
                 ...firmwares.map(f => ({
-                    title: `${f.core} core`,
+                    title: `${f.coreLabel || f.core} core`,
                     link: f.link,
                 })),
                 { title: 'Reset device' },
