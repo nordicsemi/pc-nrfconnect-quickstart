@@ -7,7 +7,8 @@
 import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { type RootState } from '../../app/store';
+import { type AppThunk, type RootState } from '../../app/store';
+import { type ProgressInfo } from '../../common/steps/Program/programSlice';
 import { type DeviceWithSerialnumber } from './deviceLib';
 
 export interface Firmware {
@@ -68,11 +69,25 @@ export interface ResetAction {
     type: 'reset';
 }
 
-export type ActionListEntry =
+type BasicActions =
     | ProgrammingAction
     | WaitAction
     | ProgramModemFirmwareAction
     | ResetAction;
+
+export interface CustomAction {
+    type: 'custom';
+    run: (device: DeviceWithSerialnumber) => AppThunk<Promise<void> | void>;
+    onConfirm?:
+        | BasicActions
+        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void>>);
+    onCancel?:
+        | BasicActions
+        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void>>);
+    displayInfo?: Omit<ProgressInfo, 'progress' | 'skipped' | 'confirm'>;
+}
+
+export type ActionListEntry = BasicActions | CustomAction;
 
 interface ActionListChoice extends ChoiceInfo {
     type: 'action-list';
