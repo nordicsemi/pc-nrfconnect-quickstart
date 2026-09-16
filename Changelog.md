@@ -1,3 +1,9 @@
+## 1.11.0 - 2026-09-16
+
+### Added
+
+- Support for the nRF54LC10 DK.
+
 ## 1.10.0 - 2026-08-27
 
 ### Added
