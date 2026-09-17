@@ -7,7 +7,7 @@
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
-import { type AppThunk, type RootState } from '../../../../app/store';
+import { type AppThunk } from '../../../../app/store';
 import { type DeviceWithSerialnumber } from '../../../device/deviceLib';
 import { getSelectedDeviceUnsafely } from '../../../device/deviceSlice';
 import {
@@ -49,7 +49,7 @@ const attemptRead = async (
 };
 
 export const fetchDeviceInfo =
-    (vComIndex: number): AppThunk<RootState, Promise<void>> =>
+    (vComIndex: number): AppThunk<Promise<void>> =>
     async (dispatch, getState) => {
         const device = getSelectedDeviceUnsafely(getState());
         dispatch(setDeviceInfoFetching());

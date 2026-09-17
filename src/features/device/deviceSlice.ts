@@ -47,24 +47,24 @@ interface BatchChoice extends ChoiceInfo {
     };
 }
 
-interface ProgrammingAction {
+export interface ProgrammingAction {
     type: 'program';
     firmware: Firmware;
 }
 
-interface WaitAction {
+export interface WaitAction {
     type: 'wait';
     durationMs: number;
 }
 
-interface ProgramModemFirmwareAction {
+export interface ProgramModemFirmwareAction {
     type: 'program-modem-firmware';
     firmware: Firmware;
     version: string;
     vComIndex: number;
 }
 
-interface ResetAction {
+export interface ResetAction {
     type: 'reset';
 }
 
