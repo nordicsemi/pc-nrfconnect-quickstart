@@ -7,7 +7,7 @@
 import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
-import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
+import { type DevelopConfig } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -258,28 +258,24 @@ const programConfig = [
 ] as Choice[];
 
 const verifyConfig = {
-    settings: [
-        {
-            ref: 'Start testing',
+    settings: {
+        'Start testing': {
             vComIndex: 0,
             mode: 'SHELL' as const,
         },
-        {
-            ref: 'Asset Tracker',
+        'Asset Tracker': {
             vComIndex: 0,
             mode: 'SHELL' as const,
         },
-        {
-            ref: 'AT Commands',
+        'AT Commands': {
             vComIndex: 0,
             mode: 'LINE' as const,
         },
-        {
-            ref: 'Shell Command Line Interface',
+        'Shell Command Line Interface': {
             vComIndex: 0,
             mode: 'SHELL' as const,
         },
-    ],
+    },
     commands: [
         {
             title: 'Manufacturer',
@@ -300,82 +296,74 @@ const verifyConfig = {
     ],
 };
 
-const evaluateConfig = [
-    {
-        ref: 'Start testing',
-        resources: [
-            {
-                title: 'Discover the features',
-                mainLink: {
-                    label: 'Open web interface',
-                    href: 'https://hello.nrfcloud.com/',
+const evaluateConfig = {
+    'Start testing': [
+        {
+            title: 'Discover the features',
+            mainLink: {
+                label: 'Open web interface',
+                href: 'https://hello.nrfcloud.com/',
+            },
+            description:
+                'Scan the QR code or fill in the fingerprint to access your device.',
+        },
+        {
+            app: 'pc-nrfconnect-serial-terminal',
+            description: 'Serial interface to send commands to the device.',
+            vComIndex: 0,
+            supplementaryLinks: [
+                {
+                    label: 'Modem shell commands',
+                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/modem_shell/README.html#overview',
                 },
-                description:
-                    'Scan the QR code or fill in the fingerprint to access your device.',
-            },
-            {
-                app: 'pc-nrfconnect-serial-terminal',
-                description: 'Serial interface to send commands to the device.',
-                vComIndex: 0,
-                supplementaryLinks: [
-                    {
-                        label: 'Modem shell commands',
-                        href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/modem_shell/README.html#overview',
-                    },
-                    {
-                        label: 'AT Commands reference manual',
-                        href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
-                    },
-                ],
-            },
-        ],
+                {
+                    label: 'AT Commands reference manual',
+                    href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
+                },
+            ],
+        },
+    ],
+
+    'Asset Tracker': {
+        customNode: CustomEvaluate,
     },
-    {
-        ref: 'Asset Tracker',
-        component: CustomEvaluate,
-    },
-    {
-        ref: 'AT Commands',
-        resources: [
-            {
-                app: 'pc-nrfconnect-serial-terminal',
-                description:
-                    'Use the Serial Terminal PC application as a serial interface to send AT commands to the device.',
-                vComIndex: 0,
-                supplementaryLinks: [
-                    {
-                        label: 'AT Commands reference manual',
-                        href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
-                    },
-                    {
-                        label: 'IP AT Commands Documentation',
-                        href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/doc/AT_commands.html',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        ref: 'Shell Command Line Interface',
-        resources: [
-            {
-                app: 'pc-nrfconnect-serial-terminal',
-                description: 'Serial interface to send commands to the device.',
-                vComIndex: 0,
-                supplementaryLinks: [
-                    {
-                        label: 'Modem shell commands',
-                        href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/modem_shell/README.html#overview',
-                    },
-                    {
-                        label: 'AT Commands reference manual',
-                        href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
-                    },
-                ],
-            },
-        ],
-    },
-];
+    'AT Commands': [
+        {
+            app: 'pc-nrfconnect-serial-terminal',
+            description:
+                'Use the Serial Terminal PC application as a serial interface to send AT commands to the device.',
+            vComIndex: 0,
+            supplementaryLinks: [
+                {
+                    label: 'AT Commands reference manual',
+                    href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
+                },
+                {
+                    label: 'IP AT Commands Documentation',
+                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/doc/AT_commands.html',
+                },
+            ],
+        },
+    ],
+
+    'Shell Command Line Interface': [
+        {
+            app: 'pc-nrfconnect-serial-terminal',
+            description: 'Serial interface to send commands to the device.',
+            vComIndex: 0,
+            supplementaryLinks: [
+                {
+                    label: 'Modem shell commands',
+                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/modem_shell/README.html#overview',
+                },
+                {
+                    label: 'AT Commands reference manual',
+                    href: 'https://docs.nordicsemi.com/bundle/ref_at_commands_nrf91x1/page/REF/at_commands/intro_nrf91x1.html',
+                },
+            ],
+        },
+    ],
+};
 
 const learnConfig = [
     {
@@ -397,27 +385,24 @@ const learnConfig = [
     },
 ];
 
-const developConfig = [
-    {
-        ref: 'Asset Tracker',
+const developConfig = {
+    'Asset Tracker': {
         type: 'ncsAddon',
         link: 'app=asset-tracker-template&branch=v1.5.3&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
     },
-    {
-        ref: 'AT Commands',
+    'AT Commands': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/applications/serial_lte_modem',
         },
     },
-    {
-        ref: 'Shell Command Line Interface',
+    'Shell Command Line Interface': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/cellular/modem_shell',
         },
     },
-] as SampleWithRef[];
+} as DevelopConfig;
 
 const appsConfig = [
     'pc-nrfconnect-cellularmonitor',

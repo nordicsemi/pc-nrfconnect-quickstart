@@ -7,7 +7,7 @@
 import Verify from '../../../common/steps/5xFamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
-import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
+import { type DevelopConfig } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -87,97 +87,79 @@ const programConfig = [
             ],
         },
     },
-] as Choice[];
+] satisfies Choice[];
 
-const verifyConfig = [
-    {
-        ref: 'Hello World',
-        config: {
-            vComIndex: 0,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf52dk\/nrf52832)/,
-        },
+const verifyConfig = {
+    'Hello World': {
+        vComIndex: 0,
+        regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf52dk\/nrf52832)/,
     },
-    {
-        ref: 'Peripheral LED Button Service',
-        config: {
-            vComIndex: 0,
-            regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Bluetooth Peripheral LBS example)/,
-        },
+    'Peripheral LED Button Service': {
+        vComIndex: 0,
+        regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Bluetooth Peripheral LBS example)/,
     },
-    {
-        ref: 'Peripheral UART',
-        config: {
-            vComIndex: 0,
-            regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Nordic UART service example)/,
-        },
+    'Peripheral UART': {
+        vComIndex: 0,
+        regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Nordic UART service example)/,
     },
-];
+};
 
-const evaluateConfig = [
-    {
-        ref: 'Hello World',
-        resources: [
-            {
-                title: 'Test the sample',
-                description:
-                    'Open the nRF Connect Serial Terminal application and press reset on the device to print the output.',
-                app: 'pc-nrfconnect-serial-terminal',
-                vComIndex: 0,
+const evaluateConfig = {
+    'Hello World': [
+        {
+            title: 'Test the sample',
+            description:
+                'Open the nRF Connect Serial Terminal application and press reset on the device to print the output.',
+            app: 'pc-nrfconnect-serial-terminal',
+            vComIndex: 0,
+        },
+        {
+            title: 'Documentation',
+            description: 'Read the complete documentation for the sample.',
+            mainLink: {
+                label: 'Open documentation',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/samples/hello_world/README.html',
             },
-            {
-                title: 'Documentation',
-                description: 'Read the complete documentation for the sample.',
-                mainLink: {
-                    label: 'Open documentation',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/samples/hello_world/README.html',
-                },
+        },
+    ],
+    'Peripheral LED Button Service': [
+        {
+            title: 'Test the sample',
+            description: 'Follow the testing steps to evaluate the sample.',
+            mainLink: {
+                label: 'Testing steps',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_lbs/README.html#testing',
             },
-        ],
-    },
-    {
-        ref: 'Peripheral LED Button Service',
-        resources: [
-            {
-                title: 'Test the sample',
-                description: 'Follow the testing steps to evaluate the sample.',
-                mainLink: {
-                    label: 'Testing steps',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_lbs/README.html#testing',
-                },
+        },
+        {
+            title: 'Documentation',
+            description: 'Read the complete documentation for the sample.',
+            mainLink: {
+                label: 'Open documentation',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_lbs/README.html',
             },
-            {
-                title: 'Documentation',
-                description: 'Read the complete documentation for the sample.',
-                mainLink: {
-                    label: 'Open documentation',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_lbs/README.html',
-                },
+        },
+    ],
+    'Peripheral UART': [
+        {
+            title: 'Test the sample',
+            description:
+                'Follow the testing steps instructions to evaluate the sample.',
+            mainLink: {
+                label: 'Testing steps',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_uart/README.html#testing',
             },
-        ],
-    },
-    {
-        ref: 'Peripheral UART',
-        resources: [
-            {
-                title: 'Test the sample',
-                description:
-                    'Follow the testing steps instructions to evaluate the sample.',
-                mainLink: {
-                    label: 'Testing steps',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_uart/README.html#testing',
-                },
+        },
+        {
+            title: 'Documentation',
+            description: 'Read the complete documentation for the sample.',
+            mainLink: {
+                label: 'Open documentation',
+                href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_uart/README.html',
             },
-            {
-                title: 'Documentation',
-                description: 'Read the complete documentation for the sample.',
-                mainLink: {
-                    label: 'Open documentation',
-                    href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/peripheral_uart/README.html',
-                },
-            },
-        ],
-    },
-];
+        },
+    ],
+};
 
 const learnConfig = [
     {
@@ -209,29 +191,26 @@ const learnConfig = [
     },
 ];
 
-const developConfig = [
-    {
-        ref: 'Hello World',
+const developConfig = {
+    'Hello World': {
         type: 'sdk',
         params: {
             samplePath: 'zephyr/samples/hello_world',
         },
     },
-    {
-        ref: 'Peripheral LED Button Service',
+    'Peripheral LED Button Service': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/bluetooth/peripheral_lbs',
         },
     },
-    {
-        ref: 'Peripheral UART',
+    'Peripheral UART': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/bluetooth/peripheral_uart',
         },
     },
-] as SampleWithRef[];
+} satisfies DevelopConfig;
 
 const appsConfig = [
     'pc-nrfconnect-programmer',

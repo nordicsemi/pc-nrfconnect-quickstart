@@ -27,7 +27,7 @@ interface ChoiceInfo {
     name: string;
     description: string;
     documentation: { label: string; href: string };
-    firmwareNote: FirmwareNote | undefined;
+    firmwareNote?: FirmwareNote;
 }
 
 interface BatchChoice extends ChoiceInfo {
