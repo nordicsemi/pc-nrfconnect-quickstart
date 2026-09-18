@@ -28,29 +28,20 @@ import sendATCommands from '../../../sendATCommands';
 import type { ProgrammingConfig } from '../programEffects';
 import {
     type ActionListProgrammingStep,
-    getProgrammingActions,
+    getCurrentAction,
+    increaseCurrentIndex,
     setError,
     setProgrammingProgress,
 } from '../programSlice';
 
 const runResetAction =
-    (index: number, device: DeviceWithSerialnumber): AppThunk<Promise<void>> =>
+    (device: DeviceWithSerialnumber): AppThunk<Promise<void>> =>
     async dispatch => {
-        dispatch(
-            setProgrammingProgress({
-                index,
-                progress: 20,
-            }),
-        );
+        dispatch(setProgrammingProgress(20));
         await reset(device)
             .then(() => {
-                dispatch(
-                    setProgrammingProgress({
-                        index,
-                        progress: 100,
-                    }),
-                );
-                dispatch(runNextProgrammingAction(device, index));
+                dispatch(setProgrammingProgress(100));
+                dispatch(runNextProgrammingAction(device));
             })
             .catch(e => {
                 dispatch(
@@ -67,7 +58,6 @@ const runResetAction =
 
 const runWaitAction =
     (
-        index: number,
         device: DeviceWithSerialnumber,
         config: WaitAction,
     ): AppThunk<Promise<void>> =>
@@ -76,12 +66,11 @@ const runWaitAction =
             setTimeout(resolve, config.durationMs);
         });
 
-        dispatch(runNextProgrammingAction(device, index));
+        dispatch(runNextProgrammingAction(device));
     };
 
 const runProgramAction =
     (
-        index: number,
         device: DeviceWithSerialnumber,
         config: ProgrammingAction,
     ): AppThunk<Promise<void>> =>
@@ -92,16 +81,11 @@ const runProgramAction =
                 device,
                 path.join(getFirmwareFolder(), file),
                 ({ totalProgressPercentage: progress }) =>
-                    dispatch(
-                        setProgrammingProgress({
-                            index,
-                            progress,
-                        }),
-                    ),
+                    dispatch(setProgrammingProgress(progress)),
                 core,
                 undefined,
             );
-            dispatch(runNextProgrammingAction(device, index));
+            dispatch(runNextProgrammingAction(device));
         } catch (e) {
             dispatch(
                 setError({
@@ -115,7 +99,6 @@ const runProgramAction =
 
 const runModemFirmwareAction =
     (
-        index: number,
         device: DeviceWithSerialnumber,
         config: ProgramModemFirmwareAction,
     ): AppThunk<Promise<void>> =>
@@ -139,11 +122,8 @@ const runModemFirmwareAction =
         const programmingProgressWeight = 1 - ATProgressWeight;
 
         dispatch(
-            setProgrammingProgress({
-                index,
-                // Give some initial progress for AT commands
-                progress: (ATProgressWeight * 100) / 2,
-            }),
+            // Give some initial progress for AT commands
+            setProgrammingProgress((ATProgressWeight * 100) / 2),
         );
 
         if (!alwaysProgramMwfNoATCheck) {
@@ -159,13 +139,8 @@ const runModemFirmwareAction =
                 ).catch(() => undefined);
 
                 if (res?.length === 1 && res?.[0].includes(config.version)) {
-                    dispatch(
-                        setProgrammingProgress({
-                            index,
-                            progress: 100,
-                        }),
-                    );
-                    dispatch(runNextProgrammingAction(device, index));
+                    dispatch(setProgrammingProgress(100));
+                    dispatch(runNextProgrammingAction(device));
                     return;
                 }
             } catch (e) {
@@ -185,17 +160,15 @@ const runModemFirmwareAction =
                 path.join(getFirmwareFolder(), file),
                 ({ totalProgressPercentage: progress }) =>
                     dispatch(
-                        setProgrammingProgress({
-                            index,
-                            progress:
-                                progress * programmingProgressWeight +
+                        setProgrammingProgress(
+                            progress * programmingProgressWeight +
                                 ATProgressWeight * 100,
-                        }),
+                        ),
                     ),
                 core,
                 undefined,
             );
-            dispatch(runNextProgrammingAction(device, index));
+            dispatch(runNextProgrammingAction(device));
         } catch (e) {
             dispatch(
                 setError({
@@ -207,28 +180,37 @@ const runModemFirmwareAction =
         }
     };
 
+export const runProgrammingAction =
+    (device: DeviceWithSerialnumber, config: ActionListEntry): AppThunk =>
+    dispatch => {
+        switch (config.type) {
+            case 'program-modem-firmware':
+                dispatch(runModemFirmwareAction(device, config));
+                break;
+            case 'program':
+                dispatch(runProgramAction(device, config));
+                break;
+            case 'wait':
+                dispatch(runWaitAction(device, config));
+                break;
+            case 'reset':
+                dispatch(runResetAction(device));
+                break;
+            case 'custom':
+                dispatch(config.run(device));
+                break;
+        }
+    };
+
 export const runNextProgrammingAction =
-    (device: DeviceWithSerialnumber, index?: number): AppThunk =>
+    (device: DeviceWithSerialnumber): AppThunk =>
     (dispatch, getState) => {
         try {
-            index = index !== undefined ? index + 1 : 0;
-            const action = getProgrammingActions(getState()).at(index);
+            dispatch(increaseCurrentIndex());
+            const action = getCurrentAction(getState());
             if (!!action && 'config' in action) {
                 const { config } = action;
-                switch (config.type) {
-                    case 'program-modem-firmware':
-                        dispatch(runModemFirmwareAction(index, device, config));
-                        break;
-                    case 'program':
-                        dispatch(runProgramAction(index, device, config));
-                        break;
-                    case 'wait':
-                        dispatch(runWaitAction(index, device, config));
-                        break;
-                    case 'reset':
-                        dispatch(runResetAction(index, device));
-                        break;
-                }
+                dispatch(runProgrammingAction(device, config));
             }
         } catch (e) {
             // Actions will run their own handlers, we just want to log it
@@ -277,6 +259,16 @@ export default (actionList: ActionListEntry[]): AppThunk<ProgrammingConfig> =>
                         return {
                             config,
                         };
+                    case 'custom': {
+                        return {
+                            ...(config.displayInfo &&
+                                displayInfo(
+                                    config.displayInfo.title,
+                                    config.displayInfo.link,
+                                )),
+                            config,
+                        };
+                    }
                     default:
                         return undefined;
                 }
@@ -284,7 +276,8 @@ export default (actionList: ActionListEntry[]): AppThunk<ProgrammingConfig> =>
             .filter(v => v !== undefined);
 
         return {
-            run: device => dispatch(runNextProgrammingAction(device)),
+            run: device =>
+                dispatch(runProgrammingAction(device, actions[0].config)),
             actions,
         };
     };
