@@ -9,7 +9,7 @@ import {
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { type AppThunk, type RootState } from '../../../app/store';
+import { type AppThunk } from '../../../app/store';
 import {
     type DeviceWithSerialnumber,
     reset,
@@ -22,7 +22,7 @@ const decoder = new TextDecoder();
 export default (
         device: DeviceWithSerialnumber,
         vComIndex: number,
-    ): AppThunk<RootState, Promise<() => void>> =>
+    ): AppThunk<Promise<() => void>> =>
     async (dispatch, getState) => {
         if (!selectedDeviceIsConnected(getState())) {
             throw new Error('No development kit connected.');

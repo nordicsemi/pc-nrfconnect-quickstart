@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type AppThunk, type RootState } from '../../../app/store';
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
+import { type AppThunk } from '../../../app/store';
 import {
     type DeviceWithSerialnumber,
     reset,
@@ -17,42 +19,36 @@ import {
 import actionList from './actionVariants/actionList';
 import jlinkBatch from './actionVariants/jlinkBatch';
 import {
+    addNote,
     prepareProgramming,
-    removeError,
+    type ProgrammingStep,
     type RetryRef,
     setError,
     setProgrammingProgress,
 } from './programSlice';
 
-const checkDeviceConnected =
-    (): AppThunk<RootState, boolean> => (dispatch, getState) => {
-        if (!selectedDeviceIsConnected(getState())) {
-            dispatch(
-                setError({
-                    icon: 'mdi-lightbulb-alert-outline',
-                    text: 'No development kit detected',
-                }),
-            );
-            return false;
-        }
-        return true;
-    };
-
-interface ProgrammingInfo {
-    title: string;
-    link?: { label: string; href: string };
-}
+const checkDeviceConnected = (): AppThunk<boolean> => (dispatch, getState) => {
+    if (!selectedDeviceIsConnected(getState())) {
+        dispatch(
+            setError({
+                icon: 'mdi-lightbulb-alert-outline',
+                text: 'No development kit detected',
+            }),
+        );
+        return false;
+    }
+    return true;
+};
 
 export interface ProgrammingConfig {
-    run: (device: DeviceWithSerialnumber) => Promise<unknown>;
-    actions: ProgrammingInfo[];
+    run: (device: DeviceWithSerialnumber) => unknown;
+    actions: ProgrammingStep[];
 }
 
 export const startProgramming = (): AppThunk => (dispatch, getState) => {
     const choice = getChoiceUnsafely(getState());
-    dispatch(removeError(undefined));
 
-    let config: ProgrammingConfig;
+    let config;
 
     switch (choice.type) {
         case 'jlink-batch':
@@ -74,10 +70,16 @@ export const startProgramming = (): AppThunk => (dispatch, getState) => {
     }
 
     dispatch(prepareProgramming(config.actions));
+    if (choice.firmwareNote) {
+        dispatch(addNote(choice.firmwareNote));
+    }
 
     if (!dispatch(checkDeviceConnected())) return;
 
-    return config.run(getSelectedDeviceUnsafely(getState())).catch(() => {
+    try {
+        config.run(getSelectedDeviceUnsafely(getState()));
+    } catch (e) {
+        logger.error(e);
         if (!getState().steps.program.error) {
             dispatch(
                 setError({
@@ -86,7 +88,7 @@ export const startProgramming = (): AppThunk => (dispatch, getState) => {
                 }),
             );
         }
-    });
+    }
 };
 
 export const retry =
@@ -106,36 +108,16 @@ const resetDevice = (): AppThunk => (dispatch, getState) => {
 
     const device = getSelectedDeviceUnsafely(getState());
 
-    // batchWithProgress should always be filled here
-    const batchLength = getState().steps.program.programmingActions?.length;
-    // length 0 is alse an invalid state
-    if (!batchLength) {
-        console.error('Could not find valid programming progress batch');
-        dispatch(
-            setError({
-                icon: 'mdi-lightbulb-alert-outline',
-                text: 'Program is in invalid state. Please contact support.',
-            }),
-        );
-        return;
-    }
-    dispatch(removeError(undefined));
-    const index = batchLength - 1;
-    dispatch(
-        setProgrammingProgress({
-            index,
-            progress: 50,
-        }),
-    );
+    dispatch(setError(undefined));
+
+    // This must happen during a batch program, and all batch programming will have a reset at the very end.
+    // We do not increase the index after reset has finished, and so we can simply set the reset progress
+    // This isn't preferable, so an alternative should be found to handle this more explicitly
+    dispatch(setProgrammingProgress(50));
 
     reset(device)
         .then(() => {
-            dispatch(
-                setProgrammingProgress({
-                    index,
-                    progress: 100,
-                }),
-            );
+            dispatch(setProgrammingProgress(100));
         })
         .catch(() =>
             dispatch(
