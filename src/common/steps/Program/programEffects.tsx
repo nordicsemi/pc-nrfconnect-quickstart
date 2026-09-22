@@ -19,9 +19,9 @@ import {
 import actionList from './actionVariants/actionList';
 import jlinkBatch from './actionVariants/jlinkBatch';
 import {
+    addNote,
     prepareProgramming,
     type ProgrammingStep,
-    removeError,
     type RetryRef,
     setError,
     setProgrammingProgress,
@@ -47,7 +47,6 @@ export interface ProgrammingConfig {
 
 export const startProgramming = (): AppThunk => (dispatch, getState) => {
     const choice = getChoiceUnsafely(getState());
-    dispatch(removeError(undefined));
 
     let config;
 
@@ -71,6 +70,9 @@ export const startProgramming = (): AppThunk => (dispatch, getState) => {
     }
 
     dispatch(prepareProgramming(config.actions));
+    if (choice.firmwareNote) {
+        dispatch(addNote(choice.firmwareNote));
+    }
 
     if (!dispatch(checkDeviceConnected())) return;
 
@@ -106,36 +108,16 @@ const resetDevice = (): AppThunk => (dispatch, getState) => {
 
     const device = getSelectedDeviceUnsafely(getState());
 
-    // batchWithProgress should always be filled here
-    const batchLength = getState().steps.program.programmingActions?.length;
-    // length 0 is alse an invalid state
-    if (!batchLength) {
-        logger.error('Could not find valid programming progress batch');
-        dispatch(
-            setError({
-                icon: 'mdi-lightbulb-alert-outline',
-                text: 'Program is in invalid state. Please contact support.',
-            }),
-        );
-        return;
-    }
-    dispatch(removeError(undefined));
-    const index = batchLength - 1;
-    dispatch(
-        setProgrammingProgress({
-            index,
-            progress: 50,
-        }),
-    );
+    dispatch(setError(undefined));
+
+    // This must happen during a batch program, and all batch programming will have a reset at the very end.
+    // We do not increase the index after reset has finished, and so we can simply set the reset progress
+    // This isn't preferable, so an alternative should be found to handle this more explicitly
+    dispatch(setProgrammingProgress(50));
 
     reset(device)
         .then(() => {
-            dispatch(
-                setProgrammingProgress({
-                    index,
-                    progress: 100,
-                }),
-            );
+            dispatch(setProgrammingProgress(100));
         })
         .catch(() =>
             dispatch(
