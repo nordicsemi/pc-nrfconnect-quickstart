@@ -1,3 +1,9 @@
+## 1.13.0 - UNRELEASED
+
+### Changed
+
+- Updated firmware for the nRF54LV10 DK.
+
 ## 1.12.0 - 2026-09-22
 
 ### Added
