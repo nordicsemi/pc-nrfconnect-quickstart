@@ -7,18 +7,17 @@
 import StepByChoice from '../../StepByChoice';
 import Verify from './Verify';
 
+interface Config {
+    vComIndex: number;
+    regex: RegExp;
+}
 export default (
-    config: { ref: string; config: { vComIndex: number; regex: RegExp } }[],
+    configs: Record<string, Config | { customNode: () => React.ReactNode }>,
 ) => ({
     name: 'Verify',
     component: () =>
-        StepByChoice({
-            steps: config.reduce(
-                (acc, next) => ({
-                    ...acc,
-                    [next.ref]: () => Verify({ ...next.config }),
-                }),
-                {},
-            ),
+        StepByChoice<Config>({
+            defaultNode: Verify,
+            configs,
         }),
 });

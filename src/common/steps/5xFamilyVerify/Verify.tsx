@@ -22,7 +22,14 @@ import { getError, getResponse, reset, setError } from './verifySlice';
 
 import './cursor.scss';
 
-export default ({ vComIndex, regex }: { vComIndex: number; regex: RegExp }) => {
+export default ({
+    config: { vComIndex, regex },
+}: {
+    config: {
+        vComIndex: number;
+        regex: RegExp;
+    };
+}) => {
     const choice = useAppSelector(getChoiceUnsafely);
     const dispatch = useAppDispatch();
     const device = useAppSelector(getSelectedDeviceUnsafely);
