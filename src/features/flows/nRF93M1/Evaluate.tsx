@@ -142,6 +142,7 @@ export default () => {
                             In{' '}
                             <Link
                                 label="nRF Cloud"
+                                color="tw-text-primary"
                                 href={NRF_CLOUD_SETUP_LINK}
                             />
                             , go to <b>Fleet</b> &gt; <b>Devices</b> &gt;{' '}
