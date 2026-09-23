@@ -33,17 +33,35 @@ export const queryParamsString = (
         .map(([param, value]) => `${param}=${encodeURIComponent(value)}`)
         .join('&');
 
-export interface SampleWithRef {
-    ref: string;
-    sampleSource: string;
+export enum SDKType {
+    nRFConnectSDK = 'nRF Connect SDK', // Must match the description on nrfutil SDK types.
+    nRFConnectSDKBareMetal = 'nRF Connect SDK Bare Metal', // Must match the description on nrfutil SDK types.
 }
+
+interface NCSAddon {
+    type: 'ncsAddon';
+    link: string;
+}
+
+interface SDKParams {
+    type: 'sdk';
+    params: {
+        samplePath: string;
+        sdkVersion?: string;
+        sdkType?: SDKType;
+    };
+}
+export type SampleWithRef = {
+    ref: string;
+    type: 'sdk' | 'ncsAddon';
+} & (NCSAddon | SDKParams);
 
 export default ({ samples }: { samples: SampleWithRef[] }) => {
     const dispatch = useAppDispatch();
     const isVsCodeInstalled = useAppSelector(getIsVsCodeInstalled);
     const choice = useAppSelector(getChoiceUnsafely);
 
-    const sample = samples.find(s => s.ref === choice.name)?.sampleSource;
+    const sample = samples.find(s => s.ref === choice.name);
 
     useEffect(
         () => detectVsCodeRepeatedly(dispatch, isVsCodeInstalled),
@@ -86,20 +104,22 @@ export default ({ samples }: { samples: SampleWithRef[] }) => {
                         const deepLink =
                             'vscode://nordic-semiconductor.nrf-connect/';
 
-                        if (choice.ncsAddon) {
-                            openUrl(
-                                `${deepLink}openFromAppIndex?${choice.ncsAddon}`,
-                            );
-                        } else {
-                            openUrl(
-                                `${deepLink}openSampleFromSDK?${queryParamsString(
-                                    {
-                                        samplePath: sample,
-                                        sdkVersion: choice.sdk?.version,
-                                        sdkType: choice.sdk?.type,
-                                    },
-                                )}`,
-                            );
+                        switch (sample?.type) {
+                            case 'ncsAddon':
+                                openUrl(
+                                    `${deepLink}openFromAppIndex${sample.link}`,
+                                );
+                                break;
+                            case 'sdk':
+                                openUrl(
+                                    `${deepLink}openSampleFromSDK?${queryParamsString(
+                                        sample.params,
+                                    )}`,
+                                );
+                                break;
+                            default:
+                                openUrl(`${deepLink}openSampleFromSDK`);
+                                break;
                         }
 
                         dispatch(setDevelopState(DevelopState.VS_CODE_OPENED));

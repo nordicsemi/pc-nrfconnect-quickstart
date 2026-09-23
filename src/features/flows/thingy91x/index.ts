@@ -7,6 +7,7 @@
 import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
+import { type SampleWithRef } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
 import Info from '../../../common/steps/Info';
 import Learn from '../../../common/steps/Learn';
@@ -94,8 +95,6 @@ const programConfig = [
             content:
                 'Modem Trace is enabled; the current consumption will be higher than usual.',
         },
-        ncsAddon:
-            'app=asset-tracker-template&branch=v1.5.3&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
         programmingOptions: {
             actions: [
                 {
@@ -400,14 +399,25 @@ const learnConfig = [
 
 const developConfig = [
     {
+        ref: 'Asset Tracker',
+        type: 'ncsAddon',
+        link: 'app=asset-tracker-template&branch=v1.5.3&manifest=&repo=https://github.com/nrfconnect/Asset-Tracker-Template',
+    },
+    {
         ref: 'AT Commands',
-        sampleSource: 'nrf/applications/serial_lte_modem',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/applications/serial_lte_modem',
+        },
     },
     {
         ref: 'Shell Command Line Interface',
-        sampleSource: 'nrf/samples/cellular/modem_shell',
+        type: 'sdk',
+        params: {
+            samplePath: 'nrf/samples/cellular/modem_shell',
+        },
     },
-];
+] as SampleWithRef[];
 
 const appsConfig = [
     'pc-nrfconnect-cellularmonitor',
