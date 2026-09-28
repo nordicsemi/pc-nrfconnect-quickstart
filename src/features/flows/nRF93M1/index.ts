@@ -8,7 +8,7 @@ import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
 import {
-    type SampleWithRef,
+    type DevelopConfig,
     SDKType,
 } from '../../../common/steps/Develop/OpenVsCode';
 import Evaluate from '../../../common/steps/Evaluate';
@@ -127,23 +127,21 @@ const programConfig = [
     //         ],
     //     },
     // },
-] as Choice[];
+] satisfies Choice[];
 
 const verificationConfig = {
-    settings: [
-        {
-            ref: 'AT Commands',
+    settings: {
+        'AT Commands': {
             vComIndex: 1,
             mode: 'LINE' as const,
         },
 
         /* Not supported during initial release but next in line for priority */
-        // {
-        //     ref: 'PPP Host Application',
+        // 'PPP Host Application': {
         //     vComIndex: 0,
         //     mode: 'SHELL' as const,
         // },
-    ],
+    },
     commands: [
         {
             title: 'Manufacturer',
@@ -164,16 +162,13 @@ const verificationConfig = {
     ],
 };
 
-const evaluationConfig = [
-    {
-        ref: 'AT Commands',
-        component: CustomEvaluate,
+const evaluationConfig = {
+    'AT Commands': {
+        customNode: CustomEvaluate,
     },
 
     /* Not supported during initial release but next in line for priority */
-    // {
-    //     ref: 'PPP Host Application',
-    //     resources: [
+    // 'PPP Host Application': [
     //         {
     //             title: 'Provision and onboard with nRF Cloud',
     //             mainLink: {
@@ -205,9 +200,8 @@ const evaluationConfig = [
     //                 },
     //             ],
     //         },
-    //     ],
-    // },
-];
+    // ],
+};
 
 const learnConfig = [
     {
@@ -248,9 +242,8 @@ const learnConfig = [
     },
 ];
 
-const developConfig = [
-    {
-        ref: 'AT Commands',
+const developConfig = {
+    'AT Commands': {
         type: 'sdk',
         params: {
             samplePath: 'nrf/samples/nrf93m1dk/modem_bypass',
@@ -258,7 +251,7 @@ const developConfig = [
             sdkType: SDKType.nRFConnectSDK,
         },
     },
-] as SampleWithRef[];
+} satisfies DevelopConfig;
 
 const appsConfig = [
     'pc-nrfconnect-serial-terminal',

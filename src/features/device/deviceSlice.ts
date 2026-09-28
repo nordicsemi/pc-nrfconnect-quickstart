@@ -28,7 +28,7 @@ interface ChoiceInfo {
     name: string;
     description: string;
     documentation: { label: string; href: string };
-    firmwareNote: FirmwareNote | undefined;
+    firmwareNote?: FirmwareNote;
 }
 
 interface BatchChoice extends ChoiceInfo {
@@ -70,10 +70,10 @@ export interface CustomAction {
     run: (device: DeviceWithSerialnumber) => AppThunk<Promise<void> | void>;
     onConfirm?:
         | BasicActions
-        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void>>);
+        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void> | void>);
     onCancel?:
         | BasicActions
-        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void>>);
+        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void> | void>);
     displayInfo?: Omit<ProgressInfo, 'progress' | 'skipped' | 'confirm'>;
 }
 

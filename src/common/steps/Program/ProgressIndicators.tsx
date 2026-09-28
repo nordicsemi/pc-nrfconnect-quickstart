@@ -57,7 +57,7 @@ const ConfirmButton = ({
     type: 'Confirm' | 'Cancel';
     action:
         | ActionListEntry
-        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void>>);
+        | ((device: DeviceWithSerialnumber) => AppThunk<Promise<void> | void>);
     device: DeviceWithSerialnumber;
 }) => {
     const dispatch = useAppDispatch();

@@ -155,12 +155,12 @@ const VerifyConfigLayer = ({
     settings,
     commands,
 }: {
-    settings: { ref: string; vComIndex: number; mode: 'LINE' | 'SHELL' }[];
+    settings: Record<string, { vComIndex: number; mode: 'LINE' | 'SHELL' }>;
     commands: Command[];
 }) => {
     const device = useAppSelector(getSelectedDeviceUnsafely);
     const choice = useAppSelector(getChoiceUnsafely);
-    const choiceSettings = settings.find(s => s.ref === choice.name);
+    const choiceSettings = settings[choice.name];
     const path =
         choiceSettings &&
         device.serialPorts?.[choiceSettings.vComIndex]?.comName;
@@ -178,7 +178,7 @@ const VerifyConfigLayer = ({
 };
 
 export default (config: {
-    settings: { ref: string; vComIndex: number; mode: 'LINE' | 'SHELL' }[];
+    settings: Record<string, { vComIndex: number; mode: 'LINE' | 'SHELL' }>;
     commands: Command[];
 }) => ({
     name: 'Verify',
