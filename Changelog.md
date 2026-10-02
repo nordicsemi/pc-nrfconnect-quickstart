@@ -1,3 +1,13 @@
+## 1.14.0 - Unreleased
+
+### Added
+
+- nRF Cloud learning resource for all supported devices.
+
+### Changed
+
+- Aligned the learning resources for the nRF9160 DK and nRF9161 DK.
+
 ## 1.13.0 - 2026-09-24
 
 ### Changed
