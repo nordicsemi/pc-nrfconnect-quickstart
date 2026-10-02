@@ -14,6 +14,7 @@ import path from 'path';
 
 import { type AppThunk } from '../../../../app/store';
 import { getFirmwareFolder } from '../../../device/deviceGuides';
+import { reset } from '../../../device/deviceLib';
 import {
     getChoice,
     getSelectedDeviceUnsafely,
@@ -39,7 +40,12 @@ const HARDWARE_VERSION_FALLBACK = 'nrf54l15dk';
 export const registerDevice =
     (vComIndex: number): AppThunk<Promise<void>> =>
     async (dispatch, getState) => {
-        dispatch(setRegistration({ status: 'loading' }));
+        dispatch(
+            setRegistration({
+                status: 'loading',
+                stage: 'assign-project-key',
+            }),
+        );
         let phase = 'validate';
         try {
             const state = getState();
@@ -65,7 +71,19 @@ export const registerDevice =
             phase = 'set-project-key';
             await setDeviceProjectKey(device, vComIndex, projectKey);
 
+            phase = 'reset-device';
+            dispatch(
+                setRegistration({ status: 'loading', stage: 'reset-device' }),
+            );
+            await reset(device);
+
             phase = 'register';
+            dispatch(
+                setRegistration({
+                    status: 'loading',
+                    stage: 'register-device',
+                }),
+            );
             await dispatch(
                 withMemfaultToken(t =>
                     postRegisterDevice(

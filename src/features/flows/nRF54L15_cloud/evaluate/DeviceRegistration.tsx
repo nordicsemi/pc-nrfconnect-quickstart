@@ -16,9 +16,35 @@ import {
     getMemfault,
     getRegistration,
     prevSubStep,
+    type RegistrationStage,
 } from './cloudEvaluateSlice';
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { registerDevice } from './registrationEffects';
+
+const registrationStages: Array<{
+    id: RegistrationStage;
+    label: string;
+}> = [
+    { id: 'assign-project-key', label: 'Assign project key to the device' },
+    { id: 'reset-device', label: 'Reset device' },
+    { id: 'register-device', label: 'Register device online' },
+];
+
+const RegistrationStageIcon = ({
+    active,
+    complete,
+}: {
+    active: boolean;
+    complete: boolean;
+}) => {
+    if (complete) {
+        return <span className="mdi mdi-check-circle tw-text-green-500" />;
+    }
+    if (active) {
+        return <Spinner size="sm" />;
+    }
+    return <span className="mdi mdi-circle-outline tw-text-gray-400" />;
+};
 
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
@@ -88,11 +114,12 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         if (hasAuth && !hasSn && deviceInfo.status !== 'error') {
             return 'Reading device information…';
         }
-        if (hasAuth && hasSn && registration.status === 'loading') {
-            return 'Registering device online and configuring the project key…';
-        }
         return undefined;
     })();
+
+    const activeStageIndex = registrationStages.findIndex(
+        ({ id }) => id === registration.stage,
+    );
 
     const errorMessage = (() => {
         if (!hasAuth) {
@@ -154,12 +181,55 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                     </div>
 
                     {registration.status === 'success' && (
-                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-1 tw-text-green-500">
-                            <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
-                            <span>
-                                Your nRF54L15 DK is connected and configured.
-                            </span>
+                        <div className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-2 tw-text-green-700">
+                            <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
+                                <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
+                                <span>
+                                    Your nRF54L15 DK is registered and
+                                    configured.
+                                </span>
+                            </div>
+                            <p className="tw-text-xs">
+                                The device has been reset. Reconnect it in nRF
+                                Toolbox to send and see events in your account.
+                                Newest versions of nRF Toolbox for Android will
+                                reconnect automatically.
+                            </p>
                         </div>
+                    )}
+
+                    {registration.status === 'loading' && (
+                        <ol className="tw-flex tw-flex-col tw-gap-2">
+                            {registrationStages.map((stage, index) => {
+                                const complete =
+                                    registration.status === 'success' ||
+                                    index < activeStageIndex;
+                                const active =
+                                    registration.status === 'loading' &&
+                                    index === activeStageIndex;
+
+                                return (
+                                    <li
+                                        className="tw-flex tw-items-center tw-gap-2"
+                                        key={stage.id}
+                                    >
+                                        <RegistrationStageIcon
+                                            active={active}
+                                            complete={complete}
+                                        />
+                                        <span
+                                            className={
+                                                active
+                                                    ? 'tw-font-medium'
+                                                    : undefined
+                                            }
+                                        >
+                                            {stage.label}
+                                        </span>
+                                    </li>
+                                );
+                            })}
+                        </ol>
                     )}
 
                     {loadingMessage && (
