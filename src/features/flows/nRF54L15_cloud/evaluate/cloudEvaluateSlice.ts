@@ -49,8 +49,14 @@ interface DeviceInfoState {
     message?: string;
 }
 
+export type RegistrationStage =
+    | 'assign-project-key'
+    | 'reset-device'
+    | 'register-device';
+
 interface RegistrationState {
     status: AsyncStatus;
+    stage?: RegistrationStage;
     message?: string;
     key?: string;
 }
