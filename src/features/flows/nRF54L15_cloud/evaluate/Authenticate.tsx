@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Button,
     describeError,
@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
+import telemetryThunk from '../../../flow/telemetryThunk';
 import { connectMemfault, fetchProjectsForOrg } from './authEffects';
 import {
     getMemfault,
@@ -41,6 +42,7 @@ export default () => {
     const memfault = useAppSelector(getMemfault);
     const [authState, setAuthState] = useState<AuthState | null>(null);
     const [authError, setAuthError] = useState<string | null>(null);
+    const signInStarted = useRef(false);
 
     const authStatus = authState?.status;
     const account = authState?.account ?? null;
@@ -51,8 +53,23 @@ export default () => {
 
     useEffect(() => {
         auth.getAuthStatus().then(setAuthState);
-        auth.registerOnStateChanged(setAuthState);
-    }, []);
+        auth.registerOnStateChanged(state => {
+            console.log('[Authenticate] IPC auth state:', state.status);
+
+            if (state.status === 'signingIn') {
+                signInStarted.current = true;
+                dispatch(telemetryThunk('Authenticate - Sign in started'));
+            } else if (signInStarted.current && state.status === 'signedIn') {
+                signInStarted.current = false;
+                dispatch(telemetryThunk('Authenticate - Sign in completed'));
+            } else if (signInStarted.current && state.status === 'signedOut') {
+                signInStarted.current = false;
+                dispatch(telemetryThunk('Authenticate - Sign in cancelled'));
+            }
+
+            setAuthState(state);
+        });
+    }, [dispatch]);
 
     const signIn = async () => {
         setAuthError(null);
@@ -263,7 +280,7 @@ export default () => {
                                         <Button
                                             variant="secondary"
                                             size="lg"
-                                            onClick={() => auth.cancelSignIn()}
+                                            onClick={auth.cancelSignIn}
                                         >
                                             Cancel
                                         </Button>
