@@ -55,6 +55,8 @@ export default (subStepName?: string): AppThunk<RootState> =>
         selectedDevice = device;
         selectedFW = fw;
 
+        // TODO remove after debugging telemetry events
+        console.log('[Telemetry] Sending event:', telemetryKey);
         telemetry.sendEvent(telemetryKey, {
             step: subStepName ?? step,
             device,
