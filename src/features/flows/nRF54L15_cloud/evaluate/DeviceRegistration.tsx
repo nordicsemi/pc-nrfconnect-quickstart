@@ -190,10 +190,14 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                 </span>
                             </div>
                             <p className="tw-text-xs">
-                                The device has been reset. Reconnect it in nRF
-                                Toolbox to send and see events in your account.
-                                Newest versions of nRF Toolbox for Android will
-                                reconnect automatically.
+                                The device has been reset. Please reconnect to
+                                the nRF Toolbox app to see device events and
+                                data in{' '}
+                                <Link
+                                    label="nRF Cloud"
+                                    href="app.memfault.com"
+                                    color="tw-text-primary"
+                                />
                             </p>
                         </div>
                     )}
