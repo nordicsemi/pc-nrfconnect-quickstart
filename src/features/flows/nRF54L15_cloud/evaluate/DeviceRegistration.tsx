@@ -202,7 +202,8 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         </div>
                     )}
 
-                    {registration.status === 'loading' && (
+                    {(registration.status === 'loading' ||
+                        registration.status === 'success') && (
                         <ol className="tw-flex tw-flex-col tw-gap-2">
                             {registrationStages.map((stage, index) => {
                                 const complete =
