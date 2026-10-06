@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IssueBox, Spinner } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
+import Link from '../../../../common/Link';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
 import {
@@ -53,6 +54,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
     const registration = useAppSelector(getRegistration);
     const [triedSn, setTriedSn] = useState(false);
     const [retriedChain, setRetriedChain] = useState(false);
+    const successMessageRef = useRef<HTMLDivElement>(null);
 
     const hasAuth =
         !!memfault.accessToken &&
@@ -74,6 +76,15 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             dispatch(registerDevice(vComIndex));
         }
     }, [hasAuth, hasSn, registration.status, vComIndex, dispatch]);
+
+    useEffect(() => {
+        if (registration.status === 'success') {
+            successMessageRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [registration.status]);
 
     const primaryAction = () => {
         if (!hasAuth) {
@@ -181,7 +192,10 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                     </div>
 
                     {registration.status === 'success' && (
-                        <div className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-2 tw-text-green-700">
+                        <div
+                            ref={successMessageRef}
+                            className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-2 tw-text-green-700"
+                        >
                             <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
                                 <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
                                 <span>
