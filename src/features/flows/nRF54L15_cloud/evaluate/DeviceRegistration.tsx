@@ -191,31 +191,6 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         </div>
                     </div>
 
-                    {registration.status === 'success' && (
-                        <div
-                            ref={successMessageRef}
-                            className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-2 tw-text-green-700"
-                        >
-                            <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
-                                <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
-                                <span>
-                                    Your nRF54L15 DK is registered and
-                                    configured.
-                                </span>
-                            </div>
-                            <p className="tw-text-xs">
-                                The device has been reset. Please reconnect to
-                                the nRF Toolbox app to see device events and
-                                data in{' '}
-                                <Link
-                                    label="nRF Cloud"
-                                    href="app.memfault.com"
-                                    color="tw-text-primary"
-                                />
-                            </p>
-                        </div>
-                    )}
-
                     {(registration.status === 'loading' ||
                         registration.status === 'success') && (
                         <ol className="tw-flex tw-flex-col tw-gap-2">
@@ -249,6 +224,31 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                 );
                             })}
                         </ol>
+                    )}
+
+                    {registration.status === 'success' && (
+                        <div
+                            ref={successMessageRef}
+                            className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-2 tw-text-green-700"
+                        >
+                            <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
+                                <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
+                                <span>
+                                    Your nRF54L15 DK is registered and
+                                    configured.
+                                </span>
+                            </div>
+                            <p className="tw-text-xs">
+                                The device has been reset. Please reconnect to
+                                the nRF Toolbox app to see device events and
+                                data in{' '}
+                                <Link
+                                    label="nRF Cloud"
+                                    href="app.memfault.com"
+                                    color="tw-text-primary"
+                                />
+                            </p>
+                        </div>
                     )}
 
                     {loadingMessage && (
