@@ -244,7 +244,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                 data in{' '}
                                 <Link
                                     label="nRF Cloud"
-                                    href="app.memfault.com"
+                                    href="https://app.memfault.com"
                                     color="tw-text-primary"
                                 />
                             </p>
