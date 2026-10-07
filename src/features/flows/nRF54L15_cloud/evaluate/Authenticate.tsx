@@ -58,13 +58,13 @@ export default () => {
 
             if (state.status === 'signingIn') {
                 signInStarted.current = true;
-                dispatch(telemetryThunk('Authenticate - Sign in started'));
+                dispatch(telemetryThunk('Authenticate - Signing in'));
             } else if (signInStarted.current && state.status === 'signedIn') {
                 signInStarted.current = false;
-                dispatch(telemetryThunk('Authenticate - Sign in completed'));
+                dispatch(telemetryThunk('Authenticate - Signed in'));
             } else if (signInStarted.current && state.status === 'signedOut') {
                 signInStarted.current = false;
-                dispatch(telemetryThunk('Authenticate - Sign in cancelled'));
+                dispatch(telemetryThunk('Authenticate - Sign-in cancelled'));
             }
 
             setAuthState(state);
