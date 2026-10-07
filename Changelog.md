@@ -1,3 +1,10 @@
+## 1.14.0 - Unreleased
+
+### Added
+
+- Board controller firmware update for the nRF9151 DK and the nRF9151 SMA DK
+  when programming the Serial Modem v2 firmware.
+
 ## 1.13.0 - 2026-09-24
 
 ### Changed
