@@ -239,9 +239,9 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                 </span>
                             </div>
                             <p className="tw-text-xs">
-                                The device has been reset. Reconnect to
-                                the nRF Toolbox mobile app to see device events and
-                                data in{' '}
+                                The device has been reset. Reconnect to the nRF
+                                Toolbox mobile app to see device events and data
+                                in{' '}
                                 <Link
                                     label="nRF Cloud"
                                     href="https://app.memfault.com"
