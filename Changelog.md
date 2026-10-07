@@ -6,7 +6,7 @@
 
 ### Changed
 
-- Aligned the learning resources for the nRF9160 DK and nRF9161 DK.
+- Unified the learning resources for the nRF9160 DK and the nRF9161 DK.
 
 ## 1.13.0 - 2026-09-24
 
