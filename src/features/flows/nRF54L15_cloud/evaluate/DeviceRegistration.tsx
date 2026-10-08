@@ -247,6 +247,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                                     href="https://app.memfault.com"
                                     color="tw-text-primary"
                                 />
+                                .
                             </p>
                         </div>
                     )}
