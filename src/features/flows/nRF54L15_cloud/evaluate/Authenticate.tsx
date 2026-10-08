@@ -43,6 +43,7 @@ export default () => {
     const [authState, setAuthState] = useState<AuthState | null>(null);
     const [authError, setAuthError] = useState<string | null>(null);
     const signInStarted = useRef(false);
+    const signOutStarted = useRef(false);
 
     const authStatus = authState?.status;
     const account = authState?.account ?? null;
@@ -65,6 +66,14 @@ export default () => {
             } else if (signInStarted.current && state.status === 'signedOut') {
                 signInStarted.current = false;
                 dispatch(telemetryThunk('Authenticate - Sign-in cancelled'));
+            }
+
+            if (state.status === 'signingOut') {
+                signOutStarted.current = true;
+                dispatch(telemetryThunk('Authenticate - Signing out'));
+            } else if (signOutStarted.current && state.status === 'signedOut') {
+                signOutStarted.current = false;
+                dispatch(telemetryThunk('Authenticate - Signed out'));
             }
 
             setAuthState(state);
