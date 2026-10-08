@@ -289,7 +289,7 @@ export default () => {
                                         <Button
                                             variant="secondary"
                                             size="lg"
-                                            onClick={auth.cancelSignIn}
+                                            onClick={() => auth.cancelSignIn()}
                                         >
                                             Cancel
                                         </Button>
