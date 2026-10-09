@@ -55,7 +55,6 @@ export default () => {
     useEffect(() => {
         auth.getAuthStatus().then(setAuthState);
         auth.registerOnStateChanged(state => {
-            console.log('[Authenticate] IPC auth state:', state.status);
 
             if (state.status === 'signingIn') {
                 signInStarted.current = true;
