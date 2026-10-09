@@ -1,3 +1,15 @@
+## 1.14.0 - Unreleased
+
+### Added
+
+- nRF Cloud learning resource for all supported devices.
+
+### Changed
+
+- Unified the learning resources for the nRF9160 DK and the nRF9161 DK.
+- Improved the flow for registering the nRF54L15 DK to nRF Cloud with progress
+  updates, automatic device reset, and nRF Toolbox reconnection guidance.
+
 ## 1.13.0 - 2026-09-24
 
 ### Changed

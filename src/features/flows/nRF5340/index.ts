@@ -13,6 +13,11 @@ import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
+import {
+    developerAcademy,
+    nrfCloud,
+    nrfConnectSdkAndZephyr,
+} from '../learnConfig';
 
 const infoConfig = {
     title: 'Dual-core Bluetooth 5.4 SoC',
@@ -187,24 +192,8 @@ const evaluateConfig = [
 ];
 
 const learnConfig = [
-    {
-        label: 'Developer Academy',
-        description:
-            'Get the know-how to build wireless products using Nordic Semiconductor solutions.',
-        link: {
-            label: 'Nordic Developer Academy',
-            href: 'https://academy.nordicsemi.com/',
-        },
-    },
-    {
-        label: 'nRF Connect SDK and Zephyr',
-        description:
-            'Learn about the application development in the nRF Connect SDK and Zephyr.',
-        link: {
-            label: 'Application development',
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev.html',
-        },
-    },
+    developerAcademy,
+    nrfConnectSdkAndZephyr,
     {
         label: 'Developing with nRF53 Series',
         description:
@@ -214,6 +203,7 @@ const learnConfig = [
             href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf53/index.html',
         },
     },
+    nrfCloud,
 ];
 
 const developConfig = [

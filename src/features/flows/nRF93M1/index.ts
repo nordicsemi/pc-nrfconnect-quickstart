@@ -13,6 +13,7 @@ import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
 import { type Choice, SDKType } from '../../device/deviceSlice';
+import { nrfCloud } from '../learnConfig';
 import {
     checkModemFirmwareVersion,
     onCancel,
@@ -246,6 +247,7 @@ const learnConfig = [
             href: 'https://nrfconnectdocs.nordicsemi.com/ncs/latest/zephyr/boards/nordic/nrf93m1dk/doc/index.html',
         },
     },
+    nrfCloud,
 ];
 
 const developConfig = [
