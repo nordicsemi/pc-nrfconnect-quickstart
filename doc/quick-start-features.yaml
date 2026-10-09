@@ -1,0 +1,215 @@
+app:
+  id: quick-start
+  name: Quick Start
+  repo: pc-nrfconnect-quickstart
+
+statuses: [full, unsupported, not_applicable]
+
+general_app_features:
+  - id: device_detection
+    name: Device detection
+    description: "Identify connected kits, distiguish supported from not supported and mark not supported as incompatible/non-selectable"
+  - id: device_list_kit_selection
+    name: Device list / kit selection
+    description: List connected kits with family, device, and serial number, and select one to start the flow
+  - id: custom_device_naming
+    name: Custom device naming
+    description: Assign and display a custom name for a connected kit
+  - id: device_info_step
+    name: Device info step
+    description: Display device overview, description, onboard features, and included hardware for the selected kit
+  - id: firmware_selection
+    name: Firmware selection
+    description: Present the list of available applications/samples for the selected device and choose one to program
+  - id: program_device
+    name: Program device
+    description: "Erase, program modem core and application core, and reset the device with per-stage progress"
+  - id: programming_failure_reporting
+    name: Programming failure reporting
+    description: Report which programming stage failed and link to support and the log for troubleshooting
+  - id: automatic_device_verification
+    name: Automatic device verification
+    description: Automatically verify communication with the device using AT commands after programming
+  - id: device_verification
+    name: Device verification
+    description: Show manufacturer, hardware version, and IMEI returned by the device
+  - id: launch_related_nrf_connect_app
+    name: Launch related nRF Connect app
+    description: Open a related app (e.g. Cellular Monitor) directly from the evaluation step
+  - id: launch_vs_code
+    name: Launch VS Code
+    description: Open VS Code with the nRF Connect extension
+  - id: recommended_apps_detection
+    name: Recommended apps detection
+    description: List recommended nRF Connect for Desktop apps for the device and select which to install and which are already installed
+  - id: recommended_apps_installation
+    name: Recommended apps installation
+    description: Install the selected apps and show ongoing installation status
+  - id: submit_feedback
+    name: Submit feedback
+    description: Send feedback about the app and receive a response via DevZone
+  - id: step_navigation
+    name: Step navigation
+    description: Move backward and forward through the guided flow via a persistent step sidebar
+  - id: restart_application
+    name: Restart application
+    description: Restart the app via a keyboard shortcut (Ctrl+R / Command+R)
+
+device_specific_features:
+  - id: nrf_cloud_support
+    name: nRF Cloud support
+    description: Guided flow includes nRF Cloud connectivity for the device
+
+shared_features: []
+
+supported_devices:
+  - device: "Nordic Thingy:91 X"
+    pca: PCA20049
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF52 DK
+    pca: PCA10040
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF52833 DK
+    pca: PCA10100
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF52840 DK
+    pca: PCA10056
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF5340 DK
+    pca: PCA10095
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF54L15 DK
+    pca: PCA10156
+    verification_version:
+    support:
+      nrf_cloud_support: full
+
+  - device: nRF54LC10 DK
+    pca: PCA10226
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF54LM20 DK
+    pca: PCA10184
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF54LS05 DK
+    pca: PCA10214
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF54LV10 DK
+    pca: PCA10188
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF7002 DK
+    pca: PCA10143
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF9151 DK
+    pca: PCA10171
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF9151 SMA DK
+    pca: PCA10201
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF9160 DK
+    pca: PCA10090
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF9161 DK
+    pca: PCA10153
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF9251 DK
+    pca: PCA10218
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF93M1 DK
+    pca: PCA10232
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+  - device: nRF93M1 DK
+    pca: PCA10237
+    verification_version:
+    support:
+      nrf_cloud_support: unsupported
+
+unsupported_devices:
+  - device: "Nordic Thingy:52"
+    pca: PCA20020
+
+  - device: "Nordic Thingy:53"
+    pca: PCA20053
+
+  - device: "Nordic Thingy:91"
+    pca: PCA20035
+
+  - device: nPM 1300 EK
+    pca: PCA10152  
+
+  - device: nPM 1304 EK
+    pca: PCA10195
+
+  - device: nPM 2100 EK
+    pca: PCA10170
+
+  - device: nRF51 DK
+    pca: PCA10028
+
+  - device: nRF51 Dongle
+    pca: PCA10031
+
+  - device: nRF52840 Dongle
+    pca: PCA10059
+
+  - device: nRF5340 Audio DK
+    pca: PCA10121 
+
+  - device: nRF54H20 DK
+    pca: PCA10175
+
+  - device: nRF54LM20 Dongle
+    pca: PCA10208
+
+  - device: nRF9131 EK
+    pca: PCA10165
+  
+  - device: PPK2
+    pca: PCA63100
