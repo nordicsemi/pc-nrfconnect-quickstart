@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IssueBox, Spinner } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/store';
 import { Back } from '../../../../common/Back';
+import Link from '../../../../common/Link';
 import Main from '../../../../common/Main';
 import { Next, Skip } from '../../../../common/Next';
 import {
@@ -16,9 +17,35 @@ import {
     getMemfault,
     getRegistration,
     prevSubStep,
+    type RegistrationStage,
 } from './cloudEvaluateSlice';
 import { fetchDeviceInfo } from './deviceInfoEffects';
 import { registerDevice } from './registrationEffects';
+
+const registrationStages: Array<{
+    id: RegistrationStage;
+    label: string;
+}> = [
+    { id: 'assign-project-key', label: 'Assign project key to the device' },
+    { id: 'reset-device', label: 'Reset device' },
+    { id: 'register-device', label: 'Register device online' },
+];
+
+const RegistrationStageIcon = ({
+    active,
+    complete,
+}: {
+    active: boolean;
+    complete: boolean;
+}) => {
+    if (complete) {
+        return <span className="mdi mdi-check-circle tw-text-green-500" />;
+    }
+    if (active) {
+        return <Spinner size="sm" />;
+    }
+    return <span className="mdi mdi-circle-outline tw-text-gray-400" />;
+};
 
 export default ({ vComIndex }: { vComIndex: number }) => {
     const dispatch = useAppDispatch();
@@ -27,6 +54,7 @@ export default ({ vComIndex }: { vComIndex: number }) => {
     const registration = useAppSelector(getRegistration);
     const [triedSn, setTriedSn] = useState(false);
     const [retriedChain, setRetriedChain] = useState(false);
+    const successMessageRef = useRef<HTMLDivElement>(null);
 
     const hasAuth =
         !!memfault.accessToken &&
@@ -48,6 +76,15 @@ export default ({ vComIndex }: { vComIndex: number }) => {
             dispatch(registerDevice(vComIndex));
         }
     }, [hasAuth, hasSn, registration.status, vComIndex, dispatch]);
+
+    useEffect(() => {
+        if (registration.status === 'success') {
+            successMessageRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [registration.status]);
 
     const primaryAction = () => {
         if (!hasAuth) {
@@ -88,11 +125,12 @@ export default ({ vComIndex }: { vComIndex: number }) => {
         if (hasAuth && !hasSn && deviceInfo.status !== 'error') {
             return 'Reading device information…';
         }
-        if (hasAuth && hasSn && registration.status === 'loading') {
-            return 'Registering device online and configuring the project key…';
-        }
         return undefined;
     })();
+
+    const activeStageIndex = registrationStages.findIndex(
+        ({ id }) => id === registration.stage,
+    );
 
     const errorMessage = (() => {
         if (!hasAuth) {
@@ -153,12 +191,64 @@ export default ({ vComIndex }: { vComIndex: number }) => {
                         </div>
                     </div>
 
+                    {(registration.status === 'loading' ||
+                        registration.status === 'success') && (
+                        <ol className="tw-flex tw-flex-col tw-gap-2">
+                            {registrationStages.map((stage, index) => {
+                                const complete =
+                                    registration.status === 'success' ||
+                                    index < activeStageIndex;
+                                const active =
+                                    registration.status === 'loading' &&
+                                    index === activeStageIndex;
+
+                                return (
+                                    <li
+                                        className="tw-flex tw-items-center tw-gap-2"
+                                        key={stage.id}
+                                    >
+                                        <RegistrationStageIcon
+                                            active={active}
+                                            complete={complete}
+                                        />
+                                        <span
+                                            className={
+                                                active
+                                                    ? 'tw-font-medium'
+                                                    : undefined
+                                            }
+                                        >
+                                            {stage.label}
+                                        </span>
+                                    </li>
+                                );
+                            })}
+                        </ol>
+                    )}
+
                     {registration.status === 'success' && (
-                        <div className="tw-flex tw-flex-row tw-items-center tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-1 tw-text-green-500">
-                            <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
-                            <span>
-                                Your nRF54L15 DK is connected and configured.
-                            </span>
+                        <div
+                            ref={successMessageRef}
+                            className="tw-flex tw-flex-col tw-gap-2 tw-border tw-border-green-500 tw-bg-green-50 tw-px-4 tw-py-2 tw-text-green-700"
+                        >
+                            <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
+                                <span className="mdi mdi-cloud-check-variant-outline tw-text-2xl tw-leading-none" />
+                                <span>
+                                    Your nRF54L15 DK is registered and
+                                    configured.
+                                </span>
+                            </div>
+                            <p className="tw-text-xs">
+                                The device has been reset. Reconnect to the nRF
+                                Toolbox mobile app to see device events and data
+                                in{' '}
+                                <Link
+                                    label="nRF Cloud"
+                                    href="https://app.memfault.com"
+                                    color="tw-text-primary"
+                                />
+                                .
+                            </p>
                         </div>
                     )}
 
