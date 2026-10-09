@@ -13,6 +13,7 @@ import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
+import { nrf54LLearnConfig } from '../nRF54L15/learnConfig';
 import CloudEvaluate from './evaluate';
 
 const VCOM_INDEX = 1;
@@ -68,36 +69,6 @@ const evaluateConfig = [
     },
 ];
 
-const learnConfig = [
-    {
-        label: 'Developer Academy',
-        description:
-            'Speed up your wireless IoT learning journey with Nordic devices.',
-        link: {
-            label: 'Nordic Developer Academy',
-            href: 'https://academy.nordicsemi.com/',
-        },
-    },
-    {
-        label: 'nRF Connect SDK and Zephyr',
-        description:
-            'Learn about the application development in the nRF Connect SDK and Zephyr.',
-        link: {
-            label: 'Application development',
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev.html',
-        },
-    },
-    {
-        label: 'Developing with nRF54L Series',
-        description:
-            'Device-specific information about features, DFU solution, and development.',
-        link: {
-            label: 'Developing with nRF54L Series',
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html',
-        },
-    },
-];
-
 const developConfig = [
     {
         ref: 'Hello World',
@@ -128,7 +99,7 @@ export default {
         Program(programConfig),
         Verify(verifyConfig),
         Evaluate(evaluateConfig),
-        Learn(learnConfig),
+        Learn(nrf54LLearnConfig),
         Develop(developConfig),
         Apps(appsConfig),
     ],

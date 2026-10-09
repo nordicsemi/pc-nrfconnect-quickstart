@@ -13,6 +13,7 @@ import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
+import { nrfCloud } from '../learnConfig';
 import CustomEvaluate from './Evaluate';
 import SIM from './SIM';
 
@@ -396,6 +397,7 @@ const learnConfig = [
             href: 'https://docs.nordicsemi.com/bundle/nwp_044/page/WP/nwp_044/intro.html',
         },
     },
+    nrfCloud,
 ];
 
 const developConfig = [

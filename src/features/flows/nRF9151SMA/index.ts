@@ -13,6 +13,7 @@ import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
+import { nrf91LearnConfig } from '../nRF9151/learnConfig';
 import CustomEvaluate from './Evaluate';
 
 const infoConfig = {
@@ -283,36 +284,6 @@ const evaluationConfig = [
     },
 ];
 
-const learnConfig = [
-    {
-        label: 'Developer Academy',
-        description:
-            'Speed up your wireless IoT learning journey with Nordic devices.',
-        link: {
-            label: 'Nordic Developer Academy',
-            href: 'https://academy.nordicsemi.com/',
-        },
-    },
-    {
-        label: 'nRF Connect SDK and Zephyr',
-        description:
-            'Learn about the application development in the nRF Connect SDK and Zephyr.',
-        link: {
-            label: 'Application development',
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev.html',
-        },
-    },
-    {
-        label: 'Developing with nRF91 Series',
-        description:
-            'Device-specific information on working with nRF91 Series devices.',
-        link: {
-            label: 'Developing with nRF91 Series',
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf91/index.html',
-        },
-    },
-];
-
 const developConfig = [
     {
         ref: 'AT Commands',
@@ -339,7 +310,7 @@ export default {
         Program(programConfig),
         Verify(verificationConfig),
         Evaluate(evaluationConfig),
-        Learn(learnConfig),
+        Learn(nrf91LearnConfig),
         Develop(developConfig),
         Apps(appsConfig),
     ],
