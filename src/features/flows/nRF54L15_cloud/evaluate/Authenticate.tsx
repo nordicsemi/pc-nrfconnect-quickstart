@@ -55,7 +55,6 @@ export default () => {
     useEffect(() => {
         auth.getAuthStatus().then(setAuthState);
         auth.registerOnStateChanged(state => {
-
             if (state.status === 'signingIn') {
                 signInStarted.current = true;
                 dispatch(telemetryThunk('Authenticate - Signing in'));
