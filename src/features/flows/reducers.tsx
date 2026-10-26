@@ -9,7 +9,7 @@ import { combineReducers } from '@reduxjs/toolkit';
 import type { AppThunk } from '../../app/store';
 import nrf54l15Cloud, {
     reset as nrf54l15CloudReset,
-} from './nRF54L15_cloud/evaluate/cloudEvaluateSlice';
+} from './nRF54L15/evaluate/cloudEvaluateSlice';
 import nrf93m1, { reset as nrf93m1Reset } from './nRF93M1/nrf93m1Slice';
 import nrf9151, { reset as nrf9151Reset } from './nRF9151/nrf9151Slice';
 import nrf9151SMA, {

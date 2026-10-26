@@ -1,3 +1,11 @@
+## 1.15.0 - 2026-10-26
+
+### Added
+
+- Hello World, Peripheral LED Button Service, and Peripheral UART samples for
+  the nRF54L15 DK. These samples are built against the nRF Connect SDK LTS
+  v3.4.1.
+
 ## 1.14.1 - 2026-10-13
 
 ### Changed
