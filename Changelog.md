@@ -1,11 +1,26 @@
-## 1.15.0 - Unreleased
+## 1.16.0 - Unreleased
 
 ### Added
 
 - Programming of board controller firmware for the nRF9151 DK and the nRF9151
   SMA DK when programming the Serial Modem v2 firmware.
 
-## 1.14.0 - Unreleased
+## 1.15.0 - 2026-10-26
+
+### Added
+
+- Hello World, Peripheral LED Button Service, and Peripheral UART samples for
+  the nRF54L15 DK. These samples are built against the nRF Connect SDK LTS
+  v3.4.1.
+
+## 1.14.1 - 2026-10-13
+
+### Changed
+
+- Updated the Asset Tracker Template firmware for the Nordic Thingy:91 X, the
+  nRF9151 DK, and the nRF9151 SMA DK to v1.6.1.
+
+## 1.14.0 - 2026-10-12
 
 ### Added
 

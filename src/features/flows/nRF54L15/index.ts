@@ -13,7 +13,10 @@ import Learn from '../../../common/steps/Learn';
 import Program from '../../../common/steps/Program';
 import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
+import CloudEvaluate from './evaluate';
 import { nrf54LLearnConfig } from './learnConfig';
+
+const VCOM_INDEX = 1;
 
 const infoConfig = {
     title: 'nRF54L Series – nRF54L15 DK',
@@ -22,6 +25,31 @@ const infoConfig = {
 };
 
 const programConfig = [
+    {
+        name: 'nRF Cloud Bluetooth Quick Start',
+        type: 'jlink-batch',
+        description:
+            "This sample turns your nRF54L15 DK into a Bluetooth LE peripheral with cloud-based device health monitoring built in. The device reports heartbeats over Bluetooth. Once connected and paired, you'll see your board in nRF Cloud. Pressing a button triggers a fake crash, which sends a coredump over Bluetooth to nRF Cloud.",
+        documentation: {
+            label: 'nRF Cloud Bluetooth Quick Start',
+            href: 'https://github.com/nrfconnect/quickstart-bluetooth',
+        },
+        ncsAddon:
+            'app=quickstart-bluetooth&branch=v1.1.1&manifest=&repo=https://github.com/nrfconnect/quickstart-bluetooth',
+        programmingOptions: {
+            firmwareList: [
+                {
+                    core: 'Application',
+                    file: 'nrf54l15dk_quickstart_bluetooth.hex',
+                    elfFile: 'nrf54l15dk_quickstart_bluetooth.elf',
+                    link: {
+                        label: 'nRF Cloud Bluetooth Quick Start',
+                        href: 'https://github.com/nrfconnect/quickstart-bluetooth',
+                    },
+                },
+            ],
+        },
+    },
     {
         name: 'Hello World',
         type: 'jlink-batch',
@@ -91,29 +119,40 @@ const programConfig = [
 
 const verifyConfig = [
     {
+        ref: 'nRF Cloud Bluetooth Quick Start',
+        config: {
+            vComIndex: VCOM_INDEX,
+            regex: /(\*{3} Booting Quickstart Bluetooth .* \*{3}\r\n\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\n)/,
+        },
+    },
+    {
         ref: 'Hello World',
         config: {
-            vComIndex: 1,
-            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf54l15pdk@.*\r\n)/,
+            vComIndex: VCOM_INDEX,
+            regex: /(\*{3} Booting nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nHello World! nrf54l15dk.*\r\n)/,
         },
     },
     {
         ref: 'Peripheral LED Button Service',
         config: {
-            vComIndex: 1,
-            regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Bluetooth Peripheral LBS example)/,
+            vComIndex: VCOM_INDEX,
+            regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Bluetooth Peripheral LBS sample)/,
         },
     },
     {
         ref: 'Peripheral UART',
         config: {
-            vComIndex: 1,
-            regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Nordic UART service example)/,
+            vComIndex: VCOM_INDEX,
+            regex: /(\*{3} Using nRF Connect SDK .* \*{3}\r\n\*{3} Using Zephyr OS .* \*{3}\r\nStarting Nordic UART service sample)/,
         },
     },
 ];
 
 const evaluateConfig = [
+    {
+        ref: 'nRF Cloud Bluetooth Quick Start',
+        component: () => CloudEvaluate({ vComIndex: VCOM_INDEX }),
+    },
     {
         ref: 'Hello World',
         resources: [
@@ -122,7 +161,7 @@ const evaluateConfig = [
                 description:
                     'Open the nRF Connect Serial Terminal application and press reset on the device to print the output.',
                 app: 'pc-nrfconnect-serial-terminal',
-                vComIndex: 1,
+                vComIndex: VCOM_INDEX,
             },
             {
                 title: 'Documentation',
