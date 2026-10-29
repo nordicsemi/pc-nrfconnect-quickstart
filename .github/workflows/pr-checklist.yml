@@ -1,10 +1,7 @@
 name: PR checklist
 
 on:
-  # pull_request_target runs this file from the base branch, so a PR can't
-  # weaken the check by editing the workflow. It is safe here because the job
-  # never checks out or runs code from the PR. Keep it that way.
-  pull_request_target:
+  pull_request:
     types: [opened, edited, reopened, synchronize, labeled, unlabeled]
 
 permissions:
@@ -24,13 +21,17 @@ jobs:
         with:
           script: |
             // Must match .github/pull_request_template.md exactly.
+            // Boxes that must be ticked.
             const REQUIRED = [
               'Ensure all user-facing text is spell-checked.',
-              'Bump version in package.json.',
-              'Update changelog.',
-              'Update application feature and/or device support metadata (if applicable).',
-              'Make sure Greg confirmed your PR.',
             ];
+            // Bold title -> its options. Exactly one option per group must be ticked.
+            const GROUPS = {
+              'Version in package.json': ['Bumped', 'Can stay the same'],
+              'Changelog': ['Updated', 'Update not needed'],
+              'Application feature and/or device support metadata': ['Updated', 'Can stay the same'],
+              "Greg's review": ['Greg confirmed this PR', 'Review not needed'],
+            };
             const BYPASS_LABEL = 'checkboxes not required';
 
             // Fetch the live PR instead of using the event payload, so re-runs
@@ -52,11 +53,23 @@ jobs:
               .replace(/<!--[\s\S]*?-->/g, '')
               .replace(/^(```|~~~)[\s\S]*?^\1/gm, '');
 
-            const boxes = body
-              .split(/\r?\n/)
-              .map(line => line.match(/^\s*[-*+]\s+\[([ xX])\]\s+(.+?)\s*$/))
-              .filter(Boolean)
-              .map(([, mark, text]) => ({ checked: mark !== ' ', text }));
+            // A box belongs to the group whose "- **Title**" line it is nested under.
+            // Any other top-level line ends the group.
+            const titles = new Set();
+            const boxes = [];
+            let group = null;
+            for (const line of body.split(/\r?\n/)) {
+              if (!line.trim()) continue;
+              const title = line.match(/^[-*+]\s+\*\*(.+?)\*\*\s*$/);
+              if (title) {
+                group = title[1];
+                titles.add(group);
+                continue;
+              }
+              if (!/^\s/.test(line)) group = null;
+              const box = line.match(/^\s*[-*+]\s+\[([ xX])\]\s+(.+?)\s*$/);
+              if (box) boxes.push({ group, checked: box[1] !== ' ', text: box[2] });
+            }
 
             const problems = [];
             for (const item of REQUIRED) {
@@ -67,14 +80,33 @@ jobs:
                 problems.push(`Not checked: "${item}"`);
               }
             }
+            for (const [title, options] of Object.entries(GROUPS)) {
+              if (!titles.has(title)) {
+                problems.push(`Missing or modified: "${title}"`);
+                continue;
+              }
+              const inGroup = boxes.filter(b => b.group === title);
+              const missing = options.filter(o => !inGroup.some(b => b.text === o));
+              if (missing.length > 0) {
+                problems.push(...missing.map(o => `Missing or modified: "${title}" / "${o}"`));
+                continue;
+              }
+              const ticked = options.filter(o => inGroup.some(b => b.text === o && b.checked));
+              if (ticked.length === 0) {
+                problems.push(`Nothing ticked under "${title}", tick one option`);
+              } else if (ticked.length > 1) {
+                problems.push(`More than one option ticked under "${title}", tick only one`);
+              }
+            }
 
             if (problems.length > 0) {
               core.setFailed(
                 'PR checklist is incomplete:\n' +
                 problems.map(p => `  - ${p}`).join('\n') +
-                '\n\nCheck every required box. If an item was edited or deleted, restore its original ' +
-                'text from .github/pull_request_template.md. If this PR does not need the checklist, ' +
-                `ask a maintainer to add the "${BYPASS_LABEL}" label.`
+                '\n\nTick the required boxes and exactly one option in each group. If an item was ' +
+                'edited or deleted, restore its original text from .github/pull_request_template.md. ' +
+                'If this PR does not need the checklist, ask a maintainer to add the ' +
+                `"${BYPASS_LABEL}" label.`
               );
             } else {
               core.info('All required checklist items are checked.');
