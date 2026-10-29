@@ -41,7 +41,7 @@ general_app_features:
     description: Open VS Code with the nRF Connect extension
   - id: recommended_apps_detection
     name: Recommended apps detection
-    description: List recommended nRF Connect for Desktop apps for the device and select which to install and which are already installed
+    description: List recommended nRF Connect for Desktop apps for the device and select which app to install and which are already installed
   - id: recommended_apps_installation
     name: Recommended apps installation
     description: Install the selected apps and show ongoing installation status
