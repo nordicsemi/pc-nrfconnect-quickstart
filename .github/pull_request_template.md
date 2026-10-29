@@ -13,7 +13,7 @@
 - **Changelog**
   - [ ] Updated
   - [ ] Update not needed
-- **Application feature and/or device support metadata**
+- **Support doc in docs/...yml**
   - [ ] Updated
   - [ ] Can stay the same
 - **Greg's review**
