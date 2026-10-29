@@ -4,6 +4,9 @@ on:
     pull_request:
         types: [opened, edited, reopened, synchronize, labeled, unlabeled]
 
+permissions:
+    pull-requests: read
+
 jobs:
     checklist:
         uses: nordicsemi/pc-nrfconnect-shared/.github/workflows/pr-checklist.yml@main
