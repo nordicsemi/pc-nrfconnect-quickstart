@@ -21,6 +21,7 @@ After installing and opening the app from nRF Connect for Desktop, connect your 
 - nRF54LC10 DK
 - nRF54LS05 DK
 - nRF54LM20 DK
+- nRF54LM20 Dongle
 - nRF54L15 DK
 - nRF5340 DK
 - nRF52840 DK
