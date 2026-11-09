@@ -76,24 +76,23 @@ const programConfig = [
         },
     },
     {
-        name: 'AT Commands',
+        name: 'Serial Modem',
         type: 'action-list',
-        description: 'Evaluate the cellular modem using AT commands.',
+        description: 'Use the device as a serial modem through AT commands.',
         documentation: {
             label: 'Serial Modem',
-            // todo: fix link
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
+            href: 'https://nrfconnectdocs.nordicsemi.com/addons/addon-serial_modem/latest/main/index.html',
         },
+        ncsAddon:
+            'app=ncs-serial-modem&branch=v2.0.0&manifest=&repo=https://github.com/nrfconnect/ncs-serial-modem',
         programmingOptions: {
             actions: [
                 {
-                    // TODO: confirm progress-row title and whether a documentation link should be added
                     type: 'program-board-controller',
-                    // TODO: verify that 1.2.1 is intended version
-                    version: '1.2.1',
+                    version: '1.2.2',
                     firmware: {
                         coreLabel: 'Board Controller',
-                        file: '9151dk_board_controller_update_a871d6f.bin',
+                        file: '9151dk_board_controller_update_1.2.2.bin',
                     },
                 },
                 {
@@ -124,8 +123,7 @@ const programConfig = [
                         file: 'nrf9151dk_serial_modem.hex',
                         link: {
                             label: 'Serial Modem',
-                            // todo: fix link
-                            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
+                            href: 'https://nrfconnectdocs.nordicsemi.com/addons/addon-serial_modem/latest/main/index.html',
                         },
                     },
                 },
@@ -194,7 +192,7 @@ const verificationConfig = {
             mode: 'SHELL' as const,
         },
         {
-            ref: 'AT Commands',
+            ref: 'Serial Modem',
             vComIndex: 0,
             mode: 'LINE' as const,
         },
@@ -230,7 +228,7 @@ const evaluationConfig = [
         component: CustomEvaluate,
     },
     {
-        ref: 'AT Commands',
+        ref: 'Serial Modem',
         resources: [
             {
                 app: 'pc-nrfconnect-serial-terminal',
@@ -281,10 +279,6 @@ const evaluationConfig = [
 ];
 
 const developConfig = [
-    {
-        ref: 'AT Commands',
-        sampleSource: 'nrf/applications/serial_lte_modem',
-    },
     {
         ref: 'Shell Command Line Interface',
         sampleSource: 'nrf/samples/cellular/modem_shell',

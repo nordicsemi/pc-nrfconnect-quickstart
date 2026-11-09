@@ -13,7 +13,7 @@ import { getChoiceUnsafely } from '../../device/deviceSlice';
 
 const DtrHelp = () => {
     const choice = useAppSelector(getChoiceUnsafely);
-    if (choice.name !== 'AT Commands') return null;
+    if (choice.name !== 'Serial Modem') return null;
 
     return (
         <p className="tw-pt-2">
