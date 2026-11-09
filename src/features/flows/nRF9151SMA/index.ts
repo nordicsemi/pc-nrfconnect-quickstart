@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
 import Evaluate from '../../../common/steps/Evaluate';
@@ -15,6 +14,7 @@ import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
 import { nrf91LearnConfig } from '../nRF9151/learnConfig';
 import CustomEvaluate from './Evaluate';
+import Verify from './Verify';
 
 const infoConfig = {
     title: 'Massive IoT Powerhouse',

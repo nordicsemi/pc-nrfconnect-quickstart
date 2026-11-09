@@ -79,6 +79,73 @@ export const ResourceWithButton = ({
     </div>
 );
 
+const installAndOpenApp = async (
+    app: string,
+    device: { serialPortPath: string } | { serialNumber: string },
+    {
+        onInstallStart,
+        onInstallFinish,
+    }: { onInstallStart: () => void; onInstallFinish: () => void },
+) => {
+    const appInfo = await apps
+        .getDownloadableApps()
+        .then(({ apps: receivedApps }) =>
+            receivedApps.find(a => a.name === app && a.source === 'official'),
+        );
+
+    if (appInfo && !apps.isInstalled(appInfo)) {
+        onInstallStart();
+        try {
+            await apps.installDownloadableApp(appInfo);
+        } finally {
+            onInstallFinish();
+        }
+    }
+
+    openWindow.openApp(
+        {
+            name: app,
+            source: 'official',
+        },
+        {
+            device,
+        },
+    );
+
+    telemetry.sendEvent('Opened evaluation app', {
+        app,
+    });
+};
+
+export const AppLink = ({ app, label }: { app: string; label: string }) => {
+    const device = useAppSelector(getSelectedDeviceUnsafely);
+    const [isInstalling, setIsInstalling] = useState(false);
+
+    return (
+        <button
+            type="button"
+            className="tw-inline tw-h-min tw-p-0 tw-text-primary tw-underline"
+            disabled={isInstalling}
+            onClick={async () => {
+                await installAndOpenApp(
+                    app,
+                    { serialNumber: device.serialNumber },
+                    {
+                        onInstallStart: () => setIsInstalling(true),
+                        onInstallFinish: () => setIsInstalling(false),
+                    },
+                );
+
+                telemetry.sendEvent('Opened app from verification error', {
+                    app,
+                });
+            }}
+        >
+            {isInstalling ? `Installing ${label}...` : label}
+        </button>
+    );
+};
+
 export const AppResourceButton = ({
     description,
     links,
@@ -134,41 +201,24 @@ export const AppResourceButton = ({
                 variant="link-button"
                 size="xl"
                 disabled={disabled || isInstalling}
-                onClick={async () => {
-                    const appInfo = await apps
-                        .getDownloadableApps()
-                        .then(({ apps: receivedApps }) =>
-                            receivedApps.find(
-                                a => a.name === app && a.source === 'official',
-                            ),
-                        );
-
-                    if (appInfo && !apps.isInstalled(appInfo)) {
-                        setIsInstalling(true);
-                        onInstallStart?.();
-                        await apps.installDownloadableApp(appInfo);
-                        setIsInstalling(false);
-                        onInstallFinish?.();
-                    }
-
-                    const deviceOptions = path
-                        ? { serialPortPath: path }
-                        : { serialNumber: device.serialNumber };
-
-                    openWindow.openApp(
-                        {
-                            name: app,
-                            source: 'official',
-                        },
-                        {
-                            device: deviceOptions,
-                        },
-                    );
-
-                    telemetry.sendEvent('Opened evaluation app', {
+                onClick={() =>
+                    installAndOpenApp(
                         app,
-                    });
-                }}
+                        path
+                            ? { serialPortPath: path }
+                            : { serialNumber: device.serialNumber },
+                        {
+                            onInstallStart: () => {
+                                setIsInstalling(true);
+                                onInstallStart?.();
+                            },
+                            onInstallFinish: () => {
+                                setIsInstalling(false);
+                                onInstallFinish?.();
+                            },
+                        },
+                    )
+                }
                 className="tw-flex-1"
             >
                 {isInstalling ? 'Installing...' : `Open ${displayName}`}
