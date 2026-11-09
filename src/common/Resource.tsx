@@ -117,6 +117,7 @@ const installAndOpenApp = async (
     });
 };
 
+// TODO: if user is offline and installs, it will hang as "installing". But I kept existing behavior, so need to check other usages of installAndOpenApp
 export const AppLink = ({ app, label }: { app: string; label: string }) => {
     const device = useAppSelector(getSelectedDeviceUnsafely);
     const [isInstalling, setIsInstalling] = useState(false);
