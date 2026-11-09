@@ -50,10 +50,10 @@ general_app_features:
     description: Send feedback about the app and receive a response through DevZone
   - id: step_navigation
     name: Step navigation
-    description: Move backward and forward through the guided flow via a persistent step sidebar
+    description: Move backward and forward through the guided flow using a persistent step sidebar
   - id: restart_application
     name: Restart application
-    description: Restart the app via a keyboard shortcut (Ctrl+R / Command+R)
+    description: Restart the app using a keyboard shortcut (Ctrl+R / Command+R)
 
 device_specific_features:
   - id: nrf_cloud_support
