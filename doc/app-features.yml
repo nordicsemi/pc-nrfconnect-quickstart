@@ -8,7 +8,7 @@ statuses: [full, unsupported, not_applicable]
 general_app_features:
   - id: device_detection
     name: Device detection
-    description: "Identify connected kits, distiguish supported from not supported and mark not supported as incompatible/non-selectable"
+    description: Identify connected kits, distinguish supported from not supported and mark not supported as incompatible/non-selectable
   - id: device_list_kit_selection
     name: Device listing and selection
     description: List connected kits with family, device, and serial number, and select one to start the flow
@@ -52,8 +52,8 @@ general_app_features:
     name: Step navigation
     description: Move backward and forward through the guided flow via a persistent step sidebar
   - id: restart_application
-    name: Application restart
-    description: Restart the app using a keyboard shortcut (Ctrl+R or Command+R)
+    name: Restart application
+    description: Restart the app via a keyboard shortcut (Ctrl+R / Command+R)
 
 device_specific_features:
   - id: nrf_cloud_support
@@ -63,7 +63,7 @@ device_specific_features:
 shared_features: []
 
 supported_devices:
-  - device: "Nordic Thingy:91 X"
+  - device: Nordic Thingy:91 X
     pca: PCA20049
     verification_version: 1.12.0
     support:
@@ -172,17 +172,17 @@ supported_devices:
       nrf_cloud_support: unsupported
 
 unsupported_devices:
-  - device: "Nordic Thingy:52"
+  - device: Nordic Thingy:52
     pca: PCA20020
 
-  - device: "Nordic Thingy:53"
+  - device: Nordic Thingy:53
     pca: PCA20053
 
-  - device: "Nordic Thingy:91"
+  - device: Nordic Thingy:91
     pca: PCA20035
 
   - device: nPM 1300 EK
-    pca: PCA10152  
+    pca: PCA10152
 
   - device: nPM 1304 EK
     pca: PCA10195
@@ -200,7 +200,7 @@ unsupported_devices:
     pca: PCA10059
 
   - device: nRF5340 Audio DK
-    pca: PCA10121 
+    pca: PCA10121
 
   - device: nRF54H20 DK
     pca: PCA10175
@@ -210,6 +210,6 @@ unsupported_devices:
 
   - device: nRF9131 EK
     pca: PCA10165
-  
+
   - device: PPK2
     pca: PCA63100
