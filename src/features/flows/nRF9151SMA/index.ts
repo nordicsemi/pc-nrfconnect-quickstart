@@ -83,11 +83,6 @@ const programConfig = [
             label: 'Serial LTE Modem',
             href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
         },
-        firmwareNote: {
-            title: 'Increased power consumption',
-            content:
-                'Modem Trace is enabled; the current consumption will be higher than usual.',
-        },
         programmingOptions: {
             actions: [
                 {
