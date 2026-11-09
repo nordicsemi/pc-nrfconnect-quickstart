@@ -2,8 +2,14 @@
 
 ### Added
 
+- Serial Modem v2 firmware for the nRF9151 DK and the nRF9151 SMA DK.
 - Programming of board controller firmware for the nRF9151 DK and the nRF9151
   SMA DK when programming the Serial Modem v2 firmware.
+
+### Removed
+
+- Serial LTE Modem firmware from the nRF9151 DK and the nRF9151 SMA DK list of
+  supported firmware.
 
 ## 1.15.0 - 2026-10-26
 

@@ -80,11 +80,26 @@ const programConfig = [
         type: 'action-list',
         description: 'Evaluate the cellular modem using AT commands.',
         documentation: {
-            label: 'Serial LTE Modem',
+            label: 'Serial Modem',
+            // todo: fix link
             href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
         },
         programmingOptions: {
             actions: [
+                {
+                    // TODO: confirm progress-row title and whether a documentation link should be added
+                    type: 'program-board-controller',
+                    // TODO: verify that 1.2.1 is intended version
+                    version: '1.2.1',
+                    firmware: {
+                        coreLabel: 'Board Controller',
+                        file: '9151dk_board_controller_update_a871d6f.bin',
+                    },
+                },
+                {
+                    type: 'wait',
+                    durationMs: 2000,
+                },
                 {
                     type: 'program-modem-firmware',
                     firmware: {
@@ -103,27 +118,13 @@ const programConfig = [
                     durationMs: 2000,
                 },
                 {
-                    // TODO: confirm progress-row title and whether a documentation link should be added
-                    type: 'program-board-controller',
-                    // TODO: verify that 1.2.1 is intended version
-                    version: '1.2.1',
-                    firmware: {
-                        coreLabel: 'Board Controller',
-                        file: '9151dk_board_controller_update_a871d6f.bin',
-                    },
-                },
-                {
-                    // TODO: verify that 2000 ms is enough for the board controller to reboot and the device to re-enumerate
-                    type: 'wait',
-                    durationMs: 2000,
-                },
-                {
                     type: 'program',
                     firmware: {
                         core: 'Application',
-                        file: 'nrf9151dk_serial_lte_modem.hex',
+                        file: 'nrf9151dk_serial_modem.hex',
                         link: {
-                            label: 'Serial LTE Modem',
+                            label: 'Serial Modem',
+                            // todo: fix link
                             href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
                         },
                     },
