@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import Verify from '../../../common/steps/91FamilyVerify';
 import Apps from '../../../common/steps/Apps';
 import Develop from '../../../common/steps/Develop';
 import Evaluate from '../../../common/steps/Evaluate';
@@ -15,6 +14,7 @@ import Rename from '../../../common/steps/Rename';
 import { type Choice } from '../../device/deviceSlice';
 import { nrf91LearnConfig } from '../nRF9151/learnConfig';
 import CustomEvaluate from './Evaluate';
+import Verify from './Verify';
 
 const infoConfig = {
     title: 'Massive IoT Powerhouse',
@@ -76,20 +76,29 @@ const programConfig = [
         },
     },
     {
-        name: 'AT Commands',
+        name: 'Serial Modem',
         type: 'action-list',
-        description: 'Evaluate the cellular modem using AT commands.',
+        description: 'Use the device as a serial modem through AT commands.',
         documentation: {
-            label: 'Serial LTE Modem',
-            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
+            label: 'Serial Modem',
+            href: 'https://nrfconnectdocs.nordicsemi.com/addons/addon-serial_modem/latest/main/index.html',
         },
-        firmwareNote: {
-            title: 'Increased power consumption',
-            content:
-                'Modem Trace is enabled; the current consumption will be higher than usual.',
-        },
+        ncsAddon:
+            'app=ncs-serial-modem&branch=v2.0.0&manifest=&repo=https://github.com/nrfconnect/ncs-serial-modem',
         programmingOptions: {
             actions: [
+                {
+                    type: 'program-board-controller',
+                    version: '1.2.2',
+                    firmware: {
+                        coreLabel: 'Board Controller',
+                        file: '9151dk_board_controller_update_1.2.2.bin',
+                    },
+                },
+                {
+                    type: 'wait',
+                    durationMs: 2000,
+                },
                 {
                     type: 'program-modem-firmware',
                     firmware: {
@@ -111,10 +120,10 @@ const programConfig = [
                     type: 'program',
                     firmware: {
                         core: 'Application',
-                        file: 'nrf9151dk_serial_lte_modem.hex',
+                        file: 'nrf9151dk_serial_modem.hex',
                         link: {
-                            label: 'Serial LTE Modem',
-                            href: 'https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/applications/serial_lte_modem/README.html',
+                            label: 'Serial Modem',
+                            href: 'https://nrfconnectdocs.nordicsemi.com/addons/addon-serial_modem/latest/main/index.html',
                         },
                     },
                 },
@@ -183,7 +192,7 @@ const verificationConfig = {
             mode: 'SHELL' as const,
         },
         {
-            ref: 'AT Commands',
+            ref: 'Serial Modem',
             vComIndex: 0,
             mode: 'LINE' as const,
         },
@@ -219,7 +228,7 @@ const evaluationConfig = [
         component: CustomEvaluate,
     },
     {
-        ref: 'AT Commands',
+        ref: 'Serial Modem',
         resources: [
             {
                 app: 'pc-nrfconnect-serial-terminal',
@@ -270,10 +279,6 @@ const evaluationConfig = [
 ];
 
 const developConfig = [
-    {
-        ref: 'AT Commands',
-        sampleSource: 'nrf/applications/serial_lte_modem',
-    },
     {
         ref: 'Shell Command Line Interface',
         sampleSource: 'nrf/samples/cellular/modem_shell',
