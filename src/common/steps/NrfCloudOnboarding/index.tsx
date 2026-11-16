@@ -34,7 +34,6 @@ import {
     loadAccount,
     onboard,
     readAttestationToken,
-    refreshBatteryPercent,
     refreshProvisioning,
     selectOrganization,
 } from './effects';
@@ -49,8 +48,8 @@ import {
 } from './onboardingSlice';
 
 const NRF_CLOUD_LINK = 'https://app.memfault.com';
+const DEVICE_OVERVIEW_TAB = 'd-9263';
 const PROVISIONING_POLL_INTERVAL = 5000;
-const BATTERY_POLL_INTERVAL = 30000;
 
 const onboardingStages: {
     id: OnboardingStage;
@@ -132,12 +131,6 @@ const isProvisioningPending = (status?: ProvisioningStatus) =>
 const formatTime = (timestamp: string) =>
     new Date(timestamp).toLocaleTimeString();
 
-const batteryIcon = (percent: number) => {
-    if (percent > 60) return 'mdi-battery-high';
-    if (percent > 25) return 'mdi-battery-medium';
-    return 'mdi-battery-low';
-};
-
 const usePolling = (active: boolean, interval: number, poll: () => void) => {
     useEffect(() => {
         if (!active) return undefined;
@@ -168,7 +161,6 @@ const DeviceStatus = () => {
         deviceId = '',
         provisioning,
         provisioningError,
-        batteryPercent,
     } = useAppSelector(getOnboarding);
     const status = provisioning?.status;
 
@@ -176,19 +168,10 @@ const DeviceStatus = () => {
         () => dispatch(refreshProvisioning()),
         [dispatch],
     );
-    const pollBattery = useCallback(
-        () => dispatch(refreshBatteryPercent()),
-        [dispatch],
-    );
     usePolling(
         isProvisioningPending(status),
         PROVISIONING_POLL_INTERVAL,
         pollProvisioning,
-    );
-    usePolling(
-        batteryPercent === undefined,
-        BATTERY_POLL_INTERVAL,
-        pollBattery,
     );
 
     useEffect(() => {
@@ -201,7 +184,7 @@ const DeviceStatus = () => {
         selectedOrgSlug,
     )}/projects/${encodeURIComponent(
         selectedProjectSlug,
-    )}/devices/${encodeURIComponent(deviceId)}`;
+    )}/devices/${encodeURIComponent(deviceId)}?tab=${DEVICE_OVERVIEW_TAB}`;
     const checkIns = [
         provisioning?.firstContactAt &&
             `First contact ${formatTime(provisioning.firstContactAt)}`,
@@ -247,12 +230,6 @@ const DeviceStatus = () => {
                     )}
                 </div>
             </div>
-            {batteryPercent !== undefined && (
-                <div className="tw-flex tw-flex-row tw-items-center tw-gap-2">
-                    <span className={`mdi ${batteryIcon(batteryPercent)}`} />
-                    <span>Battery {Math.round(batteryPercent)}%</span>
-                </div>
-            )}
         </div>
     );
 };

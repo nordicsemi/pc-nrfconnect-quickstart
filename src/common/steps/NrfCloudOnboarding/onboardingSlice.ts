@@ -38,7 +38,6 @@ interface OnboardingState {
     deviceId?: string;
     provisioning?: Provisioning;
     provisioningError?: string;
-    batteryPercent?: number;
 }
 
 interface State {
@@ -131,9 +130,6 @@ const slice = createSlice({
         setProvisioningError: (state, { payload }: PayloadAction<string>) => {
             state.onboarding.provisioningError = payload;
         },
-        setBatteryPercent: (state, { payload }: PayloadAction<number>) => {
-            state.onboarding.batteryPercent = payload;
-        },
         resetAccount: state => {
             state.account = initialAccount;
             state.onboarding = { status: 'idle' };
@@ -158,7 +154,6 @@ export const {
     setOnboarding,
     setProvisioning,
     setProvisioningError,
-    setBatteryPercent,
     resetAccount,
     reset,
 } = slice.actions;

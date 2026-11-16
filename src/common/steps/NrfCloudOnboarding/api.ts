@@ -6,7 +6,6 @@
 
 import { HttpError } from '../../../features/flows/nRF54L15_cloud/evaluate/api';
 
-const MEMFAULT_API = 'https://api.memfault.com/api/v0';
 const NRFCLOUD_API = 'https://api.nrfcloud.com/v1';
 
 export type ProvisioningStatus =
@@ -99,34 +98,4 @@ export const fetchProvisioning = async (
         provisioning?: Provisioning;
     };
     return provisioning;
-};
-
-export const fetchBatteryPercent = async (
-    memfaultToken: string,
-    orgSlug: string,
-    projectSlug: string,
-    deviceId: string,
-): Promise<number | undefined> => {
-    const res = await fetch(
-        `${MEMFAULT_API}${projectPath(
-            orgSlug,
-            projectSlug,
-        )}/devices/${encodeURIComponent(deviceId)}/attributes?q=battery_soc_pct`,
-        { headers: bearer(memfaultToken) },
-    );
-    if (!res.ok) {
-        throw new HttpError(
-            res.status,
-            await errorMessage(
-                res,
-                `Failed to get the battery level (${res.status})`,
-            ),
-        );
-    }
-    const { data } = (await res.json()) as {
-        data: { string_key: string; state: { value?: unknown } | null }[];
-    };
-    const value = data.find(a => a.string_key === 'battery_soc_pct')?.state
-        ?.value;
-    return typeof value === 'number' ? value : undefined;
 };

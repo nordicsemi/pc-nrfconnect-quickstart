@@ -29,7 +29,7 @@ import {
 } from '../../../features/flows/nRF54L15_cloud/evaluate/api';
 import { reportEvaluateError } from '../../../features/flows/nRF54L15_cloud/evaluate/reportError';
 import runVerification from '../../sendATCommands';
-import { fetchBatteryPercent, fetchProvisioning, onboardDevice } from './api';
+import { fetchProvisioning, onboardDevice } from './api';
 import {
     getAccount,
     getOnboarding,
@@ -39,7 +39,6 @@ import {
     setAccountSuccess,
     setAttestationToken,
     setAttestationTokenError,
-    setBatteryPercent,
     setOnboarding,
     setProjects,
     setProvisioning,
@@ -261,29 +260,5 @@ export const refreshProvisioning =
             dispatch(setProvisioning(provisioning));
         } catch (e) {
             dispatch(setProvisioningError(describeError(e)));
-        }
-    };
-
-export const refreshBatteryPercent =
-    (): AppThunk<Promise<void>> => async (dispatch, getState) => {
-        const { selectedOrgSlug, selectedProjectSlug } = getAccount(getState());
-        const { deviceId } = getOnboarding(getState());
-        if (!selectedOrgSlug || !selectedProjectSlug || !deviceId) return;
-        try {
-            const batteryPercent = await dispatch(
-                withAccessToken(t =>
-                    fetchBatteryPercent(
-                        t,
-                        selectedOrgSlug,
-                        selectedProjectSlug,
-                        deviceId,
-                    ),
-                ),
-            );
-            if (batteryPercent !== undefined) {
-                dispatch(setBatteryPercent(batteryPercent));
-            }
-        } catch {
-            // Battery data is optional; the next poll retries.
         }
     };
