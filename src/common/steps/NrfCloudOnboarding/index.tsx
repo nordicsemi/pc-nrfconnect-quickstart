@@ -48,7 +48,6 @@ import {
 } from './onboardingSlice';
 
 const NRF_CLOUD_LINK = 'https://app.memfault.com';
-const DEVICE_OVERVIEW_TAB = 'd-9263';
 const PROVISIONING_POLL_INTERVAL = 5000;
 
 const onboardingStages: {
@@ -184,7 +183,7 @@ const DeviceStatus = () => {
         selectedOrgSlug,
     )}/projects/${encodeURIComponent(
         selectedProjectSlug,
-    )}/devices/${encodeURIComponent(deviceId)}?tab=${DEVICE_OVERVIEW_TAB}`;
+    )}/devices/${encodeURIComponent(deviceId)}`;
     const checkIns = [
         provisioning?.firstContactAt &&
             `First contact ${formatTime(provisioning.firstContactAt)}`,
