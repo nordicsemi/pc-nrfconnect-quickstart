@@ -29,12 +29,7 @@ import {
 } from '../../../features/flows/nRF54L15_cloud/evaluate/api';
 import { reportEvaluateError } from '../../../features/flows/nRF54L15_cloud/evaluate/reportError';
 import runVerification from '../../sendATCommands';
-import {
-    fetchBatteryPercent,
-    fetchNrfCloudToken,
-    fetchProvisioning,
-    onboardDevice,
-} from './api';
+import { fetchBatteryPercent, fetchProvisioning, onboardDevice } from './api';
 import {
     getAccount,
     getOnboarding,
@@ -45,7 +40,6 @@ import {
     setAttestationToken,
     setAttestationTokenError,
     setBatteryPercent,
-    setNrfCloudToken,
     setOnboarding,
     setProjects,
     setProvisioning,
@@ -105,28 +99,6 @@ const withAccessToken = <T>(request: (accessToken: string) => Promise<T>) =>
     withToken(
         state => getAccount(state).accessToken,
         refreshAccessToken,
-        request,
-    );
-
-const refreshNrfCloudToken =
-    (): AppThunk<Promise<string>> => async (dispatch, getState) => {
-        const { selectedOrgSlug, selectedProjectSlug } = getAccount(getState());
-        if (!selectedOrgSlug || !selectedProjectSlug) {
-            throw new Error('Select an organization and a project.');
-        }
-        const token = await dispatch(
-            withAccessToken(t =>
-                fetchNrfCloudToken(t, selectedOrgSlug, selectedProjectSlug),
-            ),
-        );
-        dispatch(setNrfCloudToken(token));
-        return token;
-    };
-
-const withNrfCloudToken = <T>(request: (nrfCloudToken: string) => Promise<T>) =>
-    withToken(
-        state => getAccount(state).nrfCloudToken,
-        refreshNrfCloudToken,
         request,
     );
 
@@ -245,7 +217,7 @@ export const onboard =
             phase = 'onboard';
             dispatch(setOnboarding({ status: 'loading', stage: 'onboard' }));
             const deviceId = await dispatch(
-                withNrfCloudToken(t =>
+                withAccessToken(t =>
                     onboardDevice(
                         t,
                         selectedOrgSlug,
@@ -277,7 +249,7 @@ export const refreshProvisioning =
         if (!selectedOrgSlug || !selectedProjectSlug || !deviceId) return;
         try {
             const provisioning = await dispatch(
-                withNrfCloudToken(t =>
+                withAccessToken(t =>
                     fetchProvisioning(
                         t,
                         selectedOrgSlug,

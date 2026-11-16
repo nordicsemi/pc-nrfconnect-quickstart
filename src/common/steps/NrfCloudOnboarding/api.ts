@@ -43,44 +43,8 @@ const projectPath = (orgSlug: string, projectSlug: string) =>
         orgSlug,
     )}/projects/${encodeURIComponent(projectSlug)}`;
 
-// nRF Cloud rejects the Memfault access token, so Memfault exchanges it for
-// a short-lived token scoped to the project.
-export const fetchNrfCloudToken = async (
-    memfaultToken: string,
-    orgSlug: string,
-    projectSlug: string,
-): Promise<string> => {
-    const res = await fetch(
-        `${MEMFAULT_API}${projectPath(orgSlug, projectSlug)}/cross-domain/token`,
-        {
-            method: 'POST',
-            headers: {
-                ...bearer(memfaultToken),
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                key_type: 'RSA',
-                permissions: ['device:read', 'device:write'],
-            }),
-        },
-    );
-    if (!res.ok) {
-        throw new HttpError(
-            res.status,
-            await errorMessage(
-                res,
-                `Failed to obtain nRF Cloud access token (${res.status})`,
-            ),
-        );
-    }
-    const { access_token: accessToken } = (await res.json()) as {
-        access_token: string;
-    };
-    return accessToken;
-};
-
 export const onboardDevice = async (
-    nrfCloudToken: string,
+    accessToken: string,
     orgSlug: string,
     projectSlug: string,
     attestationToken: string,
@@ -90,7 +54,7 @@ export const onboardDevice = async (
         {
             method: 'POST',
             headers: {
-                ...bearer(nrfCloudToken),
+                ...bearer(accessToken),
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ attestationToken }),
@@ -110,7 +74,7 @@ export const onboardDevice = async (
 };
 
 export const fetchProvisioning = async (
-    nrfCloudToken: string,
+    accessToken: string,
     orgSlug: string,
     projectSlug: string,
     deviceId: string,
@@ -120,7 +84,7 @@ export const fetchProvisioning = async (
             orgSlug,
             projectSlug,
         )}/claimed-devices/${encodeURIComponent(deviceId)}`,
-        { headers: bearer(nrfCloudToken) },
+        { headers: bearer(accessToken) },
     );
     if (!res.ok) {
         throw new HttpError(

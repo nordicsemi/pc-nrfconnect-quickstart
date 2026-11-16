@@ -24,7 +24,6 @@ export type OnboardingStage =
 interface AccountState {
     status: AsyncStatus;
     accessToken?: string;
-    nrfCloudToken?: string;
     organizations: Organization[];
     projects: Project[];
     selectedOrgSlug?: string;
@@ -91,14 +90,10 @@ const slice = createSlice({
         setAccessToken: (state, { payload }: PayloadAction<string>) => {
             state.account.accessToken = payload;
         },
-        setNrfCloudToken: (state, { payload }: PayloadAction<string>) => {
-            state.account.nrfCloudToken = payload;
-        },
         setSelectedOrgSlug: (state, { payload }: PayloadAction<string>) => {
             if (state.account.selectedOrgSlug !== payload) {
                 state.account.projects = [];
                 state.account.selectedProjectSlug = undefined;
-                state.account.nrfCloudToken = undefined;
                 state.onboarding = { status: 'idle' };
             }
             state.account.selectedOrgSlug = payload;
@@ -106,11 +101,9 @@ const slice = createSlice({
         setProjects: (state, { payload }: PayloadAction<Project[]>) => {
             state.account.projects = payload;
             state.account.selectedProjectSlug = payload[0]?.slug;
-            state.account.nrfCloudToken = undefined;
         },
         setSelectedProjectSlug: (state, { payload }: PayloadAction<string>) => {
             if (state.account.selectedProjectSlug !== payload) {
-                state.account.nrfCloudToken = undefined;
                 state.onboarding = { status: 'idle' };
             }
             state.account.selectedProjectSlug = payload;
@@ -157,7 +150,6 @@ export const {
     setAccountError,
     setAccountSuccess,
     setAccessToken,
-    setNrfCloudToken,
     setSelectedOrgSlug,
     setProjects,
     setSelectedProjectSlug,
