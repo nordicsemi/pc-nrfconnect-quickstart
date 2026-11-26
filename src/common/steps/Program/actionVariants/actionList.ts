@@ -10,6 +10,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import path from 'path';
+import semver from 'semver';
 
 import { alwaysProgramMwfNoATCheck } from '../../../../app/devOptions';
 import { type AppThunk } from '../../../../app/store';
@@ -20,6 +21,7 @@ import {
 } from '../../../../features/device/deviceLib';
 import {
     type ActionListEntry,
+    type ProgramBoardControllerAction,
     type ProgrammingAction,
     type ProgramModemFirmwareAction,
     type WaitAction,
@@ -180,12 +182,67 @@ const runModemFirmwareAction =
         }
     };
 
+const runProgramBoardControllerAction =
+    (
+        device: DeviceWithSerialnumber,
+        config: ProgramBoardControllerAction,
+    ): AppThunk<Promise<void>> =>
+    async dispatch => {
+        const { file } = config.firmware;
+
+        const versionCheckProgressWeight = 0.2;
+        const programmingProgressWeight = 1 - versionCheckProgressWeight;
+
+        dispatch(
+            // Give some initial progress for the version check
+            setProgrammingProgress((versionCheckProgressWeight * 100) / 2),
+        );
+
+        const currentVersion = await NrfutilDeviceLib.getBoardControllerVersion(
+            device,
+        )
+            .then(res => semver.valid(res.bc_fw_ver))
+            .catch(() => undefined);
+
+        if (currentVersion && semver.gte(currentVersion, config.version)) {
+            dispatch(setProgrammingProgress(100));
+            dispatch(runNextProgrammingAction(device));
+            return;
+        }
+
+        try {
+            await NrfutilDeviceLib.programBoardController(
+                device,
+                path.join(getFirmwareFolder(), file),
+                ({ totalProgressPercentage: progress }) =>
+                    dispatch(
+                        setProgrammingProgress(
+                            progress * programmingProgressWeight +
+                                versionCheckProgressWeight * 100,
+                        ),
+                    ),
+            );
+            dispatch(runNextProgrammingAction(device));
+        } catch (e) {
+            dispatch(
+                setError({
+                    icon: 'mdi-flash-alert-outline',
+                    text: 'Failed to program the board controller',
+                }),
+            );
+            throw e;
+        }
+    };
+
 export const runProgrammingAction =
     (device: DeviceWithSerialnumber, config: ActionListEntry): AppThunk =>
     dispatch => {
         switch (config.type) {
             case 'program-modem-firmware':
                 dispatch(runModemFirmwareAction(device, config));
+                break;
+            case 'program-board-controller':
+                dispatch(runProgramBoardControllerAction(device, config));
                 break;
             case 'program':
                 dispatch(runProgramAction(device, config));
@@ -247,6 +304,16 @@ export default (actionList: ActionListEntry[]): AppThunk<ProgrammingConfig> =>
                         const { core, link, coreLabel } = config.firmware;
                         return {
                             ...displayInfo(`${coreLabel || core} core`, link),
+                            config,
+                        };
+                    }
+                    case 'program-board-controller': {
+                        const { link, coreLabel } = config.firmware;
+                        return {
+                            ...displayInfo(
+                                coreLabel || 'Board Controller',
+                                link,
+                            ),
                             config,
                         };
                     }

@@ -5,7 +5,11 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { IssueBox, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    ExternalLink,
+    logger,
+    NoticeBox,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { useAppDispatch, useAppSelector } from '../../../app/store';
 import {
@@ -33,14 +37,37 @@ export interface Command {
     copiable?: boolean;
 }
 
+// copied from shared
+const ContactSupport = () => (
+    <p>
+        Contact support on{' '}
+        <ExternalLink
+            href="https://devzone.nordicsemi.com/support/add"
+            label="DevZone"
+        />{' '}
+        and provide the{' '}
+        <button
+            type="button"
+            className="tw-inline tw-h-min tw-p-0 tw-text-primary"
+            onClick={() => logger.openLogFileLocation()}
+        >
+            <span className="mdi mdi-text-box tw-mr-0.5 tw-text-base tw-leading-none" />
+            Log
+        </button>{' '}
+        if the problem persists.
+    </p>
+);
+
 const VerifyStep = ({
     path,
     mode,
     commands,
+    FailureHelp,
 }: {
     path: string;
     mode: 'LINE' | 'SHELL';
     commands: Command[];
+    FailureHelp?: React.ComponentType;
 }) => {
     const dispatch = useAppDispatch();
     const responses = useAppSelector(getResponses);
@@ -123,10 +150,16 @@ const VerifyStep = ({
                 </div>
                 {failed && (
                     <div className="tw-pt-8">
-                        <IssueBox
+                        <NoticeBox
                             mdiIcon="mdi-lightbulb-alert-outline"
                             color="tw-text-red"
                             title={failed}
+                            content={
+                                <>
+                                    <ContactSupport />
+                                    {FailureHelp && <FailureHelp />}
+                                </>
+                            }
                         />
                     </div>
                 )}
@@ -154,9 +187,11 @@ const VerifyStep = ({
 const VerifyConfigLayer = ({
     settings,
     commands,
+    FailureHelp,
 }: {
     settings: { ref: string; vComIndex: number; mode: 'LINE' | 'SHELL' }[];
     commands: Command[];
+    FailureHelp?: React.ComponentType;
 }) => {
     const device = useAppSelector(getSelectedDeviceUnsafely);
     const choice = useAppSelector(getChoiceUnsafely);
@@ -170,6 +205,7 @@ const VerifyConfigLayer = ({
                 path={path}
                 mode={choiceSettings.mode}
                 commands={commands}
+                FailureHelp={FailureHelp}
             />
         );
     }
@@ -180,6 +216,7 @@ const VerifyConfigLayer = ({
 export default (config: {
     settings: { ref: string; vComIndex: number; mode: 'LINE' | 'SHELL' }[];
     commands: Command[];
+    FailureHelp?: React.ComponentType;
 }) => ({
     name: 'Verify',
     component: () => VerifyConfigLayer({ ...config }),

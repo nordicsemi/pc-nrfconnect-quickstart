@@ -65,6 +65,12 @@ export interface ProgramModemFirmwareAction {
     vComIndex: number;
 }
 
+export interface ProgramBoardControllerAction {
+    type: 'program-board-controller';
+    firmware: Firmware;
+    version: string;
+}
+
 export interface ResetAction {
     type: 'reset';
 }
@@ -73,6 +79,7 @@ type BasicActions =
     | ProgrammingAction
     | WaitAction
     | ProgramModemFirmwareAction
+    | ProgramBoardControllerAction
     | ResetAction;
 
 export interface CustomAction {

@@ -59,6 +59,9 @@ device_specific_features:
   - id: nrf_cloud_support
     name: nRF Cloud support
     description: Guided flow includes nRF Cloud connectivity for the device
+  - id: bc_fw_programming
+    name: Board controller FW programming
+    description: Program board controller firmware
 
 shared_features: []
 
@@ -69,6 +72,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF52 DK
     pca: PCA10040
@@ -76,6 +80,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF52833 DK
     pca: PCA10100
@@ -83,6 +88,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF52840 DK
     pca: PCA10056
@@ -90,6 +96,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF5340 DK
     pca: PCA10095
@@ -97,6 +104,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF54L15 DK
     pca: PCA10156
@@ -104,6 +112,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: full
+      bc_fw_programming: unsupported
 
   - device: nRF54LC10 DK
     pca: PCA10226
@@ -111,6 +120,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF54LM20 DK
     pca: PCA10184
@@ -118,6 +128,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF54LS05 DK
     pca: PCA10214
@@ -125,6 +136,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF54LV10 DK
     pca: PCA10188
@@ -132,6 +144,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF7002 DK
     pca: PCA10143
@@ -139,6 +152,7 @@ supported_devices:
     support:
       device_hardware_verification: unsupported
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF9151 DK
     pca: PCA10171
@@ -146,6 +160,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: full
 
   - device: nRF9151 SMA DK
     pca: PCA10201
@@ -153,6 +168,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: full
 
   - device: nRF9160 DK
     pca: PCA10090
@@ -160,6 +176,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF9161 DK
     pca: PCA10153
@@ -167,6 +184,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF93M1 DK
     pca: PCA10232
@@ -174,6 +192,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
   - device: nRF93M1 DK
     pca: PCA10237
@@ -181,6 +200,7 @@ supported_devices:
     support:
       device_hardware_verification: full
       nrf_cloud_support: unsupported
+      bc_fw_programming: unsupported
 
 unsupported_devices:
   - device: Nordic Thingy:52
